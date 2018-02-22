@@ -1,0 +1,32 @@
+apply plugin: 'idea'
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "ch.supsi.dti.i2b.shrug.optitravel.Main";
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "com.sparkjava:spark-core:2.7.1";
+    compile "org.slf4j:slf4j-simple:1.7.9";
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+
+    test {
+        java {
+            srcDir 'test'
+        }
+    }
+}
+
+run{
+
+}
