@@ -6,7 +6,7 @@ import static spark.Spark.*;
 public class Main {
 
     public static void main(String[] args) {
-        Spark.staticFileLocation("/public/"); // Static files
+        Spark.staticFileLocation("/public"); // Static files
         get("/", (req, res) -> "Hello World");
     }
 }

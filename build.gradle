@@ -1,3 +1,7 @@
+plugins {
+    id 'com.github.ksoichiro.web.resource' version '1.7.3'
+}
+
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'application'
@@ -6,11 +10,13 @@ mainClassName = "ch.supsi.dti.i2b.shrug.optitravel.Main";
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
     compile "com.sparkjava:spark-core:2.7.1";
     compile "org.slf4j:slf4j-simple:1.7.9";
+    testCompile "org.mockito:mockito-core:2.+";
 }
 
 sourceSets {
@@ -24,6 +30,25 @@ sourceSets {
         java {
             srcDir 'test'
         }
+    }
+}
+
+webResource {
+    /*bower {
+        dependencies {
+            install name: 'bootstrap', version: '3.3.4'
+            install name: 'components-font-awesome', version: '4.3.0', outputName: 'font-awesome'
+        }
+    }*/
+
+    less {
+        enabled = true
+        src = './src/resources/src/less/'
+        dest = './src/resources/public/css'
+        // Default: ['**/*.less']
+        include = ['**/*.less']
+        exclude = ['**/_*.less']
+        minify = true
     }
 }
 
