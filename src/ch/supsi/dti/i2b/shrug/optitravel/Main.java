@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.MapQuest.MapQuestWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.MapQuest.MapType;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -20,7 +21,7 @@ public class Main extends Application {
         stage.show();
 
         MapQuestWrapper mapQuestWrapper = new MapQuestWrapper();
-        Image mapImage = mapQuestWrapper.getMapImage(46.0037, 8.9511, 7);
+        Image mapImage = mapQuestWrapper.getMapImage(46.0037, 8.9511, 17, MapType.HYB);
 
         ImageView imageView = new ImageView();
         imageView.setImage(mapImage);

@@ -9,6 +9,7 @@ import okio.Okio;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MapQuestWrapper {
     // https://developer.mapquest.com/documentation/
@@ -22,7 +23,7 @@ public class MapQuestWrapper {
         client = new HttpClient();
     }
 
-    public Image getMapImage(double lat, double lng, int zoom) throws IOException {
+    public Image getMapImage(double lat, double lng, int zoom, MapType mapType){
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
@@ -32,18 +33,29 @@ public class MapQuestWrapper {
                 .addQueryParameter("format", "jpg")
                 .addQueryParameter("center", String.format("%f,%f", lat, lng))
                 .addQueryParameter("zoom", String.format("%d", zoom))
-                .addQueryParameter("type", "hyb")
+                .addQueryParameter("type", mapType.toString().toLowerCase())
                 .build();
         Response response = client.get(url);
-        if(response != null && response.body() != null){
-            if(response.isSuccessful()) {
+        if(response != null && response.body() != null && response.isSuccessful()) {
+            try {
                 File temp = File.createTempFile("optitravel_mapquest", null);
                 BufferedSink sink = Okio.buffer(Okio.sink(temp));
                 sink.writeAll(response.body().source());
                 sink.close();
                 return new Image("file:" + temp.toString());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
             }
         }
         return null;
+    }
+
+    public Image getMapImage(double lat, double lng, int zoom) throws IOException {
+        return getMapImage(lat, lng, zoom, MapType.MAP);
+    }
+
+    public ArrayList<Place> getPOI(double lat, double lng){
+        return new ArrayList<Place>();
     }
 }
