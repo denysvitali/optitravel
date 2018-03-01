@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     testCompile "org.mockito:mockito-core:2.+";
+    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
 }
 
 sourceSets {

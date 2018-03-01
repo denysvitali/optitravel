@@ -1,0 +1,36 @@
+package ch.supsi.dti.i2b.shrug.optitravel.utilities;
+
+import ch.supsi.dti.i2b.shrug.optitravel.config.BuildConfig;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import java.io.IOException;
+
+public class HttpClient {
+    private OkHttpClient client;
+
+    public HttpClient(){
+        client = new OkHttpClient();
+    }
+
+    private Request getRequest(HttpUrl url){
+        Request r = new Request.Builder()
+                .url(url)
+                .header("User-Agent", "OptiTravel " + BuildConfig.getVersion())
+                .get()
+                .build();
+        return r;
+    }
+
+    public Response get(HttpUrl url) {
+        try {
+            Response r = client.newCall(getRequest(url)).execute();
+            return r;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
