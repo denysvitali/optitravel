@@ -5,8 +5,6 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.javascript.object.*;
-import com.lynden.gmapsfx.shapes.Polygon;
-import com.lynden.gmapsfx.shapes.PolygonOptions;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
@@ -46,8 +44,9 @@ public class Main extends Application {
 
 
         TransitLandAPIWrapper transitLandAPIWrapper = new TransitLandAPIWrapper();
+        ArrayList<Stop> stops;
         try {
-            ArrayList<Stop> stops = transitLandAPIWrapper.getStopsByRoute("r-u0nmf-449");
+            stops = transitLandAPIWrapper.getStopsByRoute("r-u0nmf-449");
             for(Stop s : stops){
                 System.out.println(s.getName());
                 System.out.println(s.getOperators().get(0).getName());
@@ -55,6 +54,7 @@ public class Main extends Application {
             }
         } catch (TransitLandAPIError transitLandAPIError) {
             transitLandAPIError.printStackTrace();
+            return;
         }
 
 
@@ -68,11 +68,6 @@ public class Main extends Application {
             LatLong chur_location = new LatLong(46.8508, 9.5320);
             MapOptions mapOptions = new MapOptions();
 
-            MarkerOptions markerOptions1 = new MarkerOptions();
-            markerOptions1.position(lugano_location);
-            markerOptions1.animation(Animation.DROP);
-
-            Marker lugano_marker = new Marker(markerOptions1);
 
             mapOptions.center(lugano_location)
                     .mapType(MapTypeIdEnum.ROADMAP)
@@ -85,7 +80,7 @@ public class Main extends Application {
                     .zoom(12);
             mapView.createMap(mapOptions);
 
-            LatLong poly1 = new LatLong(
+            /*LatLong poly1 = new LatLong(
                     lugano_location.getLatitude(),
                     lugano_location.getLongitude());
             LatLong poly2 = new LatLong(
@@ -109,13 +104,23 @@ public class Main extends Application {
                     .fillOpacity(0.5);
 
             Polygon pg = new Polygon(polygOpts);
+            mapView.getMap().addMapShape(pg);*/
+
+            for(Stop s : stops){
+                MarkerOptions markerOptions1 = new MarkerOptions();
+                markerOptions1.position(
+                        new LatLong(
+                                s.getCoordinates().getLatitude(),
+                                s.getCoordinates().getLongitude()
+                        )
+                );
+                markerOptions1.animation(Animation.DROP);
+                Marker marker = new Marker(markerOptions1);
+                mapView.getMap().addMarker(marker);
+            }
 
             //mapView.getMap().panToBounds(new LatLongBounds(lugano_location, chur_location, zurich_location, geneva_location));
 
-            mapView.getMap().addMapShape(pg);
-
-
-            mapView.getMap().addMarker(lugano_marker);
         });
         root.getChildren().add(mapView);
 
