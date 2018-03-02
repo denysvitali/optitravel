@@ -39,8 +39,8 @@ public class TransitLandAPIWrapper {
         } else {
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
-    }
 
+    }
     public ArrayList<Stop> getStopsNear(GPSCoordinates coordinates) throws TransitLandAPIError {
         // /api/v1/stops
         HttpUrl url = new HttpUrl.Builder()

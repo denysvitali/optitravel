@@ -63,7 +63,7 @@ public class Main extends Application {
                     .zoom(12);
             mapView.createMap(mapOptions);
 
-            for(Stop s : stops){
+            /*for(Stop s : stops){
                 MarkerOptions markerOptions1 = new MarkerOptions();
                 markerOptions1.position(
                         new LatLong(
@@ -74,7 +74,7 @@ public class Main extends Application {
                 markerOptions1.animation(Animation.DROP);
                 Marker marker = new Marker(markerOptions1);
                 mapView.getMap().addMarker(marker);
-            }
+            }*/
 
 
             Polyline polyline = new Polyline();
@@ -83,21 +83,60 @@ public class Main extends Application {
 
             LatLong[] ary = new LatLong[path.size()];
             MVCArray mvcArray;
+            LatLongBounds bounds = new LatLongBounds();
 
             for(int i = 0; i<path.size(); i++){
                 ary[i] = new LatLong(path.get(i).getLatitude(), path.get(i).getLongitude());
+                bounds.extend(ary[i]);
             }
 
             mvcArray = new MVCArray(ary);
 
-            PolylineOptions polyOpts = new PolylineOptions()
+
+            PolylineOptions poly_opts = new PolylineOptions()
                     .path(mvcArray)
-                    .strokeColor("red")
-                    .strokeWeight(2);
+                    .strokeColor("#f1c40f")
+                    .strokeWeight(4)
+                    .zIndex(2);
+
+            PolylineOptions poly_stroke_opts = new PolylineOptions()
+                    .path(mvcArray)
+                    .strokeColor("#999")
+                    .strokeWeight(6)
+                    .strokeOpacity(1)
+                    .zIndex(1);
 
 
-            Polyline poly = new Polyline(polyOpts);
+            Polyline poly = new Polyline(poly_opts);
+            Polyline poly_stroke = new Polyline(poly_stroke_opts);
+
             mapView.getMap().addMapShape(poly);
+            mapView.getMap().addMapShape(poly_stroke);
+            mapView.getMap().fitBounds(bounds);
+
+
+            MarkerOptions markerOptions1 = new MarkerOptions();
+            markerOptions1.position(
+                    new LatLong(
+                            ary[0].getLatitude(),
+                            ary[0].getLongitude()
+                    )
+            );
+            markerOptions1.animation(Animation.DROP);
+            Marker marker_start = new Marker(markerOptions1);
+
+            MarkerOptions markerOptions2 = new MarkerOptions();
+            markerOptions2.position(
+                    new LatLong(
+                            ary[path.size()-1].getLatitude(),
+                            ary[path.size()-1].getLongitude()
+                    )
+            );
+            markerOptions2.animation(Animation.DROP);
+            Marker marker_end = new Marker(markerOptions2);
+
+            //mapView.getMap().addMarker(marker_start);
+            mapView.getMap().addMarker(marker_end);
 
 
         });
