@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class TransitLandAPIWrapper {
-    private static String HOST = "transit.land";
+    private static String HOST = "api.transit.land";
     private HttpClient client;
 
     public TransitLandAPIWrapper(){
@@ -83,9 +83,9 @@ public class TransitLandAPIWrapper {
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/route_stop_patterns")
-                .addQueryParameter("trip", trip)
+                .addQueryParameter("trips", trip)
                 .build();
-        Response response = client.get(url);
+        Response response = client.get(url, 20*1000);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(),

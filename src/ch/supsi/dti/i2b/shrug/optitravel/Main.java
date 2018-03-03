@@ -34,7 +34,7 @@ public class Main extends Application {
         GoogleMapView mapView = new GoogleMapView();
         //mapView.setKey("AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4");
 
-        transitLandAPIWrapper.AgetRouteStopPatterns("131689", (rsp)->{
+        transitLandAPIWrapper.AgetRouteStopPatterns("1", (rsp)->{
             Platform.runLater(()->{
                 updateMapWithTrip(mapView, rsp);
             });
