@@ -112,6 +112,45 @@ public class TransitLandAPIWrapper {
         t.start();
     }
 
+    public ArrayList<RouteStopPattern> getRouteStopPatternsByStopsVisited(ArrayList<Stop> stops) throws TransitLandAPIError {
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/route_stop_patterns")
+                .addQueryParameter("stops_visited",
+                        stops.stream()
+                        .map(Stop::getId)
+                        .reduce((t,u)->t + "," + u)
+                        .get()
+                )
+                .build();
+        Response response = client.get(url);
+        if(response != null && response.isSuccessful() && response.body() != null){
+            try {
+                RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(),
+                        RouteStopPatternsResult.class);
+                return a.getRouteStopPatterns();
+            } catch(IOException ex){
+                return null;
+            }
+        } else {
+            throw new TransitLandAPIError("Unable to get any response for this request");
+        }
+    }
+
+    public void AgetRouteStopPatternsByStopsVisited(ArrayList<Stop> stops, Callback<ArrayList<RouteStopPattern>> cb){
+        Runnable r = ()->{
+            try {
+                cb.exec(getRouteStopPatternsByStopsVisited(stops));
+            } catch (TransitLandAPIError transitLandAPIError) {
+                transitLandAPIError.printStackTrace();
+                cb.exec(null);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+    }
+
     public Operator getOperatorById(String oid) throws TransitLandAPIError {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
@@ -130,6 +169,28 @@ public class TransitLandAPIWrapper {
                 e.printStackTrace();
             }
             return operator;
+        }
+        throw new TransitLandAPIError("Unable to get any response for this request");
+    }
+
+    public Stop getStopById(String oid) throws TransitLandAPIError {
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/stops")
+                .addQueryParameter("onestop_id", oid)
+                .build();
+        Response response = client.get(url);
+        if(response != null && response.isSuccessful() && response.body() != null){
+            Stop stop = null;
+            try {
+                stop = JsonIterator.deserialize(response.body().string(), StopsResult.class)
+                        .getStops()
+                        .get(0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return stop;
         }
         throw new TransitLandAPIError("Unable to get any response for this request");
     }

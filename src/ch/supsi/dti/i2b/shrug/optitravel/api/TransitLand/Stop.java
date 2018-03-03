@@ -13,7 +13,6 @@ public class Stop {
 
     }
 
-
     public String getId() {
         return onestop_id;
     }
