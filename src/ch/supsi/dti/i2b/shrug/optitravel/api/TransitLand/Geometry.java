@@ -2,8 +2,6 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
 import com.jsoniter.any.Any;
 
-import java.util.ArrayList;
-
 public class Geometry {
     private String type;
     private Any coordinates;
@@ -12,27 +10,28 @@ public class Geometry {
 
     }
 
-    public GPSCoordinates getCoordinates() {
-        if(type.equals("Point")){
-            return new GPSCoordinates(coordinates);
+    public GPSCoordinates getCoordinates() throws TransitLandAPIError {
+        if(!type.equals("Point")) {
+            throw new TransitLandAPIError("This Geometry is not a Point!");
         }
-        return null;
+        return new GPSCoordinates(coordinates);
     }
 
-    public ArrayList<GPSCoordinates> getPath(){
+    public LineString getLineString() throws TransitLandAPIError {
 
-        if(type.equals("LineString")){
-            ArrayList<GPSCoordinates> coordinates = new ArrayList<>();
-
-            ArrayList<ArrayList<Double>> mCoordinates = this.coordinates.as(ArrayList.class);
-
-            for(ArrayList<Double> d : mCoordinates){
-                coordinates.add(new GPSCoordinates(d));
-            }
-            return coordinates;
-        } else {
-            return null;
+        if(!type.equals("LineString")) {
+            throw new TransitLandAPIError("This Geometry is not a LineString!");
         }
+
+        return new LineString(this.coordinates);
+    }
+
+
+    public Polygon getPolygon() throws TransitLandAPIError {
+        if(!type.equals("Polygon")){
+            throw new TransitLandAPIError("This Geometry is not a Polygon!");
+        }
+        return new Polygon(coordinates);
     }
     public String getType() {
         return type;

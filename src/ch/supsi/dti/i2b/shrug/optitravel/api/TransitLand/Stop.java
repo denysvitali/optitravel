@@ -31,6 +31,10 @@ public class Stop {
     }
 
     public GPSCoordinates getCoordinates() {
-        return geometry.getCoordinates();
+        try {
+            return geometry.getCoordinates();
+        } catch (TransitLandAPIError transitLandAPIError) {
+            return null;
+        }
     }
 }

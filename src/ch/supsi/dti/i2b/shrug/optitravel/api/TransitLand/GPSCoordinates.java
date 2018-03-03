@@ -20,8 +20,8 @@ public class GPSCoordinates {
 
     public GPSCoordinates(Any any){
         List<Any> a = any.asList();
-        this.latitude = a.get(0).toDouble();
-        this.longitude = a.get(1).toDouble();
+        this.latitude = a.get(1).toDouble();
+        this.longitude = a.get(0).toDouble();
     }
 
     public GPSCoordinates(double lat, double lon) {

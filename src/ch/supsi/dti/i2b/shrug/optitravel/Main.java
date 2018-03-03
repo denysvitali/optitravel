@@ -7,6 +7,7 @@ import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -27,27 +28,17 @@ public class Main extends Application {
 
         TransitLandAPIWrapper transitLandAPIWrapper = new TransitLandAPIWrapper();
         ArrayList<Stop> stops;
-        ArrayList<RouteStopPattern> rsp;
-        try {
-            //stops = transitLandAPIWrapper.getStopsByRoute("r-u0nmf-449");
-            stops = transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.019421,8.974028));
-            for(Stop s : stops){
-                System.out.println(s.getName());
-                System.out.println(s.getId());
-                System.out.println(s.getRoutes().get(0).getId());
-                System.out.println(s.getOperators().get(0).getName());
-                System.out.println(s.getCoordinates().getLatitude() + "," + s.getCoordinates().getLongitude());
-            }
-            rsp = transitLandAPIWrapper.getRouteStopPatterns("131270");
 
-        } catch (TransitLandAPIError transitLandAPIError) {
-            transitLandAPIError.printStackTrace();
-            return;
-        }
 
 
         GoogleMapView mapView = new GoogleMapView();
         //mapView.setKey("AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4");
+
+        transitLandAPIWrapper.AgetRouteStopPatterns("131689", (rsp)->{
+            Platform.runLater(()->{
+                updateMapWithTrip(mapView, rsp);
+            });
+        });
         mapView.addMapInializedListener(() -> {
             LatLong lugano_location = new LatLong(46.0037, 8.9511);
             MapOptions mapOptions = new MapOptions();
@@ -77,70 +68,78 @@ public class Main extends Application {
             }*/
 
 
-            Polyline polyline = new Polyline();
-            Geometry geom = rsp.get(0).getGeometry();
-            ArrayList<GPSCoordinates> path = geom.getPath();
-
-            LatLong[] ary = new LatLong[path.size()];
-            MVCArray mvcArray;
-            LatLongBounds bounds = new LatLongBounds();
-
-            for(int i = 0; i<path.size(); i++){
-                ary[i] = new LatLong(path.get(i).getLatitude(), path.get(i).getLongitude());
-                bounds.extend(ary[i]);
-            }
-
-            mvcArray = new MVCArray(ary);
-
-
-            PolylineOptions poly_opts = new PolylineOptions()
-                    .path(mvcArray)
-                    .strokeColor("#f1c40f")
-                    .strokeWeight(4)
-                    .zIndex(2);
-
-            PolylineOptions poly_stroke_opts = new PolylineOptions()
-                    .path(mvcArray)
-                    .strokeColor("#999")
-                    .strokeWeight(6)
-                    .strokeOpacity(1)
-                    .zIndex(1);
-
-
-            Polyline poly = new Polyline(poly_opts);
-            Polyline poly_stroke = new Polyline(poly_stroke_opts);
-
-            mapView.getMap().addMapShape(poly);
-            mapView.getMap().addMapShape(poly_stroke);
-            mapView.getMap().fitBounds(bounds);
-
-
-            MarkerOptions markerOptions1 = new MarkerOptions();
-            markerOptions1.position(
-                    new LatLong(
-                            ary[0].getLatitude(),
-                            ary[0].getLongitude()
-                    )
-            );
-            markerOptions1.animation(Animation.DROP);
-            Marker marker_start = new Marker(markerOptions1);
-
-            MarkerOptions markerOptions2 = new MarkerOptions();
-            markerOptions2.position(
-                    new LatLong(
-                            ary[path.size()-1].getLatitude(),
-                            ary[path.size()-1].getLongitude()
-                    )
-            );
-            markerOptions2.animation(Animation.DROP);
-            Marker marker_end = new Marker(markerOptions2);
-
-            //mapView.getMap().addMarker(marker_start);
-            mapView.getMap().addMarker(marker_end);
-
-
         });
         root.getChildren().add(mapView);
 
+    }
+
+    private void updateMapWithTrip(GoogleMapView mapView, ArrayList<RouteStopPattern> rsp){
+        System.out.println(rsp);
+        Polyline polyline = new Polyline();
+        Geometry geom = rsp.get(0).getGeometry();
+        LineString path = null;
+        try {
+            path = geom.getLineString();
+        } catch (TransitLandAPIError transitLandAPIError) {
+            transitLandAPIError.printStackTrace();
+            return;
+        }
+
+        LatLong[] ary = new LatLong[path.size()];
+        MVCArray mvcArray;
+        LatLongBounds bounds = new LatLongBounds();
+
+        for(int i = 0; i<path.size(); i++){
+            ary[i] = new LatLong(path.get(i).getLatitude(), path.get(i).getLongitude());
+            bounds.extend(ary[i]);
+        }
+
+        mvcArray = new MVCArray(ary);
+
+
+        PolylineOptions poly_opts = new PolylineOptions()
+                .path(mvcArray)
+                .strokeColor("#f1c40f")
+                .strokeWeight(4)
+                .zIndex(2);
+
+        PolylineOptions poly_stroke_opts = new PolylineOptions()
+                .path(mvcArray)
+                .strokeColor("#999")
+                .strokeWeight(6)
+                .strokeOpacity(1)
+                .zIndex(1);
+
+
+        Polyline poly = new Polyline(poly_opts);
+        Polyline poly_stroke = new Polyline(poly_stroke_opts);
+
+        mapView.getMap().addMapShape(poly);
+        mapView.getMap().addMapShape(poly_stroke);
+        mapView.getMap().fitBounds(bounds);
+
+
+        MarkerOptions markerOptions1 = new MarkerOptions();
+        markerOptions1.position(
+                new LatLong(
+                        ary[0].getLatitude(),
+                        ary[0].getLongitude()
+                )
+        );
+        markerOptions1.animation(Animation.DROP);
+        Marker marker_start = new Marker(markerOptions1);
+
+        MarkerOptions markerOptions2 = new MarkerOptions();
+        markerOptions2.position(
+                new LatLong(
+                        ary[path.size()-1].getLatitude(),
+                        ary[path.size()-1].getLongitude()
+                )
+        );
+        markerOptions2.animation(Animation.DROP);
+        Marker marker_end = new Marker(markerOptions2);
+
+        //mapView.getMap().addMarker(marker_start);
+        mapView.getMap().addMarker(marker_end);
     }
 }
