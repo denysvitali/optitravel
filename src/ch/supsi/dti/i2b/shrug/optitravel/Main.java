@@ -7,7 +7,6 @@ import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -47,16 +46,17 @@ public class Main extends Application {
 
         mapView.addMapInializedListener(() -> {
 
-            transitLandAPIWrapper.AgetRouteStopPatternsByStopsVisited(stops, (rsp)->{
+            /*transitLandAPIWrapper.AgetRouteStopPatternsByStopsVisited(stops, (rsp)->{
                 Platform.runLater(()->{
                     updateMapWithTrip(mapView, rsp);
                 });
-            });
+            });*/
 
             LatLong lugano_location = new LatLong(46.0037, 8.9511);
+            LatLong di_location = new LatLong(-50.6060175,165.9640191);
             MapOptions mapOptions = new MapOptions();
 
-            mapOptions.center(lugano_location)
+            mapOptions.center(di_location)
                     .mapType(MapTypeIdEnum.ROADMAP)
                     .overviewMapControl(false)
                     .panControl(false)
