@@ -58,3 +58,7 @@ hs_err_pid*
 
 # Build
 build/
+
+# IDEA
+*.iml
+*.ipr
