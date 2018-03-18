@@ -1,5 +1,8 @@
 package ch.supsi.dti.i2b.shrug.optitravel;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitFeed.TransitFeedWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.GPSCoordinates;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
@@ -12,6 +15,8 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public class Main extends Application {
 
@@ -44,6 +49,16 @@ public class Main extends Application {
 
         GoogleMapView mapView = new GoogleMapView();
         //mapView.setKey("AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4");
+
+        GTFSrsWrapper gtfsrs = new GTFSrsWrapper();
+        try {
+            List<Stop> stops = gtfsrs.getStopsByTrip("t-6ebb8e-lamone-cadempinostazione");
+            for(Stop s : stops){
+                System.out.println(String.format("%s - %s", s.getUid(), s.getName()));
+            }
+        } catch (GTFSrsError gtfSrsError) {
+            gtfSrsError.printStackTrace();
+        }
 
         mapView.addMapInializedListener(() -> {
 

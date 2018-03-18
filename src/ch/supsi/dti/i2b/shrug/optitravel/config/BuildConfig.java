@@ -9,4 +9,7 @@ public class BuildConfig {
     public static String getVersion(){
         return String.format("v%d.%d.%d", MAJOR, MINOR, PATCH);
     }
+    public static boolean isDev(){
+        return buildConfig == BuildFlavour.DEV;
+    }
 }
