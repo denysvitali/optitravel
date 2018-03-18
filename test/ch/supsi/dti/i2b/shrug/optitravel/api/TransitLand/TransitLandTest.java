@@ -20,7 +20,7 @@ class TransitLandTest{
     @Test
     void map() {
 
-        GPSCoordinates gps = new GPSCoordinates(46.174372,8.911756);
+        GPSCoordinates gps = new GPSCoordinates();
         TransitLandAPIWrapper mockedTRL = mock(TransitLandAPIWrapper.class);
         ArrayList<Stop> arr = new ArrayList<Stop>();
 
@@ -28,7 +28,10 @@ class TransitLandTest{
 
             mockedTRL.getStopsNear(gps);
             verify(mockedTRL).getStopsNear(gps);
-            assertEquals("Gerra Piano, Paese",apiWrapper.getStopsNear(gps).get(0).getName());
+
+            ArrayList<Stop> gerra = apiWrapper.getStopsNear(new GPSCoordinates(46.174372,8.911756));
+            assertEquals("Gerra Piano, Paese", gerra.get(0).getName());
+            assertEquals("s-u0nqdvc3me-gerrapianopaese", gerra.get(0).getId());
 
             mockedTRL.getRouteStopPatterns(anyString());
             verify(mockedTRL).getRouteStopPatterns(anyString());
