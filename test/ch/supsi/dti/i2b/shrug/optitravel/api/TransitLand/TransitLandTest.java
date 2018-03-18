@@ -5,6 +5,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.Mockito.*;
@@ -29,7 +36,7 @@ class TransitLandTest{
             mockedTRL.getStopsNear(gps);
             verify(mockedTRL).getStopsNear(gps);
 
-            ArrayList<Stop> gerra = apiWrapper.getStopsNear(new GPSCoordinates(46.174372,8.911756));
+            List<Stop> gerra = apiWrapper.getStopsNear(new GPSCoordinates(46.174372,8.911756));
             assertEquals("Gerra Piano, Paese", gerra.get(0).getName());
             assertEquals("s-u0nqdvc3me-gerrapianopaese", gerra.get(0).getId());
 
@@ -55,7 +62,16 @@ class TransitLandTest{
 
     }
 
-
+    void getNearestStop(){
+        Coordinate c = new Coordinate(45.485188, 9.202954);
+        GPSCoordinates gpsCoordinates = new GPSCoordinates(c);
+        try {
+            List<Stop> stops = apiWrapper.getStopsNear(gpsCoordinates, 100);
+            assertEquals(0, Distance.distance(c, stops.get(0).getCoordinates().asCoordinate()));
+        } catch (TransitLandAPIError transitLandAPIError) {
+            fail(transitLandAPIError);
+        }
+    }
 
     @Test
     void SBB_Operator(){

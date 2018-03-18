@@ -13,6 +13,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends Application {
 
@@ -49,10 +50,10 @@ public class Main extends Application {
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.172491,8.800491)).get(1));
 */
             //milano
-            ArrayList<Stop> thestops = transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.485188, 9.202954));
-            stops.add(thestops.get(16));
+            List<Stop> thestops = transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.485188, 9.202954),250);
+            stops.add(thestops.get(0));
             //saronno
-            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.625286,9.030723)).get(0));
+            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.625286,9.030723),250).get(0));
 
         } catch (TransitLandAPIError transitLandAPIError) {
             transitLandAPIError.printStackTrace();
