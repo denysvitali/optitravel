@@ -64,6 +64,7 @@ public class TransitLandAPIWrapper {
                 .addPathSegments("api/v1/stops")
                 .addQueryParameter("lat", String.format("%f", coordinates.getLatitude()))
                 .addQueryParameter("lon", String.format("%f", coordinates.getLongitude()))
+                .addQueryParameter("r", "250")
                 .build();
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){

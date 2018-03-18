@@ -43,10 +43,17 @@ public class Main extends Application {
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.0311802,8.9218289)).get(0));
 */
 
-            //Gerra Piano Paese
+/*            //Gerra Piano Paese
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.174372,8.911756)).get(0));
             //Locarno stazione
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.172491,8.800491)).get(1));
+*/
+            //milano
+            ArrayList<Stop> thestops = transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.485188, 9.202954));
+            stops.add(thestops.get(16));
+            //saronno
+            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.625286,9.030723)).get(0));
+
         } catch (TransitLandAPIError transitLandAPIError) {
             transitLandAPIError.printStackTrace();
         }
