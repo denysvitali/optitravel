@@ -7,6 +7,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class HttpClient {
     private OkHttpClient client;
@@ -22,6 +23,19 @@ public class HttpClient {
                 .get()
                 .build();
         return r;
+    }
+
+    public Response get(HttpUrl url, long timeout){
+        OkHttpClient timeoutClient = new OkHttpClient.Builder()
+                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                .build();
+        try {
+            Response r = timeoutClient.newCall(getRequest(url)).execute();
+            return r;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Response get(HttpUrl url) {

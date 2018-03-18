@@ -100,6 +100,15 @@
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/ch.qos.logback/logback-core/1.2.1/8025b15884a6a3909c6b0fe881c81b647f2fc7fe/logback-core-1.2.1-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Gradle: com.jsoniter:jsoniter:0.9.19">
+      <CLASSES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jsoniter/jsoniter/0.9.19/95420aa8e842e888930b286f48f7145872b26ce9/jsoniter-0.9.19.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jsoniter/jsoniter/0.9.19/2cbf4021c13136b4e6f5c3ca662cdee9660980e9/jsoniter-0.9.19-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Gradle: com.lynden:GMapsFX:2.12.0">
       <CLASSES>
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.lynden/GMapsFX/2.12.0/9834dd5665503a8e27fb406ce204775ac26caca3/GMapsFX-2.12.0.jar!/" />
@@ -145,13 +154,13 @@
         <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy/1.7.9/d4715044fac07c15e0578933fa0dd25cd64ad0cc/byte-buddy-1.7.9-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Gradle: org.mockito:mockito-core:2.15.0">
+    <library name="Gradle: org.mockito:mockito-core:2.16.0">
       <CLASSES>
-        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/2.15.0/b84bfbbc29cd22c9529409627af6ea2897f4fa85/mockito-core-2.15.0.jar!/" />
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/2.16.0/a022ee494c753789a1e7cae75099de81d8a5cea6/mockito-core-2.16.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES>
-        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/2.15.0/46e8ee5e6fdfaee85be74093e324d53c881e0567/mockito-core-2.15.0-sources.jar!/" />
+        <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.mockito/mockito-core/2.16.0/8e7e6e75205e67839992bbb2c13094b684f8a475/mockito-core-2.16.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Gradle: org.objenesis:objenesis:2.6">
