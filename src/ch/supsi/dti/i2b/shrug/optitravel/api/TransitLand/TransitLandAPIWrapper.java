@@ -78,6 +78,29 @@ public class TransitLandAPIWrapper {
         }
     }
 
+    public ArrayList<Stop> getStopsNear(GPSCoordinates coordinates, double meters) throws TransitLandAPIError {
+        // /api/v1/stops
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/stops")
+                .addQueryParameter("lat", String.format("%f", coordinates.getLatitude()))
+                .addQueryParameter("lon", String.format("%f", coordinates.getLongitude()))
+                .addQueryParameter("r", String.format("%f", meters))
+                .build();
+        Response response = client.get(url);
+        if(response != null && response.isSuccessful() && response.body() != null){
+            try {
+                StopsResult a = JsonIterator.deserialize(response.body().string(), StopsResult.class);
+                return a.getStops();
+            } catch(IOException ex){
+                return null;
+            }
+        } else {
+            throw new TransitLandAPIError("Unable to get any response for this request");
+        }
+    }
+
     public ArrayList<RouteStopPattern> getRouteStopPatterns(String trip) throws TransitLandAPIError {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
