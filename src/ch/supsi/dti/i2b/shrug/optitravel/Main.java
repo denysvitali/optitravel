@@ -2,6 +2,7 @@ package ch.supsi.dti.i2b.shrug.optitravel;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.RouteStopPattern;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.ScheduleStopPair;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
@@ -109,6 +110,7 @@ public class Main extends Application {
 
         try {
 
+            ArrayList<ScheduleStopPair> a = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0).getTrips().get(0));
             System.out.println(rsp);
             //rsp.get(0).getTrips().stream().forEach(System.out::println);
             rsp.get(0).getStopPattern().stream().forEach(System.out::println);
