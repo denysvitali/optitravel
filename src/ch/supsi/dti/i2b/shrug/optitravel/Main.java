@@ -1,27 +1,24 @@
 package ch.supsi.dti.i2b.shrug.optitravel;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsWrapper;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitFeed.TransitFeedWrapper;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.GPSCoordinates;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.*;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.RouteStopPattern;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.ScheduleStopPair;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main extends Application {
 
     private TransitLandAPIWrapper transitLandAPIWrapper;
-    private TransitFeedWrapper transitFeedWrapper;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -32,44 +29,46 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
-        transitFeedWrapper = new TransitFeedWrapper();
+
         transitLandAPIWrapper = new TransitLandAPIWrapper();
 
-        /*try {
-            transitFeedWrapper.getLocations();
-        } catch (TransitFeedError transitFeedError) {
-            transitFeedError.printStackTrace();
-        }*/
 
-        try {
-            System.out.println(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.0059236,8.9502303)).get(0).getId());
-        } catch (TransitLandAPIError transitLandAPIError) {
-            transitLandAPIError.printStackTrace();
-        }
 
         GoogleMapView mapView = new GoogleMapView();
         //mapView.setKey("AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4");
 
-        GTFSrsWrapper gtfsrs = new GTFSrsWrapper();
-        List<Stop> stops;
+        ArrayList<Stop> stops = new ArrayList<>();
         try {
-            stops = gtfsrs.getStopsByTrip("t-4840d5-domodossolastazione");
-            for(Stop s : stops){
-                System.out.println(String.format("%s - %s", s.getUid(), s.getName()));
-            }
-        } catch (GTFSrsError gtfSrsError) {
-            gtfSrsError.printStackTrace();
-            return;
+/*            // Manno, La Monda
+            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.0248152,8.9174549)).get(0));
+            // Manno, Suglio
+            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.0311802,8.9218289)).get(0));
+*/
+
+/*            //Gerra Piano Paese
+            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.174372,8.911756)).get(0));
+            //Locarno stazione
+            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.172491,8.800491)).get(1));
+*/
+            //milano
+            List<Stop> thestops = transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.485188, 9.202954),250);
+            stops.add(thestops.get(0));
+            //saronno
+            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.625286,9.030723),250).get(0));
+
+        } catch (TransitLandAPIError transitLandAPIError) {
+            transitLandAPIError.printStackTrace();
         }
 
         mapView.addMapInializedListener(() -> {
 
-            /*transitLandAPIWrapper.AgetRouteStopPatternsByStopsVisited(stops, (rsp)->{
+            transitLandAPIWrapper.AgetRouteStopPatternsByStopsVisited(stops, (rsp)->{
                 Platform.runLater(()->{
                     updateMapWithTrip(mapView, rsp);
                 });
-            });*/
+            });
 
+            LatLong lugano_location = new LatLong(46.0037, 8.9511);
             LatLong di_location = new LatLong(-50.6060175,165.9640191);
             MapOptions mapOptions = new MapOptions();
 
@@ -84,45 +83,50 @@ public class Main extends Application {
                     .zoom(12);
             mapView.createMap(mapOptions);
 
-            LatLongBounds bounds = new LatLongBounds();
-
-            for(Stop s : stops){
-                /*MarkerOptions markerOptions1 = new MarkerOptions();
+            /*for(Stop s : stops){
+                MarkerOptions markerOptions1 = new MarkerOptions();
                 markerOptions1.position(
                         new LatLong(
-                                s.getLat(),
-                                s.getLng()
+                                s.getCoordinates().getLatitude(),
+                                s.getCoordinates().getLongitude()
                         )
                 );
                 markerOptions1.animation(Animation.DROP);
                 Marker marker = new Marker(markerOptions1);
-                mapView.getMap().addMarker(marker);*/
-                bounds.extend(new LatLong(
-                        s.getLat(),
-                        s.getLng()
-                ));
-            }
-
-            MarkerOptions markerOptions1 = new MarkerOptions();
-            markerOptions1.position(
-                    new LatLong(
-                            stops.get(stops.size()-1).getLat(),
-                            stops.get(stops.size()-1).getLng()
-                    )
-            );
-            markerOptions1.animation(Animation.DROP);
-            Marker marker = new Marker(markerOptions1);
-            mapView.getMap().addMarker(marker);
+                mapView.getMap().addMarker(marker);
+            }*/
 
 
+        });
+        root.getChildren().add(mapView);
+
+    }
+
+    private void updateMapWithTrip(GoogleMapView mapView, ArrayList<RouteStopPattern> rsp){
+        if(rsp.size() == 0){
+            System.out.println("RSP is empty!");
+            return;
+        }
+
+        try {
+
+            ArrayList<ScheduleStopPair> a = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0).getTrips().get(0));
+            System.out.println(rsp);
+            //rsp.get(0).getTrips().stream().forEach(System.out::println);
+            rsp.get(0).getStopPattern().stream().forEach(System.out::println);
+            Polyline polyline = new Polyline();
+            Geometry geom = rsp.get(0).getGeometry();
+            LineString path = null;
+            path = geom.getLineString();
+
+            LatLong[] ary = new LatLong[path.size()];
             MVCArray mvcArray;
-            LatLong[] ary = new LatLong[stops.size()];
+            LatLongBounds bounds = new LatLongBounds();
 
-            for (int i = 0; i < stops.size(); i++) {
-                ary[i] = new LatLong(stops.get(i).getLat(), stops.get(i).getLng());
+            for (int i = 0; i < path.size(); i++) {
+                ary[i] = new LatLong(path.get(i).getLatitude(), path.get(i).getLongitude());
+                bounds.extend(ary[i]);
             }
-
-            mapView.getMap().setCenter(ary[0]);
 
             mvcArray = new MVCArray(ary);
 
@@ -149,10 +153,30 @@ public class Main extends Application {
             mapView.getMap().fitBounds(bounds);
 
 
-            mapView.getMap().panToBounds(bounds);
+            MarkerOptions markerOptions1 = new MarkerOptions();
+            markerOptions1.position(
+                    new LatLong(
+                            ary[0].getLatitude(),
+                            ary[0].getLongitude()
+                    )
+            );
+            markerOptions1.animation(Animation.DROP);
+            Marker marker_start = new Marker(markerOptions1);
 
-        });
-        root.getChildren().add(mapView);
+            MarkerOptions markerOptions2 = new MarkerOptions();
+            markerOptions2.position(
+                    new LatLong(
+                            ary[path.size() - 1].getLatitude(),
+                            ary[path.size() - 1].getLongitude()
+                    )
+            );
+            markerOptions2.animation(Animation.DROP);
+            Marker marker_end = new Marker(markerOptions2);
 
+            //mapView.getMap().addMarker(marker_start);
+            mapView.getMap().addMarker(marker_end);
+        } catch (TransitLandAPIError transitLandAPIError) {
+            transitLandAPIError.printStackTrace();
+        }
     }
 }

@@ -1,9 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.OperatorsResult;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.RouteStopPattern;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.RouteStopPatternsResult;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.StopsResult;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.*;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
@@ -115,9 +112,28 @@ public class TransitLandAPIWrapper {
         Response response = client.get(url, 20*1000);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
-                RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(),
-                        RouteStopPatternsResult.class);
+                RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(), RouteStopPatternsResult.class);
                 return a.getRouteStopPatterns();
+            } catch(IOException ex){
+                return null;
+            }
+        } else {
+            throw new TransitLandAPIError("Unable to get any response for this request");
+        }
+    }
+
+    public ArrayList<ScheduleStopPair> getScheduleStopPair(String trip) throws TransitLandAPIError {
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/schedule_stop_pairs")
+                .addQueryParameter("trip", trip)
+                .build();
+        Response response = client.get(url, 20*1000);
+        if(response != null && response.isSuccessful() && response.body() != null){
+            try {
+                ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
+                return a.getScheduleStopPairs();
             } catch(IOException ex){
                 return null;
             }
