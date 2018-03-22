@@ -13,6 +13,15 @@ class GTFSrsTest {
     public GTFSrsTest(){
         gtfSrsWrapper = new GTFSrsWrapper();
     }
+    
+    @Test
+    void TestConnection(){
+        try {
+            assertEquals(true, gtfSrsWrapper.isOnline());
+        } catch (GTFSrsError gtfSrsError) {
+            fail(gtfSrsError);
+        }
+    }
 
     @Test
     void StopsByTripId(){

@@ -13,13 +13,32 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GTFSrsWrapper {
-    public static final String HOST = (BuildConfig.isDev()?"localhost":"gtfs.denv.it");
-    public static final int PORT = (BuildConfig.isDev()?8000:443);
-    public static final String SCHEME = (BuildConfig.isDev()?"http":"https");
+    public static final String HOST = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? "localhost": "gtfs.ded1.denv.it");
+    public static final int PORT = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? 8000 : 443);
+    public static final String SCHEME = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? "http" : "https");
     private HttpClient client;
 
     public GTFSrsWrapper(){
         this.client = new HttpClient();
+    }
+    
+    public boolean isOnline() throws GTFSrsError {
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .port(PORT)
+                .scheme(SCHEME)
+                .addPathSegments("api/")
+                .build();
+        Response response = client.get(url);
+        if(response != null && response.isSuccessful() && response.body() != null){
+            try {
+                return response.body().string().equals("gtfs-server");
+            } catch (IOException e) {
+                throw new GTFSrsError("Unable to parse body as String");
+            }
+        } else {
+            throw new GTFSrsError("Unable to get any response for this request");
+        }
     }
 
     public List<Stop> getStopsByTrip(String tid) throws GTFSrsError {
