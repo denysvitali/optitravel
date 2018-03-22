@@ -103,12 +103,12 @@ public class TransitLandAPIWrapper {
         }
     }
 
-    public ArrayList<RouteStopPattern> getRouteStopPatterns(String trip) throws TransitLandAPIError {
+    public List<RouteStopPattern> getRouteStopPatterns(String trip) throws TransitLandAPIError {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/route_stop_patterns")
-                .addQueryParameter("trips", trip)
+                .addQueryParameter("trip", trip)
                 .build();
         Response response = client.get(url, 20*1000);
         if(response != null && response.isSuccessful() && response.body() != null){
@@ -123,7 +123,22 @@ public class TransitLandAPIWrapper {
         }
     }
 
-    public ArrayList<ScheduleStopPair> getScheduleStopPair(String trip) throws TransitLandAPIError {
+
+
+    public void AgetRouteStopPatterns(String trip, Callback<List<RouteStopPattern>> cb){
+        Runnable r = ()->{
+            try {
+                cb.exec(getRouteStopPatterns(trip));
+            } catch (TransitLandAPIError transitLandAPIError) {
+                transitLandAPIError.printStackTrace();
+                cb.exec(null);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+    }
+
+    public List<ScheduleStopPair> getScheduleStopPair(String trip) throws TransitLandAPIError {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
@@ -143,10 +158,10 @@ public class TransitLandAPIWrapper {
         }
     }
 
-    public void AgetRouteStopPatterns(String trip, Callback<ArrayList<RouteStopPattern>> cb){
+    public void AgetScheduleStopPair(String trip, Callback<List<ScheduleStopPair>> cb){
         Runnable r = ()->{
             try {
-                cb.exec(getRouteStopPatterns(trip));
+                cb.exec(getScheduleStopPair(trip));
             } catch (TransitLandAPIError transitLandAPIError) {
                 transitLandAPIError.printStackTrace();
                 cb.exec(null);
@@ -156,7 +171,39 @@ public class TransitLandAPIWrapper {
         t.start();
     }
 
-    public ArrayList<RouteStopPattern> getRouteStopPatternsByStopsVisited(ArrayList<Stop> stops) throws TransitLandAPIError {
+    public List<ScheduleStopPair> getScheduleStopPair(RouteStopPattern rsp) throws TransitLandAPIError {
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/schedule_stop_pairs")
+                .addQueryParameter("route_stop_pattern_onestop_id", rsp.getId())
+                .build();
+        Response response = client.get(url, 20*1000);
+        if(response != null && response.isSuccessful() && response.body() != null){
+            try {
+                ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
+                return a.getScheduleStopPairs();
+            } catch(IOException ex){
+                return null;
+            }
+        } else {
+            throw new TransitLandAPIError("Unable to get any response for this request");
+        }
+    }
+
+    public void AgetScheduleStopPair(RouteStopPattern rsp, Callback<List<ScheduleStopPair>> cb){
+        Runnable r = ()->{
+            try {
+                cb.exec(getScheduleStopPair(rsp));
+            } catch (TransitLandAPIError transitLandAPIError) {
+                transitLandAPIError.printStackTrace();
+                cb.exec(null);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+    }
+    public List<RouteStopPattern> getRouteStopPatternsByStopsVisited(List<Stop> stops) throws TransitLandAPIError {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
@@ -182,7 +229,7 @@ public class TransitLandAPIWrapper {
         }
     }
 
-    public void AgetRouteStopPatternsByStopsVisited(ArrayList<Stop> stops, Callback<ArrayList<RouteStopPattern>> cb){
+    public void AgetRouteStopPatternsByStopsVisited(ArrayList<Stop> stops, Callback<List<RouteStopPattern>> cb){
         Runnable r = ()->{
             try {
                 cb.exec(getRouteStopPatternsByStopsVisited(stops));

@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,17 +45,18 @@ public class Main extends Application {
             // Manno, Suglio
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.0311802,8.9218289)).get(0));
 */
-
-/*            //Gerra Piano Paese
+/*
+           //Gerra Piano Paese
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.174372,8.911756)).get(0));
             //Locarno stazione
-            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.172491,8.800491)).get(1));
+            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.172491,8.800491)).get(0));
 */
             //milano
             List<Stop> thestops = transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.485188, 9.202954),250);
             stops.add(thestops.get(0));
             //saronno
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.625286,9.030723),250).get(0));
+
 
         } catch (TransitLandAPIError transitLandAPIError) {
             transitLandAPIError.printStackTrace();
@@ -102,15 +104,20 @@ public class Main extends Application {
 
     }
 
-    private void updateMapWithTrip(GoogleMapView mapView, ArrayList<RouteStopPattern> rsp){
+    private void updateMapWithTrip(GoogleMapView mapView, List<RouteStopPattern> rsp){
         if(rsp.size() == 0){
             System.out.println("RSP is empty!");
             return;
         }
 
         try {
+//route stop pattern id
+            List<ScheduleStopPair> a = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0).getTrips().get(0));
+            List<ScheduleStopPair> b = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0));
 
-            ArrayList<ScheduleStopPair> a = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0).getTrips().get(0));
+            List<RouteStopPattern> c = transitLandAPIWrapper.getRouteStopPatterns(rsp.get(0).getTrips().get(0));
+
+            List<Stop> d = transitLandAPIWrapper.getStopsByRoute(rsp.get(0).getRouteOnestopId());
             System.out.println(rsp);
             //rsp.get(0).getTrips().stream().forEach(System.out::println);
             rsp.get(0).getStopPattern().stream().forEach(System.out::println);
