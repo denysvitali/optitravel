@@ -5,6 +5,7 @@ public class Meta {
     private String sort_order;
     private int per_page;
     private int offset;
+    private String next;
 
     public int getOffset() {
         return offset;
@@ -20,5 +21,8 @@ public class Meta {
 
     public String getSort_order() {
         return sort_order;
+    }
+    public String getNext() {
+        return next;
     }
 }
