@@ -147,9 +147,13 @@ public enum RouteType {
     public static RouteType getRoute(int index){
         RouteType rt = map.get(index);
         if(rt==null){
-            return map.get(index-index%100);
+            return getRouteCategory(index);
         } else {
             return rt;
         }
+    }
+    
+    public static RouteType getRouteCategory(int index){
+        return map.get(index - index % 100);
     }
 }

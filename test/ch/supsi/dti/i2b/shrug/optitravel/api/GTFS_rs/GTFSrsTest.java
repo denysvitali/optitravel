@@ -60,6 +60,8 @@ class GTFSrsTest {
     @Test
     public void testRouteType(){
         RouteType rt = RouteType.getRoute(1508);
-        System.out.println(rt);
+        assertEquals(RouteType.TAXI_SERVICE, RouteType.getRoute(1508));
+        assertEquals(RouteType.AIRPORT_LINK_FERRY_SERVICE, RouteType.getRoute(1012));
+        assertEquals(RouteType.WATER_TRANSPORT_SERVICE, RouteType.getRouteCategory(1012));
     }
 }
