@@ -6,7 +6,7 @@ public class Route {
     public String short_name;
     public String long_name;
     public String description;
-    public RouteType route_type;
+    public int type;
 
     public String getUID() {
         return uid;
@@ -29,6 +29,6 @@ public class Route {
     }
 
     public RouteType getRouteType() {
-        return route_type;
+        return RouteType.getRoute(type);
     }
 }
