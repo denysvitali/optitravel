@@ -1,5 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.RouteType;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
 import org.junit.jupiter.api.Test;
 
@@ -54,5 +55,11 @@ class GTFSrsTest {
         assertEquals(0, stops.get(0).getType());
 
 
+    }
+    
+    @Test
+    public void testRouteType(){
+        RouteType rt = RouteType.getRoute(1508);
+        System.out.println(rt);
     }
 }
