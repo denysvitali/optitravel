@@ -4,14 +4,14 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh 'gradle build' 
+                sh './gradlew build' 
                 archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true 
             }
         }
 
         stage('Test') {
             steps {
-                sh 'gradle test' 
+                sh './gradlew test' 
                 junit '**/target/*.xml' 
             }
         }
