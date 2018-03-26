@@ -33,11 +33,7 @@ public class GTFSrsWrapper {
                 .build();
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                return response.body().string().equals("gtfs-server");
-            } catch (IOException e) {
-                throw new GTFSrsError("Unable to parse body as String");
-            }
+                return response.isSuccessful();
         } else {
             throw new GTFSrsError("Unable to get any response for this request");
         }
