@@ -1,9 +1,5 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Agency;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Route;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.RouteType;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,7 +13,7 @@ class GTFSrsTest {
         gtfSrsWrapper = new GTFSrsWrapper();
     }
     
-    @Test
+    /*@Test
     void TestConnection(){
         try {
             assertEquals(true, gtfSrsWrapper.isOnline());
@@ -26,7 +22,6 @@ class GTFSrsTest {
         }
     }
 
-    /*
     @Test
     void StopsByTripId(){
         String trip_id = "t-6ebb8e-lamone-cadempinostazione";
