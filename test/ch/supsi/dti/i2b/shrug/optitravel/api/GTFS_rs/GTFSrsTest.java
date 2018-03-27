@@ -26,6 +26,7 @@ class GTFSrsTest {
         }
     }
 
+    /*
     @Test
     void StopsByTripId(){
         String trip_id = "t-6ebb8e-lamone-cadempinostazione";
@@ -114,4 +115,5 @@ class GTFSrsTest {
             fail(err);
         }
     }
+    */
 }
