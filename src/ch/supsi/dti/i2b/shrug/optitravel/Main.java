@@ -1,6 +1,10 @@
 package ch.supsi.dti.i2b.shrug.optitravel;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.*;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Geometry;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.LineString;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.RouteStopPattern;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.ScheduleStopPair;
 import com.lynden.gmapsfx.GoogleMapView;
@@ -13,7 +17,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,7 +114,7 @@ public class Main extends Application {
         }
 
         try {
-//route stop pattern id
+            //route stop pattern id
             List<ScheduleStopPair> a = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0).getTrips().get(0));
             List<ScheduleStopPair> b = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0));
 

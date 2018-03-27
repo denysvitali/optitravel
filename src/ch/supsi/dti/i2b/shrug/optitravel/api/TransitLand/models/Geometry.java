@@ -1,5 +1,6 @@
-package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
+package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import com.jsoniter.any.Any;
 
 public class Geometry {
