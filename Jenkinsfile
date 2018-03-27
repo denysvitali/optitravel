@@ -1,7 +1,10 @@
 pipeline {
     agent any
-    cleanWs()
+    deleteDir()
     stages {
+        stage('Checkout') {
+                checkout scm
+        }
         stage('Build') {
             steps {
                 sh './gradlew build' 
