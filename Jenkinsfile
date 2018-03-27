@@ -1,19 +1,19 @@
-pipeline {
-    agent any
+node {
+    stage('Clean') {
+        deleteDir()
+    }
 
-    stages {
-        stage('Build') {
-            steps {
-                sh './gradlew build' 
-                archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true 
-            }
-        }
+    stage('Checkout') {
+        checkout scm
+    }
 
-        stage('Test') {
-            steps {
-                sh './gradlew test' 
-                junit 'build/test-results/**/*.xml'
-            }
-        }
+    stage('Build') {
+        sh './gradlew build'
+        archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+    }
+
+    stage('Test') {
+        sh './gradlew test'
+        junit 'build/test-results/**/*.xml'
     }
 }
