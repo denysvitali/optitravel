@@ -1,10 +1,12 @@
-pipeline {
-    agent any
-    deleteDir()
-    stages {
+node {
+        stage('Clean') {
+            deleteDir()
+        }
+
         stage('Checkout') {
                 checkout scm
         }
+
         stage('Build') {
             steps {
                 sh './gradlew build' 
