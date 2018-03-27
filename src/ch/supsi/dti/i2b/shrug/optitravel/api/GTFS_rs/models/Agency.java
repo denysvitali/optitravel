@@ -1,12 +1,19 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
-public class Agency {
+import ch.supsi.dti.i2b.shrug.optitravel.models.Operator;
+
+public class Agency extends Operator {
     String uid;
     String name;
     String url;
     String timezone;
     String lang;
     String phone;
+
+    public Agency(String agencyUID) {
+        // TODO: Fetch other fields from API? (@denvit)
+        this.uid = agencyUID;
+    }
 
     public String getName() {
         return name;

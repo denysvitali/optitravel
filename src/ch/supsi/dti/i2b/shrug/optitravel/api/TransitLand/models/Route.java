@@ -1,11 +1,11 @@
-package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
+package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.enums.FeatureStatus;
 import com.jsoniter.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
-public class Route {
+public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
     private String route_onestop_id;
     private String name;
     private Operator operator;

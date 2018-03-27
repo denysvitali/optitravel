@@ -1,5 +1,8 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Operator;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.*;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;

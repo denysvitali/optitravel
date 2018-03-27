@@ -1,8 +1,11 @@
-package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
+package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models;
+
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 
 import java.util.ArrayList;
 
-public class Stop {
+public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     private Geometry geometry;
     private String onestop_id;
     private String name;
@@ -19,6 +22,15 @@ public class Stop {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Coordinate getCoordinate() {
+        GPSCoordinates coordinates = getCoordinates();
+        if(coordinates == null){
+            return null;
+        }
+        return new Coordinate(coordinates.getLatitude(), coordinates.getLongitude());
     }
 
     public ArrayList<Operator> getOperators() {

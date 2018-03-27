@@ -1,6 +1,8 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
-public class Stop {
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+
+public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     private String uid;
     private String name;
     private double lat;
@@ -10,6 +12,11 @@ public class Stop {
 
     public String getName() {
         return this.name;
+    }
+
+    @Override
+    public Coordinate getCoordinate() {
+        return new Coordinate(lat, lng);
     }
 
     public double getLat() {
