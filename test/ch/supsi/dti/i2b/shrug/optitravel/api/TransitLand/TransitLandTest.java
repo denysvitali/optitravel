@@ -1,5 +1,8 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Operator;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.RouteStopPattern;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import org.junit.jupiter.api.Test;
@@ -8,7 +11,6 @@ import java.util.ArrayList;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
