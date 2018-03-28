@@ -13,8 +13,13 @@ import com.lynden.gmapsfx.shapes.Polyline;
 import com.lynden.gmapsfx.shapes.PolylineOptions;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -26,7 +31,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        StackPane root = new StackPane();
+
+        Parent root = FXMLLoader.load(getClass().getResource("/ui/main.fxml"));
         Scene scene = new Scene(root, 800, 600);
 
         stage.setTitle("OptiTravel");
@@ -35,7 +41,16 @@ public class Main extends Application {
 
         transitLandAPIWrapper = new TransitLandAPIWrapper();
 
+        AnchorPane ap = (AnchorPane) root.lookup("#ap-mapview");
+        TextField partenza = (TextField) root.lookup("#tf_partenza");
+        TextField arrivo = (TextField) root.lookup("#tf_arrivo");
+
+        partenza.setText("Saronno");
+        arrivo.setText("Milano, Stazione Centrale");
+
+
         GoogleMapView mapView = new GoogleMapView();
+        ap.getChildren().add(mapView);
         //mapView.setKey("AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4");
 
         ArrayList<Stop> stops = new ArrayList<>();
@@ -106,7 +121,7 @@ public class Main extends Application {
 
 
         });
-        root.getChildren().add(mapView);
+        //root.getChildren().add(mapView);
 
     }
 
