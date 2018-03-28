@@ -17,6 +17,7 @@
 <?import javafx.scene.text.Text?>
 
 <?import com.lynden.gmapsfx.GoogleMapView?>
+<?import com.jfoenix.controls.JFXButton?>
 <VBox prefHeight="475.0" prefWidth="767.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <MenuBar VBox.vgrow="NEVER">
@@ -106,7 +107,16 @@
                         <CheckBox mnemonicParsing="false" text="Taxi" />
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
                            <children>
-                              <Button alignment="CENTER" layoutX="8.0" layoutY="12.0" mnemonicParsing="false" prefWidth="200.0" text="Cerca" textAlignment="CENTER" />
+                              <JFXButton
+                                      buttonType="RAISED"
+                                      style="-fx-background-color: #2980b9; -fx-text-fill: #FFF;"
+                                      alignment="CENTER"
+                                      layoutX="8.0"
+                                      layoutY="12.0"
+                                      mnemonicParsing="false"
+                                      prefWidth="200.0"
+                                      text="Cerca"
+                                      textAlignment="CENTER" />
                            </children>
                         </AnchorPane>
                      </children>
