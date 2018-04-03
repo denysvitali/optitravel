@@ -73,11 +73,15 @@ public class TransitLandAPIWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 StopsResult a = JsonIterator.deserialize(response.body().string(), StopsResult.class);
+                response.close();
                 return sortStops(coordinates, a.getStops());
             } catch(IOException ex){
+                response.close();
                 return null;
             }
         } else {
+            if(response!=null)
+                response.close();
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
     }
@@ -96,11 +100,15 @@ public class TransitLandAPIWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 StopsResult a = JsonIterator.deserialize(response.body().string(), StopsResult.class);
+                response.close();
                 return sortStops(coordinates, a.getStops());
             } catch(IOException ex){
+                response.close();
                 return null;
             }
         } else {
+            if(response!=null)
+                response.close();
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
     }
@@ -116,11 +124,15 @@ public class TransitLandAPIWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(), RouteStopPatternsResult.class);
+                response.close();
                 return a.getRouteStopPatterns();
             } catch(IOException ex){
+                response.close();
                 return null;
             }
         } else {
+            if(response!=null)
+                response.close();
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
     }
@@ -151,11 +163,15 @@ public class TransitLandAPIWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
+                response.close();
                 return a.getScheduleStopPairs();
             } catch(IOException ex){
+                response.close();
                 return null;
             }
         } else {
+            if(response!=null)
+                response.close();
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
     }
@@ -184,11 +200,15 @@ public class TransitLandAPIWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
+                response.close();
                 return a.getScheduleStopPairs();
             } catch(IOException ex){
+                response.close();
                 return null;
             }
         } else {
+            if(response!=null)
+                response.close();
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
     }
@@ -213,17 +233,20 @@ public class TransitLandAPIWrapper {
                 .addPathSegments("api/v1/schedule_stop_pairs")
                 .addQueryParameter("route_stop_pattern_onestop_id", rsp.getId())
                 .addQueryParameter("date", year+"-"+month+"-"+day)
-
                 .build();
         Response response = client.get(url, 20*1000);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
+                response.close();
                 return a.getScheduleStopPairs();
             } catch(IOException ex){
+                response.close();
                 return null;
             }
         } else {
+            if(response!=null)
+                response.close();
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
     }
@@ -258,11 +281,15 @@ public class TransitLandAPIWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
+                response.close();
                 return a.getScheduleStopPairs();
             } catch(IOException ex){
+                response.close();
                 return null;
             }
         } else {
+            if(response!=null)
+                response.close();
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
     }
@@ -297,11 +324,15 @@ public class TransitLandAPIWrapper {
             try {
                 RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(),
                         RouteStopPatternsResult.class);
+                response.close();
                 return a.getRouteStopPatterns();
             } catch(IOException ex){
+                response.close();
                 return null;
             }
         } else {
+            if(response!=null)
+                response.close();
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
     }
@@ -336,8 +367,11 @@ public class TransitLandAPIWrapper {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            response.close();
             return operator;
         }
+        if(response!=null)
+            response.close();
         throw new TransitLandAPIError("Unable to get any response for this request");
     }
 
@@ -358,8 +392,11 @@ public class TransitLandAPIWrapper {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            response.close();
             return stop;
         }
+        if(response!=null)
+            response.close();
         throw new TransitLandAPIError("Unable to get any response for this request");
     }
 
@@ -377,5 +414,11 @@ public class TransitLandAPIWrapper {
             }
             return 0;
         }).collect(Collectors.toList());
+    }
+
+    public void destroy() {
+        if(client != null){
+            client.destroy();
+        }
     }
 }
