@@ -47,4 +47,12 @@ public class HttpClient {
         }
         return null;
     }
+
+    public void destroy() {
+        if(client != null){
+            System.out.println("Destroying client");
+            client.connectionPool().evictAll();
+            client = null;
+        }
+    }
 }
