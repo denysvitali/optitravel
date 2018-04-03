@@ -10,6 +10,10 @@ public class Agency extends Operator {
     String lang;
     String phone;
 
+    public Agency(){
+
+    }
+
     public Agency(String agencyUID) {
         // TODO: Fetch other fields from API? (@denvit)
         this.uid = agencyUID;
