@@ -24,6 +24,6 @@ node {
 
     stage('Push to SUPSI') {
         sh "git remote add supsi https://${SUPSI_SCM_LOGIN_USR}:${SUPSI_SCM_LOGIN_PSW}@scm.ti-edu.ch/repogit/labingsw012017201812.git"
-        sh "git push origin/$(git rev-parse --abbrev-ref HEAD) supsi/$(git rev-parse --abbrev-ref HEAD)"
+        sh "git push origin/\$(git rev-parse --abbrev-ref HEAD) supsi/\$(git rev-parse --abbrev-ref HEAD)"
     }
 }
