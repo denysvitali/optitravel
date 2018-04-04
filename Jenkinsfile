@@ -22,6 +22,6 @@ node {
         withCredentials([usernameColonPassword(credentialsId: 'jenkins-supsi-scm-login', variable: 'USRPW')]) {
             sh "git remote add supsi https://${USRPW}@scm.ti-edu.ch/repogit/labingsw012017201812.git"
         }
-        sh "git push origin/${scmVars.GIT_BRANCH} supsi/${scmVars.GIT_BRANCH}"
+        sh "git push supsi ${scmVars.GIT_BRANCH}"
     }
 }
