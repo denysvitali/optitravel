@@ -61,3 +61,8 @@ build/
 # IDEA
 *.iml
 *.ipr
+
+# VSCode
+.vscode/
+.project
+bin/
