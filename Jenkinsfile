@@ -20,8 +20,7 @@ node {
 
     stage('Push to SUPSI') {
         withCredentials([usernameColonPassword(credentialsId: 'jenkins-supsi-scm-login', variable: 'USRPW')]) {
-            sh "git remote add supsi https://${USRPW}@scm.ti-edu.ch/repogit/labingsw012017201812.git"
+            sh "git push https://${USRPW}@scm.ti-edu.ch/repogit/labingsw012017201812.git ${scmVars.GIT_BRANCH}"
         }
-        sh "git push supsi ${scmVars.GIT_BRANCH}"
     }
 }
