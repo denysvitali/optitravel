@@ -4,6 +4,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.ResultArray;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Agency;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Route;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.config.BuildConfig;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
@@ -114,6 +115,26 @@ public class GTFSrsWrapper {
             try {
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
                 return a.getResult().as(Route.class);
+            } catch(IOException ex){
+                return null;
+            }
+        } else {
+            throw new GTFSrsError("Unable to get any response for this request");
+        }
+    }
+
+    public Trip getTrip(String uid) throws GTFSrsError {
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .port(PORT)
+                .scheme(SCHEME)
+                .addPathSegments("api/trips/" + uid)
+                .build();
+        Response response = client.get(url);
+        if(response != null && response.isSuccessful() && response.body() != null){
+            try {
+                ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
+                return a.getResult().as(Trip.class);
             } catch(IOException ex){
                 return null;
             }

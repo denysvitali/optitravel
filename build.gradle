@@ -1,15 +1,18 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.3'
     }
 }
 
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 mainClassName = "ch.supsi.dti.i2b.shrug.optitravel.Main";
 
@@ -26,18 +29,23 @@ dependencies {
     testCompile "org.mockito:mockito-core:2.+"
     testCompile("org.junit.jupiter:junit-jupiter-api:5.1.0")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.1.0")
-
     testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     compile 'com.lynden:GMapsFX:2.12.0'
     compile 'com.jsoniter:jsoniter:0.9.19'
+    //compile 'com.jfoenix:jfoenix:8.0.3' // Java 8
+    compile 'com.jfoenix:jfoenix:9.0.3' // Java 9
 }
 
 sourceSets {
     main {
         java {
             srcDir 'src'
+        }
+
+        resources {
+            srcDir 'src/resources'
         }
     }
 
@@ -52,6 +60,12 @@ test {
     reports {
         junitXml.enabled = false
         html.enabled = true
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
     }
 }
 

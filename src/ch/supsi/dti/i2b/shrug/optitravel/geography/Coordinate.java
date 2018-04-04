@@ -16,4 +16,37 @@ public class Coordinate {
     public double getLng() {
         return lng;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == null){
+            return false;
+        }
+
+        if(obj.getClass() != this.getClass()){
+            return false;
+        }
+
+        Coordinate a;
+        try {
+            a = (Coordinate) obj;
+        } catch(ClassCastException ex){
+            return false;
+        }
+
+        if((float) a.getLat() != (float) this.getLat()){
+            return false;
+        }
+
+        if((float) a.getLng() != (float) this.getLng()){
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public String toString(){
+        return String.format("%f,%f", lat, lng);
+    }
 }
