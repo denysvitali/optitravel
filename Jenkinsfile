@@ -1,7 +1,7 @@
 node {
 
     environment {
-        SUSPSI_SCM_LOGIN = credentials('jenkins-supsi-scm-login')
+        SUPSI_SCM_LOGIN = credentials('jenkins-supsi-scm-login')
     }
 
     stage('Clean') {
