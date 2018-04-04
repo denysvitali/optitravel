@@ -20,7 +20,7 @@ node {
 
     stage('Push to SUPSI') {
         withCredentials([usernameColonPassword(credentialsId: 'jenkins-supsi-scm-login', variable: 'USRPW')]) {
-            sh "git push https://${USRPW}@scm.ti-edu.ch/repogit/labingsw012017201812.git origin/${scmVars.GIT_BRANCH}"
+            sh "git push --mirror https://${USRPW}@scm.ti-edu.ch/repogit/labingsw012017201812.git"
         }
     }
 }
