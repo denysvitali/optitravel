@@ -2,7 +2,7 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = "ch.supsi.dti.i2b.shrug.optitravel.Main";
+mainClassName = "ch.supsi.dti.i2b.shrug.optitravel.Main"
 
 repositories {
     mavenCentral()
@@ -17,6 +17,8 @@ dependencies {
     compile 'com.lynden:GMapsFX:2.12.0'
     compile 'com.jsoniter:jsoniter:0.9.19'
     compile 'com.jfoenix:jfoenix:9.0.3'
+    compile 'de.jensd:fontawesomefx-commons:9.1.2'
+    compile 'de.jensd:fontawesomefx-materialicons:2.2.0-9.1.2'
 }
 
 sourceSets {

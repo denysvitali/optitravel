@@ -1,0 +1,19 @@
+.jfx-text-field {
+    -jfx-focus-color: #ffffff;
+    -jfx-unfocus-color: #ffffff;
+}
+
+.text-field {
+    -fx-prompt-text-fill: #ffffff;
+    -fx-text-fill: #ffffff;
+}
+
+.toggle-button {
+    -fx-background-color: rgba(0,0,0,0);
+    -fx-background-radius: 24px 24px 24px 24px;
+    -fx-text-fill: WHITE;
+}
+
+.toggle-button:selected {
+    -fx-background-color: #002984;
+}
