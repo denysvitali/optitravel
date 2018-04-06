@@ -130,18 +130,33 @@ class TransitLandTest{
     }
 
     @Test
-    void checkGetScheduleStopPair(){
+    void checkGetScheduleStopPairTrip(){
         try {
             /*
             mockedTRL.getScheduleStopPair(anyString());
             verify(mockedTRL).getScheduleStopPair(anyString());
+
+             */
+
+            assertEquals("s-u0n7t3zfxx-saronno",apiWrapper.getScheduleStopPair("8898293").get(0).getOrigin_onestop_id());
+
+
+        } catch (TransitLandAPIError transitLandAPIError) {
+            fail(transitLandAPIError);
+        }
+
+    }
+
+    @Test
+    void checkGetScheduleStopPairRSP(){
+        try {
+            /*
 
             mock RouteStopPattern rsp
             mockedTRL.getScheduleStopPair(rsp);
             verify(mockedTRL).getScheduleStopPair(rsp);
              */
 
-            assertEquals("s-u0n7t3zfxx-saronno",apiWrapper.getScheduleStopPair("8898293").get(0).getOrigin_onestop_id());
             RouteStopPattern mockedRSP = mock(RouteStopPattern.class);
             when(mockedRSP.getId()).thenReturn("r-u0n7-r28-9609af-a3c09c");
             assertEquals("s-u0n7t3zfxx-saronno",apiWrapper.getScheduleStopPair(mockedRSP).get(0).getOrigin_onestop_id());
@@ -151,6 +166,7 @@ class TransitLandTest{
         }
 
     }
+
 
 
 
