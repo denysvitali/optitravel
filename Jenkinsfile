@@ -1,10 +1,11 @@
 node {
+
     stage('Clean') {
         deleteDir()
     }
 
     stage('Checkout') {
-        checkout scm
+        scmVars = checkout scm
     }
 
     stage('Build') {
@@ -15,5 +16,11 @@ node {
     stage('Test') {
         sh './gradlew test'
         junit 'build/test-results/**/*.xml'
+    }
+
+    stage('Push to SUPSI') {
+        withCredentials([usernameColonPassword(credentialsId: 'jenkins-supsi-scm-login', variable: 'USRPW')]) {
+            sh "git push https://${USRPW}@scm.ti-edu.ch/repogit/labingsw012017201812.git refs/remotes/origin/*:refs/heads/*"
+        }
     }
 }
