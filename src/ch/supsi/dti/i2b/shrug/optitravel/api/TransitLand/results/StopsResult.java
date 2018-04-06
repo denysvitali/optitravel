@@ -1,6 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
 
 import java.util.ArrayList;
 

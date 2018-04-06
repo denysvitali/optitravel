@@ -1,9 +1,12 @@
-package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
+package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models;
 
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import com.jsoniter.any.Any;
 
 import java.util.ArrayList;
 import java.util.List;
+
+// TODO: Refactor (?) - We can use ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate universally
 
 public class GPSCoordinates {
     private double latitude;
@@ -11,6 +14,11 @@ public class GPSCoordinates {
 
     public GPSCoordinates(){
 
+    }
+
+    public GPSCoordinates(Coordinate c){
+        this.latitude = c.getLat();
+        this.longitude = c.getLng();
     }
 
     public GPSCoordinates(ArrayList<Double> coordinate){
@@ -27,6 +35,10 @@ public class GPSCoordinates {
     public GPSCoordinates(double lat, double lon) {
         this.latitude = lat;
         this.longitude = lon;
+    }
+
+    public Coordinate asCoordinate(){
+        return new Coordinate(this.latitude, this.longitude);
     }
 
     public double getLatitude() {
