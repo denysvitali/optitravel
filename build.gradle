@@ -1,3 +1,12 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+    }
+}
+
 apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'application'
@@ -9,10 +18,17 @@ repositories {
     jcenter()
 }
 
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+ext.junitJupiterVersion = '5.1.0'
+
 dependencies {
     testCompile "org.mockito:mockito-core:2.+"
     testCompile("org.junit.jupiter:junit-jupiter-api:5.1.0")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:5.1.0")
+
+    testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     compile 'com.lynden:GMapsFX:2.12.0'
     compile 'com.jsoniter:jsoniter:0.9.19'
@@ -35,6 +51,13 @@ sourceSets {
         java {
             srcDir 'test'
         }
+    }
+}
+
+test {
+    reports {
+        junitXml.enabled = false
+        html.enabled = true
     }
 }
 
