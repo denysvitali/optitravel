@@ -2,6 +2,9 @@ package ch.supsi.dti.i2b.shrug.optitravel;
 
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
+import com.lynden.gmapsfx.javascript.object.LatLong;
+import com.lynden.gmapsfx.javascript.object.MapOptions;
+import com.lynden.gmapsfx.javascript.object.MapTypeIdEnum;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,7 +29,5 @@ public class Main extends Application {
         primaryStage.setWidth(1280);
         primaryStage.setHeight(720);
         primaryStage.show();
-
-
     }
 }
