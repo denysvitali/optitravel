@@ -26,7 +26,6 @@ public class TransitLandAPIWrapper {
 
     public List<Stop> getStopsByRoute(String route_onestop_id) throws TransitLandAPIError {
         // https://transit.land/api/v1/stops?served_by=r-u0nmf-449
-        System.out.println("getStopsByRoute");
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")

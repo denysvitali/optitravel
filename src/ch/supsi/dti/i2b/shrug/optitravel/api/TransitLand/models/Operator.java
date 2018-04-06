@@ -2,7 +2,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models;
 
 import java.util.ArrayList;
 
-public class Operator {
+public class Operator extends ch.supsi.dti.i2b.shrug.optitravel.models.Operator {
     private String onestop_id;
     private String name;
     private String short_name;
@@ -28,7 +28,7 @@ public class Operator {
         return short_name;
     }
 
-    public String getWebsite() {
+    public String getURL() {
         return website;
     }
 

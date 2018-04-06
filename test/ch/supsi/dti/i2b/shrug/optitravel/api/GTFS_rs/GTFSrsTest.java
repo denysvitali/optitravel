@@ -1,7 +1,12 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,11 +17,11 @@ class GTFSrsTest {
     public GTFSrsTest(){
         gtfSrsWrapper = new GTFSrsWrapper();
     }
-    
-    /*@Test
+
+    @Test
     void TestConnection(){
         try {
-            assertEquals(true, gtfSrsWrapper.isOnline());
+            assertTrue(gtfSrsWrapper.isOnline());
         } catch (GTFSrsError gtfSrsError) {
             fail(gtfSrsError);
         }
@@ -24,7 +29,7 @@ class GTFSrsTest {
 
     @Test
     void StopsByTripId(){
-        String trip_id = "t-6ebb8e-lamone-cadempinostazione";
+        String trip_id = "t-f492e1-bioggiomolinazzostazione";
 
         assertNotEquals(null, gtfSrsWrapper);
         List<Stop> stops;
@@ -35,7 +40,7 @@ class GTFSrsTest {
             return;
         }
 
-        assertEquals(9, stops.size());
+        assertEquals(16, stops.size());
         for(Stop s : stops){
             assertNotEquals(null, s);
         }
@@ -47,12 +52,11 @@ class GTFSrsTest {
             assertNotEquals(null, s.getLng());
         }
 
-        assertEquals("Bioggio Molinazzo, Stazione", stops.get(0).getName());
-        assertEquals(46.013046, stops.get(0).getLat());
-        assertEquals(8.915061, stops.get(0).getLng());
+        assertEquals("Lamone-Cadempino, Stazione", stops.get(0).getName());
+        assertEquals(new Coordinate(46.04035, 8.932156), stops.get(0).getCoordinate());
         assertEquals(0, stops.get(0).getType());
     }
-    
+
     @Test
     public void testRouteType(){
         RouteType rt = RouteType.getRoute(1508);
@@ -60,7 +64,7 @@ class GTFSrsTest {
         assertEquals(RouteType.AIRPORT_LINK_FERRY_SERVICE, RouteType.getRoute(1012));
         assertEquals(RouteType.WATER_TRANSPORT_SERVICE, RouteType.getRouteCategory(1012));
     }
-    
+
     @Test
     public void testGetRoutes(){
         List<Route> routes = null;
@@ -69,16 +73,16 @@ class GTFSrsTest {
         } catch (GTFSrsError gtfSrsError) {
             fail(gtfSrsError);
         }
-        
+
         if(routes == null){
             fail("List is null!");
         }
-        
+
         routes.forEach((r) -> {
             assertNotEquals(r.getRouteType(), null);
         });
     }
-    
+
     @Test
     public void testAgency(){
         try{
@@ -94,7 +98,7 @@ class GTFSrsTest {
             fail(err);
         }
     }
-    
+
     @Test
     public void testRoute(){
         try{
@@ -110,5 +114,35 @@ class GTFSrsTest {
             fail(err);
         }
     }
-    */
+
+    @Test
+    public void testTrip(){
+        try{
+            String uid = "t-f492e1-bioggiomolinazzostazione";
+            Trip t = gtfSrsWrapper.getTrip(uid);
+            assertNotEquals(null, t);
+            assertEquals(uid, t.getUID());
+            List<StopTrip> stopTrip = t.getStopTrip();
+            assertNotEquals(null, stopTrip);
+            assertNotEquals(0, stopTrip.size());
+
+            assertEquals(DropOff.RegularlyScheduled, stopTrip.get(0).getDropOff());
+            assertEquals(PickUp.RegularlyScheduled, stopTrip.get(0).getPickUp());
+            assertNotEquals(null, stopTrip.get(0).getStop());
+
+            // May change based on the feed version!
+            assertEquals("s-f4b2d2-lamonecadempinostazione", stopTrip.get(0).getStop().getUid());
+            assertEquals("Lamone-Cadempino, Stazione", stopTrip.get(0).getStop().getName());
+
+            assertEquals(new Coordinate(46.04035, 8.932156), stopTrip.get(0).getStop().getCoordinate());
+            assertEquals(LocalTime.of(9,35), stopTrip.get(0).getArrival());
+            assertEquals(LocalTime.of(9,35), stopTrip.get(0).getDeparture());
+
+
+            assertEquals(LocalTime.of(9,36), stopTrip.get(1).getArrival());
+            assertEquals(LocalTime.of(9,36), stopTrip.get(1).getDeparture());
+        } catch(GTFSrsError err){
+            fail(err);
+        }
+    }
 }

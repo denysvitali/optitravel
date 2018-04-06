@@ -135,11 +135,9 @@ class TransitLandTest{
             /*
             mockedTRL.getScheduleStopPair(anyString());
             verify(mockedTRL).getScheduleStopPair(anyString());
-
              */
 
             assertEquals("s-u0n7t3zfxx-saronno",apiWrapper.getScheduleStopPair("8898293").get(0).getOrigin_onestop_id());
-
 
         } catch (TransitLandAPIError transitLandAPIError) {
             fail(transitLandAPIError);
@@ -151,7 +149,6 @@ class TransitLandTest{
     void checkGetScheduleStopPairRSP(){
         try {
             /*
-
             mock RouteStopPattern rsp
             mockedTRL.getScheduleStopPair(rsp);
             verify(mockedTRL).getScheduleStopPair(rsp);
