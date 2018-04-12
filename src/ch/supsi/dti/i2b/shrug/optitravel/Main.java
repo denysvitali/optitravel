@@ -22,9 +22,7 @@ import javafx.stage.WindowEvent;
 import java.util.List;
 
 public class Main extends Application {
-
     private TransitLandAPIWrapper transitLandAPIWrapper;
-
     @Override
     public void start(Stage stage) throws Exception {
 
