@@ -399,6 +399,58 @@ public class TransitLandAPIWrapper {
         throw new TransitLandAPIError("Unable to get any response for this request");
     }
 
+    public List<RouteStopPattern> getRouteStopPatternsByBBox(Coordinate coord1, Coordinate coord2) throws TransitLandAPIError {
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/route_stop_patterns")
+                .addQueryParameter("bbox", coord1.getLat()+","+coord1.getLng()+","+coord2.getLat()+","+coord2.getLng())
+                .build();
+        Response response;
+        RouteStopPatternsResult rspResult;
+        List<RouteStopPattern> listRsp = new ArrayList<>();
+
+        do{
+            response = client.get(url);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    rspResult = JsonIterator.deserialize(response.body().string(), RouteStopPatternsResult.class);
+                    response.close();
+                    listRsp.addAll(rspResult.getRouteStopPatterns());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listRsp;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
+            }
+
+            if(rspResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(rspResult.getMeta().getNext());
+
+        }while(rspResult.getMeta().getNext() != null);
+
+        response.close();
+        return listRsp;
+    }
+
+    public void AgetRouteStopPatternsByBBox(Coordinate coord1, Coordinate coord2, Callback<List<RouteStopPattern>> cb){
+        Runnable r = ()->{
+            try {
+                cb.exec(getRouteStopPatternsByBBox(coord1, coord2));
+            } catch (TransitLandAPIError transitLandAPIError) {
+                transitLandAPIError.printStackTrace();
+                cb.exec(null);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+    }
+
     public List<Stop> sortStops(GPSCoordinates coordinates, List<Stop> arr){
         Coordinate c = coordinates.asCoordinate();
         return arr.stream().sorted((s1, s2) -> {

@@ -7,6 +7,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.LineString;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.RouteStopPattern;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.ScheduleStopPair;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.Polyline;
@@ -130,6 +131,7 @@ public class Main extends Application {
                 System.out.println("Stage is closing");
                 transitLandAPIWrapper.destroy();
                 transitLandAPIWrapper = null;
+                System.exit(0);
 
             }
         });
@@ -144,18 +146,19 @@ public class Main extends Application {
 
         try {
             //route stop pattern id
-            /*
+
             List<ScheduleStopPair> a = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0).getTrips().get(0));
-            List<ScheduleStopPair> b = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0),2,2, 2018/*,"07:00:00","10:00:00");
-            /*
+            List<ScheduleStopPair> b = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0),2,2, 2018/*,"07:00:00","10:00:00"*/);
+
             List<RouteStopPattern> c = transitLandAPIWrapper.getRouteStopPatterns(rsp.get(0).getTrips().get(0));
 
-            List<Stop> d = transitLandAPIWrapper.getStopsByRoute(rsp.get(0).getRouteOnestopId());*/
+            List<Stop> d = transitLandAPIWrapper.getStopsByRoute(rsp.get(0).getRouteOnestopId());
+            List<RouteStopPattern> e = transitLandAPIWrapper.getRouteStopPatternsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719));
             System.out.println(rsp);
             //rsp.get(0).getTrips().stream().forEach(System.out::println);
-            rsp.get(0).getStopPattern().stream().forEach(System.out::println);
+            rsp.get(2).getStopPattern().stream().forEach(System.out::println);
             Polyline polyline = new Polyline();
-            Geometry geom = rsp.get(0).getGeometry();
+            Geometry geom = rsp.get(2).getGeometry();
             LineString path = null;
             path = geom.getLineString();
 
