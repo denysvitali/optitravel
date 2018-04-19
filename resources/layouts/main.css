@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
 .combo-box.trip-filters .list-cell {
     -fx-padding: 2px 2px;
 }
@@ -9,8 +11,8 @@
 .jfx-time-picker > .text-field {
     -fx-prompt-text-fill: rgba(255,255,255,0.4);
     -fx-text-fill: #ffffff;
-    -fx-font-family: "Roboto Medium";
-    -fx-font-size: 13;
+    -fx-font-family: "Roboto";
+    -fx-font-size: 13px;
 }
 
 .combo-box.trip-filters .list-view .list-cell {
@@ -36,15 +38,20 @@
 
 .toggle-button.trip-filters {
     -fx-background-color: rgba(0,0,0,0);
-    -fx-background-radius: 24px 24px 24px 24px;
-    -fx-text-fill: WHITE;
+    -fx-background-radius: 21px 21px 21px 21px;
 }
 
 .toggle-button:selected.trip-filters {
     -fx-background-color: #002984;
 }
 
-.jfx-date-picker > .arrow-button > .jfx-svg-glyph,
-.jfx-time-picker > .arrow-button > .jfx-svg-glyph {
-    -fx-background-color: #ffffff;
+.jfx-button.fab {
+    -fx-background-radius: 23px 23px 23px 23px;
+    -fx-background-color: #002984;
+    -fx-padding: 9px 8px 9px 10px;
+}
+
+.date-picker > .arrow-button > .arrow,
+.jfx-time-picker > .arrow-button > .arrow {
+    -fx-padding: 0;
 }

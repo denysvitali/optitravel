@@ -6,10 +6,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.ResourceBundle;
+
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
+        ResourceBundle locale = ResourceBundle.getBundle("locale/strings");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"), locale);
         Parent root = loader.load();
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);
