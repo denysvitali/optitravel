@@ -24,7 +24,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import okhttp3.Call;
 
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,10 +152,59 @@ public class Main extends Application {
             List<ScheduleStopPair> a = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0).getTrips().get(0));
             List<ScheduleStopPair> b = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0),2,2, 2018/*,"07:00:00","10:00:00"*/);
 
-            List<RouteStopPattern> c = transitLandAPIWrapper.getRouteStopPatterns(rsp.get(0).getTrips().get(0));
+ //           List<RouteStopPattern> c = transitLandAPIWrapper.getRouteStopPatterns(rsp.get(0).getTrips().get(0));
 
             List<Stop> d = transitLandAPIWrapper.getStopsByRoute(rsp.get(0).getRouteOnestopId());
-            List<RouteStopPattern> e = transitLandAPIWrapper.getRouteStopPatternsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719));
+
+            long t1 = System.currentTimeMillis();
+            transitLandAPIWrapper.AgetRouteStopPatternsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719), routeStopPatterns -> {
+
+                long t2 = System.currentTimeMillis();
+                System.out.println(t2-t1+" routeStopPatterns");
+            });
+            transitLandAPIWrapper.AgetStopsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719), stops -> {
+
+                long t2 = System.currentTimeMillis();
+                System.out.println(t2-t1+" stops");
+            });
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            /*
+            List<RouteStopPattern> lrsp = new ArrayList<>();
+            List<Thread> threadList = new ArrayList<>();
+            final int per_page = 50;
+            for(int i = 0; i<8; i++){
+               final int x = i;
+               Thread t = new Thread(new Runnable() {
+                   @Override
+                   public void run() {
+                       try {
+                           lrsp.addAll(
+                                   transitLandAPIWrapper.getRouteStopPatternsByBBox(
+                                           new Coordinate(-122.000,37.668),
+                                           new Coordinate(-122.500,37.719),
+                                           x*per_page,
+                                           per_page
+                                           )
+                           );
+                       } catch (TransitLandAPIError transitLandAPIError) {
+                           transitLandAPIError.printStackTrace();
+                       }
+                   }
+               });
+               threadList.add(t);
+               t.start();
+            }
+            for(Thread t : threadList){
+               try{
+                   t.join();
+               }catch(InterruptedException e){
+
+               }
+            }
+            long t2 = System.currentTimeMillis();
+            System.out.println(t2-t1);*/
+
             System.out.println(rsp);
             //rsp.get(0).getTrips().stream().forEach(System.out::println);
             rsp.get(2).getStopPattern().stream().forEach(System.out::println);

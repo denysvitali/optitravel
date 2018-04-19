@@ -164,8 +164,40 @@ class TransitLandTest{
 
     }
 
+    @Test
+    void checkGetRouteStopPatternsByBBox(){
+        try {
+            /*
+            mockedTRL.getRouteStopPatternsByBBox(gps, gps);
+            verify(mockedTRL).getRouteStopPatternsByBBox(gps, gps);
 
+             */
 
+            List<RouteStopPattern> listRouteStopPatterns = apiWrapper.getRouteStopPatternsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719));
+            assertEquals("r-9q8yy-8bx-6b7992-8e20fa", listRouteStopPatterns.get(0).getId());
+
+        } catch (TransitLandAPIError transitLandAPIError) {
+            fail(transitLandAPIError);
+        }
+
+    }
+
+    @Test
+    void checkGetStopsByBBox(){
+        try {
+            /*
+            mockedTRL.getStopsByBBox(gps, gps);
+            verify(mockedTRL).getStopsByBBox(gps, gps);
+             */
+
+            List<Stop> listStops = apiWrapper.getStopsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719));
+            assertEquals("s-9q8yt0hwpd-dalycity", listStops.get(0).getId());
+
+        } catch (TransitLandAPIError transitLandAPIError) {
+            fail(transitLandAPIError);
+        }
+
+    }
 
 
     @Test

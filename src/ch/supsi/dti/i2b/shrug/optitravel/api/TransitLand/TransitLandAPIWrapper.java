@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 public class TransitLandAPIWrapper {
     private static String HOST = "api.transit.land";
+    private static int PER_PAGE = 200;
+    private static int MAX_REQUESTS = 1000/PER_PAGE;
     private HttpClient client;
 
     public TransitLandAPIWrapper(){
@@ -31,18 +33,43 @@ public class TransitLandAPIWrapper {
                 .scheme("https")
                 .addPathSegments("api/v1/stops")
                 .addQueryParameter("served_by", route_onestop_id)
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
-        Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                StopsResult a = JsonIterator.deserialize(response.body().string(), StopsResult.class);
-                return a.getStops();
-            } catch(IOException ex){
-                return null;
+        Response response;
+        StopsResult stopsResult;
+        List<Stop> listStop = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    stopsResult = JsonIterator.deserialize(str, StopsResult.class);
+                    response.close();
+                    listStop.addAll(stopsResult.getStops());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listStop;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
             }
-        } else {
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+
+            if(stopsResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(stopsResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(stopsResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return listStop;
 
     }
 
@@ -67,22 +94,43 @@ public class TransitLandAPIWrapper {
                 .addPathSegments("api/v1/stops")
                 .addQueryParameter("lat", String.format("%f", coordinates.getLatitude()))
                 .addQueryParameter("lon", String.format("%f", coordinates.getLongitude()))
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
-        Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                StopsResult a = JsonIterator.deserialize(response.body().string(), StopsResult.class);
-                response.close();
-                return sortStops(coordinates, a.getStops());
-            } catch(IOException ex){
-                response.close();
-                return null;
+        Response response;
+        StopsResult stopsResult;
+        List<Stop> listStop = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    stopsResult = JsonIterator.deserialize(str, StopsResult.class);
+                    response.close();
+                    listStop.addAll(stopsResult.getStops());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return sortStops(coordinates, listStop);
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
             }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+
+            if(stopsResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(stopsResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(stopsResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return sortStops(coordinates, listStop);
     }
 
     public List<Stop> getStopsNear(GPSCoordinates coordinates, double meters) throws TransitLandAPIError {
@@ -94,22 +142,43 @@ public class TransitLandAPIWrapper {
                 .addQueryParameter("lat", String.format("%f", coordinates.getLatitude()))
                 .addQueryParameter("lon", String.format("%f", coordinates.getLongitude()))
                 .addQueryParameter("r", String.format("%f", meters))
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
-        Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                StopsResult a = JsonIterator.deserialize(response.body().string(), StopsResult.class);
-                response.close();
-                return sortStops(coordinates, a.getStops());
-            } catch(IOException ex){
-                response.close();
-                return null;
+        Response response;
+        StopsResult stopsResult;
+        List<Stop> listStop = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    stopsResult = JsonIterator.deserialize(str, StopsResult.class);
+                    response.close();
+                    listStop.addAll(stopsResult.getStops());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return sortStops(coordinates, listStop);
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
             }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+
+            if(stopsResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(stopsResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(stopsResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return sortStops(coordinates, listStop);
     }
 
     public List<RouteStopPattern> getRouteStopPatterns(String trip) throws TransitLandAPIError {
@@ -118,22 +187,43 @@ public class TransitLandAPIWrapper {
                 .scheme("https")
                 .addPathSegments("api/v1/route_stop_patterns")
                 .addQueryParameter("trip", trip)
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
-        Response response = client.get(url, 20*1000);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(), RouteStopPatternsResult.class);
-                response.close();
-                return a.getRouteStopPatterns();
-            } catch(IOException ex){
-                response.close();
-                return null;
+        Response response;
+        RouteStopPatternsResult rspResult;
+        List<RouteStopPattern> listRsp = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    rspResult = JsonIterator.deserialize(str, RouteStopPatternsResult.class);
+                    response.close();
+                    listRsp.addAll(rspResult.getRouteStopPatterns());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listRsp;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
             }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+
+            if(rspResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(rspResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(rspResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return listRsp;
     }
 
 
@@ -157,22 +247,43 @@ public class TransitLandAPIWrapper {
                 .scheme("https")
                 .addPathSegments("api/v1/schedule_stop_pairs")
                 .addQueryParameter("trip", trip)
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
-        Response response = client.get(url, 20*1000);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
-                response.close();
-                return a.getScheduleStopPairs();
-            } catch(IOException ex){
-                response.close();
-                return null;
+        Response response;
+        ScheduleStopPairResult sspResult;
+        List<ScheduleStopPair> listSch = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    sspResult = JsonIterator.deserialize(str, ScheduleStopPairResult.class);
+                    response.close();
+                    listSch.addAll(sspResult.getScheduleStopPairs());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listSch;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
             }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+
+            if(sspResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(sspResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(sspResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return listSch;
     }
 
     public void AgetScheduleStopPair(String trip, Callback<List<ScheduleStopPair>> cb){
@@ -194,22 +305,43 @@ public class TransitLandAPIWrapper {
                 .scheme("https")
                 .addPathSegments("api/v1/schedule_stop_pairs")
                 .addQueryParameter("route_stop_pattern_onestop_id", rsp.getId())
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
-        Response response = client.get(url, 20*1000);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
-                response.close();
-                return a.getScheduleStopPairs();
-            } catch(IOException ex){
-                response.close();
-                return null;
+        Response response;
+        ScheduleStopPairResult sspResult;
+        List<ScheduleStopPair> listSch = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    sspResult = JsonIterator.deserialize(str, ScheduleStopPairResult.class);
+                    response.close();
+                    listSch.addAll(sspResult.getScheduleStopPairs());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listSch;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
             }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+
+            if(sspResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(sspResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(sspResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return listSch;
     }
 
     public void AgetScheduleStopPair(RouteStopPattern rsp, Callback<List<ScheduleStopPair>> cb){
@@ -232,22 +364,43 @@ public class TransitLandAPIWrapper {
                 .addPathSegments("api/v1/schedule_stop_pairs")
                 .addQueryParameter("route_stop_pattern_onestop_id", rsp.getId())
                 .addQueryParameter("date", year+"-"+month+"-"+day)
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
-        Response response = client.get(url, 20*1000);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
-                response.close();
-                return a.getScheduleStopPairs();
-            } catch(IOException ex){
-                response.close();
-                return null;
+        Response response;
+        ScheduleStopPairResult sspResult;
+        List<ScheduleStopPair> listSch = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    sspResult = JsonIterator.deserialize(str, ScheduleStopPairResult.class);
+                    response.close();
+                    listSch.addAll(sspResult.getScheduleStopPairs());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listSch;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
             }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+
+            if(sspResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(sspResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(sspResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return listSch;
     }
 
     public void AgetScheduleStopPair(RouteStopPattern rsp, int day, int month, int year, Callback<List<ScheduleStopPair>> cb){
@@ -274,23 +427,43 @@ public class TransitLandAPIWrapper {
                 .addQueryParameter("route_stop_pattern_onestop_id", rsp.getId())
                 .addQueryParameter("date", year+"-"+month+"-"+day)
                 .addQueryParameter("origin_departure_between", betweenI+","+betweenF)
-
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
-        Response response = client.get(url, 20*1000);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
-                response.close();
-                return a.getScheduleStopPairs();
-            } catch(IOException ex){
-                response.close();
-                return null;
+        Response response;
+        ScheduleStopPairResult sspResult;
+        List<ScheduleStopPair> listSch = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    sspResult = JsonIterator.deserialize(str, ScheduleStopPairResult.class);
+                    response.close();
+                    listSch.addAll(sspResult.getScheduleStopPairs());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listSch;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
             }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+
+            if(sspResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(sspResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(sspResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return listSch;
     }
 
     public void AgetScheduleStopPair(RouteStopPattern rsp, int day, int month, int year, String betweenI, String betweenF, Callback<List<ScheduleStopPair>> cb){
@@ -317,23 +490,43 @@ public class TransitLandAPIWrapper {
                         .reduce((t,u)->t + "," + u)
                         .get()
                 )
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
-        Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(),
-                        RouteStopPatternsResult.class);
-                response.close();
-                return a.getRouteStopPatterns();
-            } catch(IOException ex){
-                response.close();
-                return null;
+        Response response;
+        RouteStopPatternsResult rspResult;
+        List<RouteStopPattern> listRsp = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    rspResult = JsonIterator.deserialize(str, RouteStopPatternsResult.class);
+                    response.close();
+                    listRsp.addAll(rspResult.getRouteStopPatterns());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listRsp;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
             }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+
+            if(rspResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(rspResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(rspResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return listRsp;
     }
 
     public void AgetRouteStopPatternsByStopsVisited(ArrayList<Stop> stops, Callback<List<RouteStopPattern>> cb){
@@ -360,7 +553,10 @@ public class TransitLandAPIWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             Operator operator = null;
             try {
-                operator = JsonIterator.deserialize(response.body().string(), OperatorsResult.class)
+                String str = response.body().string();
+                byte ptext[] = str.getBytes("ISO-8859-1");
+                str = new String(ptext, "UTF-8");
+                operator = JsonIterator.deserialize(str, OperatorsResult.class)
                         .getOperators()
                         .get(0);
             } catch (IOException e) {
@@ -385,7 +581,10 @@ public class TransitLandAPIWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             Stop stop = null;
             try {
-                stop = JsonIterator.deserialize(response.body().string(), StopsResult.class)
+                String str = response.body().string();
+                byte ptext[] = str.getBytes("ISO-8859-1");
+                str = new String(ptext, "UTF-8");
+                stop = JsonIterator.deserialize(str, StopsResult.class)
                         .getStops()
                         .get(0);
             } catch (IOException e) {
@@ -400,22 +599,29 @@ public class TransitLandAPIWrapper {
     }
 
     public List<RouteStopPattern> getRouteStopPatternsByBBox(Coordinate coord1, Coordinate coord2) throws TransitLandAPIError {
+
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/route_stop_patterns")
                 .addQueryParameter("bbox", coord1.getLat()+","+coord1.getLng()+","+coord2.getLat()+","+coord2.getLng())
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
+
         Response response;
         RouteStopPatternsResult rspResult;
         List<RouteStopPattern> listRsp = new ArrayList<>();
 
+        int maxRequestLimit = MAX_REQUESTS;
         do{
-            response = client.get(url);
+            response = client.get(url,(long) 50E3);
 
             if (response != null && response.isSuccessful() && response.body() != null) {
                 try {
-                    rspResult = JsonIterator.deserialize(response.body().string(), RouteStopPatternsResult.class);
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    rspResult = JsonIterator.deserialize(str, RouteStopPatternsResult.class);
                     response.close();
                     listRsp.addAll(rspResult.getRouteStopPatterns());
 
@@ -432,11 +638,13 @@ public class TransitLandAPIWrapper {
             if(rspResult.getMeta().getNext() != null)
                 url = HttpUrl.parse(rspResult.getMeta().getNext());
 
-        }while(rspResult.getMeta().getNext() != null);
+            maxRequestLimit--;
+        }while(rspResult.getMeta().getNext() != null && maxRequestLimit != 0);
 
         response.close();
         return listRsp;
     }
+
 
     public void AgetRouteStopPatternsByBBox(Coordinate coord1, Coordinate coord2, Callback<List<RouteStopPattern>> cb){
         Runnable r = ()->{
@@ -451,8 +659,108 @@ public class TransitLandAPIWrapper {
         t.start();
     }
 
+
+    public List<Stop> getStopsByBBox(Coordinate coord1, Coordinate coord2) throws TransitLandAPIError {
+
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/stops")
+                .addQueryParameter("bbox", coord1.getLat()+","+coord1.getLng()+","+coord2.getLat()+","+coord2.getLng())
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
+                .build();
+
+        Response response;
+        StopsResult stopsResult;
+        List<Stop> listStop = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    stopsResult = JsonIterator.deserialize(str, StopsResult.class);
+                    response.close();
+                    listStop.addAll(stopsResult.getStops());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listStop;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
+            }
+
+            if(stopsResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(stopsResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(stopsResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return listStop;
+    }
+
+
+    public void AgetStopsByBBox(Coordinate coord1, Coordinate coord2, Callback<List<Stop>> cb){
+        Runnable r = ()->{
+            try {
+                cb.exec(getStopsByBBox(coord1, coord2));
+            } catch (TransitLandAPIError transitLandAPIError) {
+                transitLandAPIError.printStackTrace();
+                cb.exec(null);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+    }
+
+/*
+    public List<RouteStopPattern> getRouteStopPatternsByBBox(Coordinate coord1, Coordinate coord2, int offset, int per_page) throws TransitLandAPIError {
+
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/route_stop_patterns")
+                .addQueryParameter("bbox", coord1.getLat()+","+coord1.getLng()+","+coord2.getLat()+","+coord2.getLng())
+                .addQueryParameter("per_page", String.valueOf(per_page))
+                .addQueryParameter("offset", String.valueOf(offset))
+                .build();
+
+        Response response;
+        RouteStopPatternsResult rspResult;
+
+        response = client.get(url,(long) 30E3);
+
+        if (response != null && response.isSuccessful() && response.body() != null) {
+            try {
+                rspResult = JsonIterator.deserialize(response.body().string(), RouteStopPatternsResult.class);
+                response.close();
+                return rspResult.getRouteStopPatterns();
+
+            } catch (IOException ex) {
+                response.close();
+                return null;
+            }
+        } else {
+            if (response != null)
+                response.close();
+            throw new TransitLandAPIError("Unable to get any response for this request");
+        }
+
+    }*/
+
     public List<Stop> sortStops(GPSCoordinates coordinates, List<Stop> arr){
         Coordinate c = coordinates.asCoordinate();
+        if(arr == null){
+            return new ArrayList<Stop>();
+        }
         return arr.stream().sorted((s1, s2) -> {
             double d1 = Distance.distance(c, s1.getCoordinates().asCoordinate());
             double d2 = Distance.distance(c, s2.getCoordinates().asCoordinate());
