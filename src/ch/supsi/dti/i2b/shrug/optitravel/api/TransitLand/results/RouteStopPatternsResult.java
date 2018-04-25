@@ -1,5 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
+
 import java.util.ArrayList;
 
 public class RouteStopPatternsResult {

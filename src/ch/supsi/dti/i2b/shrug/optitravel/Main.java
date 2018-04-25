@@ -5,8 +5,8 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Geometry;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.LineString;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.RouteStopPattern;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.ScheduleStopPair;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.ScheduleStopPair;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.javascript.object.*;
@@ -19,14 +19,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import okhttp3.Call;
 
-import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -167,43 +163,6 @@ public class Main extends Application {
                 long t2 = System.currentTimeMillis();
                 System.out.println(t2-t1+" stops");
             });
-
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            /*
-            List<RouteStopPattern> lrsp = new ArrayList<>();
-            List<Thread> threadList = new ArrayList<>();
-            final int per_page = 50;
-            for(int i = 0; i<8; i++){
-               final int x = i;
-               Thread t = new Thread(new Runnable() {
-                   @Override
-                   public void run() {
-                       try {
-                           lrsp.addAll(
-                                   transitLandAPIWrapper.getRouteStopPatternsByBBox(
-                                           new Coordinate(-122.000,37.668),
-                                           new Coordinate(-122.500,37.719),
-                                           x*per_page,
-                                           per_page
-                                           )
-                           );
-                       } catch (TransitLandAPIError transitLandAPIError) {
-                           transitLandAPIError.printStackTrace();
-                       }
-                   }
-               });
-               threadList.add(t);
-               t.start();
-            }
-            for(Thread t : threadList){
-               try{
-                   t.join();
-               }catch(InterruptedException e){
-
-               }
-            }
-            long t2 = System.currentTimeMillis();
-            System.out.println(t2-t1);*/
 
             System.out.println(rsp);
             //rsp.get(0).getTrips().stream().forEach(System.out::println);

@@ -1,8 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Operator;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.*;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
@@ -645,7 +643,6 @@ public class TransitLandAPIWrapper {
         return listRsp;
     }
 
-
     public void AgetRouteStopPatternsByBBox(Coordinate coord1, Coordinate coord2, Callback<List<RouteStopPattern>> cb){
         Runnable r = ()->{
             try {
@@ -707,7 +704,6 @@ public class TransitLandAPIWrapper {
         return listStop;
     }
 
-
     public void AgetStopsByBBox(Coordinate coord1, Coordinate coord2, Callback<List<Stop>> cb){
         Runnable r = ()->{
             try {
@@ -720,41 +716,6 @@ public class TransitLandAPIWrapper {
         Thread t = new Thread(r);
         t.start();
     }
-
-/*
-    public List<RouteStopPattern> getRouteStopPatternsByBBox(Coordinate coord1, Coordinate coord2, int offset, int per_page) throws TransitLandAPIError {
-
-        HttpUrl url = new HttpUrl.Builder()
-                .host(HOST)
-                .scheme("https")
-                .addPathSegments("api/v1/route_stop_patterns")
-                .addQueryParameter("bbox", coord1.getLat()+","+coord1.getLng()+","+coord2.getLat()+","+coord2.getLng())
-                .addQueryParameter("per_page", String.valueOf(per_page))
-                .addQueryParameter("offset", String.valueOf(offset))
-                .build();
-
-        Response response;
-        RouteStopPatternsResult rspResult;
-
-        response = client.get(url,(long) 30E3);
-
-        if (response != null && response.isSuccessful() && response.body() != null) {
-            try {
-                rspResult = JsonIterator.deserialize(response.body().string(), RouteStopPatternsResult.class);
-                response.close();
-                return rspResult.getRouteStopPatterns();
-
-            } catch (IOException ex) {
-                response.close();
-                return null;
-            }
-        } else {
-            if (response != null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
-
-    }*/
 
     public List<Stop> sortStops(GPSCoordinates coordinates, List<Stop> arr){
         Coordinate c = coordinates.asCoordinate();

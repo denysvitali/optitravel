@@ -3,7 +3,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Operator;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.RouteStopPattern;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import org.junit.jupiter.api.Test;
 
