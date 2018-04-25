@@ -1,8 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Operator;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.*;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
@@ -24,14 +22,19 @@ public class TransitLandAPIWrapper {
         this.client = new HttpClient();
     }
 
+
     public List<Stop> getStopsByRoute(String route_onestop_id) throws TransitLandAPIError {
+        return getStopsByRoute(new Route(route_onestop_id));
+    }
+
+    public List<Stop> getStopsByRoute(Route route) throws TransitLandAPIError {
         // https://transit.land/api/v1/stops?served_by=r-u0nmf-449
         System.out.println("getStopsByRoute");
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/stops")
-                .addQueryParameter("served_by", route_onestop_id)
+                .addQueryParameter("served_by", route.getId())
                 .build();
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
@@ -70,20 +73,7 @@ public class TransitLandAPIWrapper {
                 .addQueryParameter("lon", String.format("%f", coordinates.getLongitude()))
                 .build();
         Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                StopsResult a = JsonIterator.deserialize(response.body().string(), StopsResult.class);
-                response.close();
-                return sortStops(coordinates, a.getStops());
-            } catch(IOException ex){
-                response.close();
-                return null;
-            }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+        return parseStopResponse(coordinates, response);
     }
 
     public List<Stop> getStopsNear(GPSCoordinates coordinates, double meters) throws TransitLandAPIError {
@@ -97,6 +87,10 @@ public class TransitLandAPIWrapper {
                 .addQueryParameter("r", String.format("%f", meters))
                 .build();
         Response response = client.get(url);
+        return parseStopResponse(coordinates, response);
+    }
+
+    private List<Stop> parseStopResponse(GPSCoordinates coordinates, Response response) throws TransitLandAPIError {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 StopsResult a = JsonIterator.deserialize(response.body().string(), StopsResult.class);
@@ -121,6 +115,10 @@ public class TransitLandAPIWrapper {
                 .addQueryParameter("trip", trip)
                 .build();
         Response response = client.get(url, 20*1000);
+        return parseRouteStopPatternResponse(response);
+    }
+
+    private List<RouteStopPattern> parseRouteStopPatternResponse(Response response) throws TransitLandAPIError {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(), RouteStopPatternsResult.class);
@@ -136,7 +134,6 @@ public class TransitLandAPIWrapper {
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
     }
-
 
 
     public void AgetRouteStopPatterns(String trip, Callback<List<RouteStopPattern>> cb){
@@ -160,6 +157,10 @@ public class TransitLandAPIWrapper {
                 .addQueryParameter("trip", trip)
                 .build();
         Response response = client.get(url, 20*1000);
+        return parseScheduleStopPairResponse(response);
+    }
+
+    private List<ScheduleStopPair> parseScheduleStopPairResponse(Response response) throws TransitLandAPIError {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
@@ -197,20 +198,7 @@ public class TransitLandAPIWrapper {
                 .addQueryParameter("route_stop_pattern_onestop_id", rsp.getId())
                 .build();
         Response response = client.get(url, 20*1000);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
-                response.close();
-                return a.getScheduleStopPairs();
-            } catch(IOException ex){
-                response.close();
-                return null;
-            }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+        return parseScheduleStopPairResponse(response);
     }
 
     public void AgetScheduleStopPair(RouteStopPattern rsp, Callback<List<ScheduleStopPair>> cb){
@@ -235,20 +223,7 @@ public class TransitLandAPIWrapper {
                 .addQueryParameter("date", year+"-"+month+"-"+day)
                 .build();
         Response response = client.get(url, 20*1000);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
-                response.close();
-                return a.getScheduleStopPairs();
-            } catch(IOException ex){
-                response.close();
-                return null;
-            }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+        return parseScheduleStopPairResponse(response);
     }
 
     public void AgetScheduleStopPair(RouteStopPattern rsp, int day, int month, int year, Callback<List<ScheduleStopPair>> cb){
@@ -278,20 +253,7 @@ public class TransitLandAPIWrapper {
 
                 .build();
         Response response = client.get(url, 20*1000);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ScheduleStopPairResult a = JsonIterator.deserialize(response.body().string(), ScheduleStopPairResult.class);
-                response.close();
-                return a.getScheduleStopPairs();
-            } catch(IOException ex){
-                response.close();
-                return null;
-            }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+        return parseScheduleStopPairResponse(response);
     }
 
     public void AgetScheduleStopPair(RouteStopPattern rsp, int day, int month, int year, String betweenI, String betweenF, Callback<List<ScheduleStopPair>> cb){
@@ -320,21 +282,7 @@ public class TransitLandAPIWrapper {
                 )
                 .build();
         Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                RouteStopPatternsResult a = JsonIterator.deserialize(response.body().string(),
-                        RouteStopPatternsResult.class);
-                response.close();
-                return a.getRouteStopPatterns();
-            } catch(IOException ex){
-                response.close();
-                return null;
-            }
-        } else {
-            if(response!=null)
-                response.close();
-            throw new TransitLandAPIError("Unable to get any response for this request");
-        }
+        return parseRouteStopPatternResponse(response);
     }
 
     public void AgetRouteStopPatternsByStopsVisited(ArrayList<Stop> stops, Callback<List<RouteStopPattern>> cb){
