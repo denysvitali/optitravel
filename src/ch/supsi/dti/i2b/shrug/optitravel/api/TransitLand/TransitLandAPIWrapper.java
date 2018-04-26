@@ -10,8 +10,7 @@ import okhttp3.HttpUrl;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TransitLandAPIWrapper {
@@ -596,13 +595,13 @@ public class TransitLandAPIWrapper {
         throw new TransitLandAPIError("Unable to get any response for this request");
     }
 
-    public List<RouteStopPattern> getRouteStopPatternsByBBox(Coordinate coord1, Coordinate coord2) throws TransitLandAPIError {
+    public List<RouteStopPattern> getRouteStopPatternsByBBox(GPSCoordinates coord1, GPSCoordinates coord2) throws TransitLandAPIError {
 
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/route_stop_patterns")
-                .addQueryParameter("bbox", coord1.getLat()+","+coord1.getLng()+","+coord2.getLat()+","+coord2.getLng())
+                .addQueryParameter("bbox", coord1.getLongitude()+","+coord1.getLatitude()+","+coord2.getLongitude()+","+coord2.getLatitude())
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
 
@@ -643,7 +642,7 @@ public class TransitLandAPIWrapper {
         return listRsp;
     }
 
-    public void AgetRouteStopPatternsByBBox(Coordinate coord1, Coordinate coord2, Callback<List<RouteStopPattern>> cb){
+    public void AgetRouteStopPatternsByBBox(GPSCoordinates coord1, GPSCoordinates coord2, Callback<List<RouteStopPattern>> cb){
         Runnable r = ()->{
             try {
                 cb.exec(getRouteStopPatternsByBBox(coord1, coord2));
@@ -657,13 +656,13 @@ public class TransitLandAPIWrapper {
     }
 
 
-    public List<Stop> getStopsByBBox(Coordinate coord1, Coordinate coord2) throws TransitLandAPIError {
+    public List<Stop> getStopsByBBox(GPSCoordinates coord1, GPSCoordinates coord2) throws TransitLandAPIError {
 
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/stops")
-                .addQueryParameter("bbox", coord1.getLat()+","+coord1.getLng()+","+coord2.getLat()+","+coord2.getLng())
+                .addQueryParameter("bbox", coord1.getLongitude()+","+coord1.getLatitude()+","+coord2.getLongitude()+","+coord2.getLatitude())
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
 
@@ -671,7 +670,7 @@ public class TransitLandAPIWrapper {
         StopsResult stopsResult;
         List<Stop> listStop = new ArrayList<>();
 
-        int maxRequestLimit = MAX_REQUESTS;
+        int maxRequestLimit = 20;
         do{
             response = client.get(url,(long) 50E3);
 
@@ -704,7 +703,7 @@ public class TransitLandAPIWrapper {
         return listStop;
     }
 
-    public void AgetStopsByBBox(Coordinate coord1, Coordinate coord2, Callback<List<Stop>> cb){
+    public void AgetStopsByBBox(GPSCoordinates coord1, GPSCoordinates coord2, Callback<List<Stop>> cb){
         Runnable r = ()->{
             try {
                 cb.exec(getStopsByBBox(coord1, coord2));
@@ -722,6 +721,13 @@ public class TransitLandAPIWrapper {
         if(arr == null){
             return new ArrayList<Stop>();
         }
+        /*
+        Map<Double, Stop> map = new SortedMap<Double, Stop>() {
+        };
+        for(Stop stop : arr){
+            Double distance = Distance.distance(c, stop.getCoordinates().asCoordinate());
+            map.put()
+        }*/
         return arr.stream().sorted((s1, s2) -> {
             double d1 = Distance.distance(c, s1.getCoordinates().asCoordinate());
             double d2 = Distance.distance(c, s2.getCoordinates().asCoordinate());
@@ -729,7 +735,7 @@ public class TransitLandAPIWrapper {
             if(d1 < d2){
                 return -1;
             }
-            if(d2 > d1){
+            if(d1 > d2){
                 return 1;
             }
             return 0;

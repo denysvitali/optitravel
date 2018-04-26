@@ -12,7 +12,7 @@ public class Distance {
         double phi2 = Math.toRadians(c2.getLat());
 
         double dphi = Math.toRadians(c2.getLat() - c1.getLat());
-        double dlam = Math.toRadians(c2.getLng() - c2.getLng());
+        double dlam = Math.toRadians(c2.getLng() - c1.getLng());
 
         double a =  Math.sin(dphi/2) * Math.sin(dphi/2) +
                     Math.cos(phi1) * Math.cos(phi2) * Math.sin(dlam/2) * Math.sin(dlam/2);
