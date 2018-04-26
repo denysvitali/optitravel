@@ -2,6 +2,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import org.junit.jupiter.api.Test;
 
@@ -154,6 +155,27 @@ class GTFSrsTest {
             assertNotEquals(null, routes);
             assertNotEquals(0, routes.size());
             routes.stream().forEach(e -> System.out.println(e.getName()));
+        } catch(GTFSrsError err){
+            fail(err);
+        }
+    }
+
+    @Test
+    public void testTripsInBBox(){
+        try {
+            BoundingBox bbox = new BoundingBox(new Coordinate(46.01946,8.974125),
+                    new Coordinate(46.023113,8.967738));
+            List<Trip> trips = gtfSrsWrapper.getTripsByBBox(bbox);
+            assertNotEquals(null, trips);
+            assertNotEquals(0, trips.size());
+            Trip t = trips.get(0);
+            // Results are inconsistent!!!
+            assertNotEquals(null, t);
+            /*
+                assertEquals("t-9217f2-luganocentro", t.getUID());
+                assertNotEquals(null, t.getRoute());
+                assertEquals(t.getRoute().getUID(), "r-5f39ec-7");
+            */
         } catch(GTFSrsError err){
             fail(err);
         }

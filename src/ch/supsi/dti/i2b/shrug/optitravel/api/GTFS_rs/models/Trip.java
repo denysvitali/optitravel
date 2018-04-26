@@ -20,4 +20,8 @@ public class Trip {
     public List<StopTrip> getStopTrip() {
         return stop_sequence;
     }
+
+    public Route getRoute() {
+        return new Route(route_id);
+    }
 }
