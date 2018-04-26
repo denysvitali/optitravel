@@ -145,4 +145,17 @@ class GTFSrsTest {
             fail(err);
         }
     }
+
+    @Test
+    public void testRoutesByStop(){
+        try{
+            String uid = "s-e5e593-luganocentro";
+            List<Route> routes = gtfSrsWrapper.getRouteByStop(uid);
+            assertNotEquals(null, routes);
+            assertNotEquals(0, routes.size());
+            routes.stream().forEach(e -> System.out.println(e.getName()));
+        } catch(GTFSrsError err){
+            fail(err);
+        }
+    }
 }

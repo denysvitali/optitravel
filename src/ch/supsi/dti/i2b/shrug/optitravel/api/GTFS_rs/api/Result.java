@@ -1,6 +1,8 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api;
 
-public class Result<T> {
-    public T result;
+import com.jsoniter.any.Any;
+
+public class Result {
+    public Any result;
     public Meta meta;
 }
