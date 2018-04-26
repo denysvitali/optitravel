@@ -1,8 +1,11 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Geometry;
+import com.jsoniter.annotation.JsonCreator;
+import com.jsoniter.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class RouteStopPattern {
     private Geometry geometry;
@@ -37,12 +40,12 @@ public class RouteStopPattern {
         return created_or_updated_in_changeset_id;
     }
 
-    public String getRouteOnestopId() {
-        return route_onestop_id;
+    public Route getRoute() {
+        return new Route(route_onestop_id);
     }
 
-    public ArrayList<String> getStopPattern() {
-        return stop_pattern;
+    public ArrayList<Stop> getStopPattern() {
+        return stop_pattern.stream().map(Stop::fromId).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public ArrayList<Double> getStopDistances() {

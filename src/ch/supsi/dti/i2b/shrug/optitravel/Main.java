@@ -1,17 +1,13 @@
 package ch.supsi.dti.i2b.shrug.optitravel;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.*;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Geometry;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.LineString;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.ScheduleStopPair;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.javascript.object.*;
-import com.lynden.gmapsfx.shapes.Polyline;
-import com.lynden.gmapsfx.shapes.PolylineOptions;
+import com.lynden.gmapsfx.shapes.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -19,6 +15,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -27,14 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main extends Application {
-
     private TransitLandAPIWrapper transitLandAPIWrapper;
-
     @Override
     public void start(Stage stage) throws Exception {
 
         Parent root = FXMLLoader.load(getClass().getResource("/ui/main.fxml"));
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1000, 800);
 
         stage.setTitle("OptiTravel");
         stage.setScene(scene);
@@ -136,6 +132,34 @@ public class Main extends Application {
 
     }
 
+    private void addCircle(GoogleMapView mapView, LatLong s1, int i) {
+        CircleOptions circleOpt = new CircleOptions();
+        circleOpt.fillColor("#009688");
+        Circle circle = new Circle(circleOpt);
+        circle.setCenter(s1);
+        circle.setRadius(i);
+        mapView.getMap().addMapShape(circle);
+    }
+
+    private void fitMap(GoogleMapView mapView, LatLong p1, LatLong p2) {
+        mapView.getMap().fitBounds(new LatLongBounds(p1, p2));
+    }
+
+    private void addMarker(GoogleMapView mapView, LatLong p1, String a) {
+        MarkerOptions mOpt = new MarkerOptions();
+        mOpt.position(p1);
+        mOpt.label(a);
+        mOpt.visible(true);
+
+        Marker m1 = new Marker(mOpt);
+        mapView.getMap().addMarker(m1);
+    }
+
+    private void drawBB(GoogleMapView mapView, LatLong p1, LatLong p2) {
+        Rectangle rect = new Rectangle(new RectangleOptions().bounds(new LatLongBounds(p1, p2)));
+        mapView.getMap().addMapShape(rect);
+    }
+
     private void updateMapWithTrip(GoogleMapView mapView, List<RouteStopPattern> rsp){
         if(rsp.size() == 0){
             System.out.println("RSP is empty!");
@@ -148,9 +172,9 @@ public class Main extends Application {
             List<ScheduleStopPair> a = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0).getTrips().get(0));
             List<ScheduleStopPair> b = transitLandAPIWrapper.getScheduleStopPair(rsp.get(0),2,2, 2018/*,"07:00:00","10:00:00"*/);
 
- //           List<RouteStopPattern> c = transitLandAPIWrapper.getRouteStopPatterns(rsp.get(0).getTrips().get(0));
+ //         List<RouteStopPattern> c = transitLandAPIWrapper.getRouteStopPatterns(rsp.get(0).getTrips().get(0));
 
-            List<Stop> d = transitLandAPIWrapper.getStopsByRoute(rsp.get(0).getRouteOnestopId());
+            List<Stop> d = transitLandAPIWrapper.getStopsByRoute(rsp.get(0).getRoute().getId());
 
             long t1 = System.currentTimeMillis();
             transitLandAPIWrapper.AgetRouteStopPatternsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719), routeStopPatterns -> {

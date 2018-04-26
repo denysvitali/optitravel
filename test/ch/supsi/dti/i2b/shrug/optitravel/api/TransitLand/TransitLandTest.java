@@ -5,6 +5,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Operator;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
+import com.jsoniter.JsonIterator;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -67,6 +68,7 @@ class TransitLandTest{
              */
             List<RouteStopPattern> rsp = apiWrapper.getRouteStopPatterns("8898293");
             assertEquals("r-dr5r7-statenislandferry-b860bb-38447b", rsp.get(0).getId());
+            assertEquals("r-dr5r7-statenislandferry",rsp.get(0).getRoute().getId());
         } catch (TransitLandAPIError transitLandAPIError) {
             fail(transitLandAPIError);
         }

@@ -1,5 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Result;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.ResultArray;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Agency;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Route;
@@ -8,10 +9,12 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.config.BuildConfig;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
+import com.jsoniter.any.Any;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -113,8 +116,30 @@ public class GTFSrsWrapper {
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
+                Result a = JsonIterator.deserialize(response.body().string()).as(Result.class);
+                return a.result.as(Route.class);
+            } catch(IOException ex){
+                return null;
+            }
+        } else {
+            throw new GTFSrsError("Unable to get any response for this request");
+        }
+    }
+
+    public List<Route> getRouteByStop(String uid) throws GTFSrsError {
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .port(PORT)
+                .scheme(SCHEME)
+                .addPathSegments("api/routes/by-stop/" + uid)
+                .build();
+        Response response = client.get(url);
+        if(response != null && response.isSuccessful() && response.body() != null){
+            try {
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult().as(Route.class);
+                List<Route> routes = new ArrayList<>();
+                a.getResult().asList().forEach(e->routes.add(e.as(Route.class)));
+                return routes;
             } catch(IOException ex){
                 return null;
             }
