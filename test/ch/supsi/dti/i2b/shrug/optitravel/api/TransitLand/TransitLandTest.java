@@ -1,9 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Operator;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
 import org.junit.jupiter.api.Test;
@@ -175,7 +172,7 @@ class TransitLandTest{
 
              */
 
-            List<RouteStopPattern> listRouteStopPatterns = apiWrapper.getRouteStopPatternsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719));
+            List<RouteStopPattern> listRouteStopPatterns = apiWrapper.getRouteStopPatternsByBBox(new GPSCoordinates(37.668,-122.000), new GPSCoordinates(37.719,-122.500));
             assertEquals("r-9q8yy-8bx-6b7992-8e20fa", listRouteStopPatterns.get(0).getId());
 
         } catch (TransitLandAPIError transitLandAPIError) {
@@ -192,7 +189,7 @@ class TransitLandTest{
             verify(mockedTRL).getStopsByBBox(gps, gps);
              */
 
-            List<Stop> listStops = apiWrapper.getStopsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719));
+            List<Stop> listStops = apiWrapper.getStopsByBBox(new GPSCoordinates(37.668,-122.000), new GPSCoordinates(37.719,-122.500));
             assertEquals("s-9q8yt0hwpd-dalycity", listStops.get(0).getId());
 
         } catch (TransitLandAPIError transitLandAPIError) {
@@ -201,6 +198,22 @@ class TransitLandTest{
 
     }
 
+    @Test
+    void checkGetScheduleStopPairsByBBox(){
+        try {
+            /*
+            mockedTRL.getScheduleStopPairsByBBox(gps, gps);
+            verify(mockedTRL).getScheduleStopPairsByBBox(gps, gps);
+             */
+
+            List<ScheduleStopPair> listSch = apiWrapper.getScheduleStopPairsByBBox(new GPSCoordinates(46.197728, 8.639571), new GPSCoordinates(45.951284, 9.120199));
+            assertEquals("r-u0-flixbus-4efdb3-591d18", listSch.get(0).getRoute_stop_pattern_onestop_id());
+
+        } catch (TransitLandAPIError transitLandAPIError) {
+            fail(transitLandAPIError);
+        }
+
+    }
 
     @Test
     void SBB_Operator(){

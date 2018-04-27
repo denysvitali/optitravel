@@ -670,7 +670,7 @@ public class TransitLandAPIWrapper {
         StopsResult stopsResult;
         List<Stop> listStop = new ArrayList<>();
 
-        int maxRequestLimit = 20;
+        int maxRequestLimit = MAX_REQUESTS;
         do{
             response = client.get(url,(long) 50E3);
 
@@ -740,6 +740,66 @@ public class TransitLandAPIWrapper {
             }
             return 0;
         }).collect(Collectors.toList());
+    }
+
+    public List<ScheduleStopPair> getScheduleStopPairsByBBox(GPSCoordinates coord1, GPSCoordinates coord2) throws TransitLandAPIError {
+
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/schedule_stop_pairs")
+                .addQueryParameter("bbox", coord1.getLongitude()+","+coord1.getLatitude()+","+coord2.getLongitude()+","+coord2.getLatitude())
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
+                .build();
+
+        Response response;
+        ScheduleStopPairResult sspResult;
+        List<ScheduleStopPair> listSch = new ArrayList<>();
+
+        int maxRequestLimit = MAX_REQUESTS;
+        do{
+            response = client.get(url,(long) 50E3);
+
+            if (response != null && response.isSuccessful() && response.body() != null) {
+                try {
+                    String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
+                    sspResult = JsonIterator.deserialize(str, ScheduleStopPairResult.class);
+                    response.close();
+                    listSch.addAll(sspResult.getScheduleStopPairs());
+
+                } catch (IOException ex) {
+                    response.close();
+                    return listSch;
+                }
+            } else {
+                if (response != null)
+                    response.close();
+                throw new TransitLandAPIError("Unable to get any response for this request");
+            }
+
+            if(sspResult.getMeta().getNext() != null)
+                url = HttpUrl.parse(sspResult.getMeta().getNext());
+
+            maxRequestLimit--;
+        }while(sspResult.getMeta().getNext() != null && maxRequestLimit != 0);
+
+        response.close();
+        return listSch;
+    }
+
+    public void AgetScheduleStopPairsByBBox(GPSCoordinates coord1, GPSCoordinates coord2, Callback<List<ScheduleStopPair>> cb){
+        Runnable r = ()->{
+            try {
+                cb.exec(getScheduleStopPairsByBBox(coord1, coord2));
+            } catch (TransitLandAPIError transitLandAPIError) {
+                transitLandAPIError.printStackTrace();
+                cb.exec(null);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
     }
 
     public void destroy() {

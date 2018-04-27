@@ -5,6 +5,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.ScheduleStopPair;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.shapes.*;
@@ -22,10 +23,18 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main extends Application {
-    private TransitLandAPIWrapper transitLandAPIWrapper;
+    final private TransitLandAPIWrapper transitLandAPIWrapper = new TransitLandAPIWrapper();
+    List<Stop> stopsInBBox = new ArrayList<>();
+    List<RouteStopPattern> routeStopPatternsInBBox = new ArrayList<>();
+    List<ScheduleStopPair> scheduleStopPairsInBBox = new ArrayList<>();
+    int count = 0;
+
     @Override
     public void start(Stage stage) throws Exception {
 
@@ -36,7 +45,6 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
-        transitLandAPIWrapper = new TransitLandAPIWrapper();
 
         AnchorPane ap = (AnchorPane) root.lookup("#ap-mapview");
         TextField partenza = (TextField) root.lookup("#tf_partenza");
@@ -49,8 +57,9 @@ public class Main extends Application {
         GoogleMapView mapView = new GoogleMapView();
         ap.getChildren().add(mapView);
         //mapView.setKey("AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4");
-
+/*
         ArrayList<Stop> stops = new ArrayList<>();
+
         try {
 /*          // Manno, La Monda
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.0248152,8.9174549)).get(0));
@@ -64,29 +73,30 @@ public class Main extends Application {
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(46.172491,8.800491)).get(0));
 */
            //milano
-            List<Stop> thestops = transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.485188, 9.202954),250);
-            stops.add(thestops.get(0));
+//           List<Stop> thestops = transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.485188, 9.202954),250);
+//           stops.add(thestops.get(0));
             //saronno
-            stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.625286,9.030723),250).get(0));
+//           stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(45.625286,9.030723),250).get(0));
 
 /*
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(37.780389, -122.477560),250).get(0));
 
             stops.add(transitLandAPIWrapper.getStopsNear(new GPSCoordinates(37.786391, -122.408333),250).get(0));
 */
-
+/*
 
         } catch (TransitLandAPIError transitLandAPIError) {
             transitLandAPIError.printStackTrace();
         }
-
+*/
         mapView.addMapInializedListener(() -> {
-
+/*
             transitLandAPIWrapper.AgetRouteStopPatternsByStopsVisited(stops, (rsp)->{
                 Platform.runLater(()->{
                     updateMapWithTrip(mapView, rsp);
                 });
             });
+*/
 
             LatLong lugano_location = new LatLong(46.0037, 8.9511);
             LatLong di_location = new LatLong(-50.6060175,165.9640191);
@@ -117,6 +127,7 @@ public class Main extends Application {
             }*/
 
 
+
         });
         //root.getChildren().add(mapView);
 
@@ -124,11 +135,48 @@ public class Main extends Application {
             public void handle(WindowEvent we) {
                 System.out.println("Stage is closing");
                 transitLandAPIWrapper.destroy();
-                transitLandAPIWrapper = null;
+     //           transitLandAPIWrapper = null;
                 System.exit(0);
 
             }
         });
+
+        //When the 2 coordinates used for creating the bbox are determined, start this Thread.
+        Runnable r = ()->{
+            transitLandAPIWrapper.AgetStopsByBBox(new GPSCoordinates(46.197728, 8.639571), new GPSCoordinates(45.951284, 9.120199), (stops)->{
+
+                System.out.println(stops);
+                stopsInBBox = stops;
+                synchronized (transitLandAPIWrapper){
+                    count++;
+                    transitLandAPIWrapper.notify();
+                }
+
+            });
+            transitLandAPIWrapper.AgetRouteStopPatternsByBBox(new GPSCoordinates(46.197728, 8.639571), new GPSCoordinates(45.951284, 9.120199), (rsps)->{
+
+                System.out.println(rsps);
+                routeStopPatternsInBBox = rsps;
+                synchronized (transitLandAPIWrapper){
+                    count++;
+                    transitLandAPIWrapper.notify();
+                }
+
+            });
+            transitLandAPIWrapper.AgetScheduleStopPairsByBBox(new GPSCoordinates(46.197728, 8.639571), new GPSCoordinates(45.951284, 9.120199), (ssps)->{
+
+                System.out.println(ssps);
+                scheduleStopPairsInBBox = ssps;
+                synchronized (transitLandAPIWrapper){
+                    count++;
+                    transitLandAPIWrapper.notify();
+                }
+
+            });
+            organize();
+        };
+        Thread t = new Thread(r);
+        t.start();
 
     }
 
@@ -160,6 +208,39 @@ public class Main extends Application {
         mapView.getMap().addMapShape(rect);
     }
 
+    private void organize(){
+
+        synchronized (transitLandAPIWrapper){
+            while(count!=3){
+                try {
+                    transitLandAPIWrapper.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println("ricevuti");
+        System.out.println(routeStopPatternsInBBox.get(0).getId());
+        System.out.println(stopsInBBox.get(0).getId());
+        stopsInBBox = transitLandAPIWrapper.sortStops(new GPSCoordinates(/*46.004962,8.950784*/46.003135, 8.759909), stopsInBBox);
+        GPSCoordinates c = new GPSCoordinates(46.004962,8.950784);
+        List<Stop> list = transitLandAPIWrapper.sortStops(c, stopsInBBox);
+        list.forEach(stop -> System.out.println(stop.getName() + " - " + Distance.distance(c.asCoordinate(), stop.getCoordinate())));
+        System.out.println(list.get(0).getId());
+        Map<String, Stop> mappaStops = new HashMap<>();
+        for(Stop stop : list){
+            mappaStops.put(stop.getId(), stop);
+        }
+        Map<String, RouteStopPattern> mappaRsps = new HashMap<>();
+        for(RouteStopPattern rsp : routeStopPatternsInBBox){
+            mappaRsps.put(rsp.getId(), rsp);
+        }
+        Map<ScheduleStopPair, String> mappaSsps = new HashMap<>();
+        for(ScheduleStopPair ssp : scheduleStopPairsInBBox){
+            mappaSsps.put(ssp, ssp.getRoute_stop_pattern_onestop_id());
+        }
+
+    }
     private void updateMapWithTrip(GoogleMapView mapView, List<RouteStopPattern> rsp){
         if(rsp.size() == 0){
             System.out.println("RSP is empty!");
@@ -177,12 +258,12 @@ public class Main extends Application {
             List<Stop> d = transitLandAPIWrapper.getStopsByRoute(rsp.get(0).getRoute().getId());
 
             long t1 = System.currentTimeMillis();
-            transitLandAPIWrapper.AgetRouteStopPatternsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719), routeStopPatterns -> {
+            transitLandAPIWrapper.AgetRouteStopPatternsByBBox(new GPSCoordinates(37.668,-122.000), new GPSCoordinates(37.719,-122.500), routeStopPatterns -> {
 
                 long t2 = System.currentTimeMillis();
                 System.out.println(t2-t1+" routeStopPatterns");
             });
-            transitLandAPIWrapper.AgetStopsByBBox(new Coordinate(-122.000,37.668), new Coordinate(-122.500,37.719), stops -> {
+            transitLandAPIWrapper.AgetStopsByBBox(new GPSCoordinates(37.668,-122.000), new GPSCoordinates(37.719,-122.500), stops -> {
 
                 long t2 = System.currentTimeMillis();
                 System.out.println(t2-t1+" stops");
