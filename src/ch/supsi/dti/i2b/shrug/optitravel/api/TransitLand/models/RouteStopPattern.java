@@ -13,7 +13,7 @@ public class RouteStopPattern {
     private String created_at;
     private String updated_at;
     private int created_or_updated_in_changeset_id;
-    private Route route;
+    private String route_onestop_id;
     private ArrayList<String> stop_pattern;
     private ArrayList<Double> stop_distances;
     private String geometry_source;
@@ -41,7 +41,7 @@ public class RouteStopPattern {
     }
 
     public Route getRoute() {
-        return route;
+        return new Route(route_onestop_id);
     }
 
     public ArrayList<Stop> getStopPattern() {

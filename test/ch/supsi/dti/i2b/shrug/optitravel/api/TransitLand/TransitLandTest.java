@@ -59,12 +59,14 @@ class TransitLandTest{
     @Test
     void checkGetRouteStopPatterns(){
         try {
-            /*
-             mockedTRL.getRouteStopPatterns(anyString());
-            verify(mockedTRL).getRouteStopPatterns(anyString());
-             */
             List<RouteStopPattern> rsp = apiWrapper.getRouteStopPatterns("8898293");
+            assertNotEquals(null, rsp);
+            assertNotEquals(0, rsp.size());
+            assertNotEquals(null, rsp.get(0));
+            assertNotEquals(null, rsp.get(0).getRoute());
+
             assertEquals("r-dr5r7-statenislandferry-b860bb-38447b", rsp.get(0).getId());
+            assertEquals("r-dr5r7-statenislandferry",rsp.get(0).getRoute().getId());
         } catch (TransitLandAPIError transitLandAPIError) {
             fail(transitLandAPIError);
         }
@@ -112,6 +114,44 @@ class TransitLandTest{
     }
 
     @Test
+    void tl_utf8_stops(){
+        Stop s;
+        try {
+            s = apiWrapper.getStopById("s-u6s89d1jbh-södertäljesödertälje");
+            assertNotEquals(null, s);
+            assertEquals("Södertälje, Södertälje", s.getName());
+            assertEquals(new Coordinate(59.16239,17.64542), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-66tm8eyjyb-buenaventuraargandoña320~360");
+            assertNotEquals(null, s);
+            assertEquals("Buenaventura Argandoña, 320-360", s.getName());
+            assertEquals(new Coordinate(-29.9491153,-71.33668005), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-66tm9u5f1b-peñuelasnorte");
+            assertNotEquals(null, s);
+            assertEquals("Peñuelas Norte", s.getName());
+            assertEquals(new Coordinate(-29.94838554,-71.2850529), s.getCoordinate());s = apiWrapper.getStopById("s-66tm9u5f1b-peñuelasnorte");
+
+            s = apiWrapper.getStopById("s-u2fjpsd6xc-vpodbabě");
+            assertNotEquals(null, s);
+            assertEquals("V Podbabě", s.getName());
+            assertEquals(new Coordinate(50.122815,14.395523), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-u2fjpskpky-podhoří");
+            assertNotEquals(null, s);
+            assertEquals("Podhoří", s.getName());
+            assertEquals(new Coordinate(50.122279,14.397788), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-u2fm1qprwx-sídlištěĎáblice");
+            assertNotEquals(null, s);
+            assertEquals("Sídliště Ďáblice", s.getName());
+            assertEquals(new Coordinate(50.131942,14.479232), s.getCoordinate());
+        } catch (TransitLandAPIError e) {
+            fail(e);
+        }
+    }
+
+    @Test
     void checkGetStopById(){
         try {
             /*
@@ -128,18 +168,30 @@ class TransitLandTest{
     }
 
     @Test
-    void checkGetScheduleStopPair(){
+    void checkGetScheduleStopPairTrip(){
         try {
             /*
             mockedTRL.getScheduleStopPair(anyString());
             verify(mockedTRL).getScheduleStopPair(anyString());
+             */
 
+            assertEquals("s-u0n7t3zfxx-saronno",apiWrapper.getScheduleStopPair("8898293").get(0).getOrigin_onestop_id());
+
+        } catch (TransitLandAPIError transitLandAPIError) {
+            fail(transitLandAPIError);
+        }
+
+    }
+
+    @Test
+    void checkGetScheduleStopPairRSP(){
+        try {
+            /*
             mock RouteStopPattern rsp
             mockedTRL.getScheduleStopPair(rsp);
             verify(mockedTRL).getScheduleStopPair(rsp);
              */
 
-            assertEquals("s-u0n7t3zfxx-saronno",apiWrapper.getScheduleStopPair("8898293").get(0).getOrigin_onestop_id());
             RouteStopPattern mockedRSP = mock(RouteStopPattern.class);
             when(mockedRSP.getId()).thenReturn("r-u0n7-r28-9609af-a3c09c");
             assertEquals("s-u0n7t3zfxx-saronno",apiWrapper.getScheduleStopPair(mockedRSP).get(0).getOrigin_onestop_id());
@@ -150,8 +202,57 @@ class TransitLandTest{
 
     }
 
+    @Test
+    void checkGetRouteStopPatternsByBBox(){
+        try {
+            /*
+            mockedTRL.getRouteStopPatternsByBBox(gps, gps);
+            verify(mockedTRL).getRouteStopPatternsByBBox(gps, gps);
 
+             */
 
+            List<RouteStopPattern> listRouteStopPatterns = apiWrapper.getRouteStopPatternsByBBox(new GPSCoordinates(37.668,-122.000), new GPSCoordinates(37.719,-122.500));
+            assertEquals("r-9q8yy-8bx-6b7992-8e20fa", listRouteStopPatterns.get(0).getId());
+
+        } catch (TransitLandAPIError transitLandAPIError) {
+            fail(transitLandAPIError);
+        }
+
+    }
+
+    @Test
+    void checkGetStopsByBBox(){
+        try {
+            /*
+            mockedTRL.getStopsByBBox(gps, gps);
+            verify(mockedTRL).getStopsByBBox(gps, gps);
+             */
+
+            List<Stop> listStops = apiWrapper.getStopsByBBox(new GPSCoordinates(37.668,-122.000), new GPSCoordinates(37.719,-122.500));
+            assertEquals("s-9q8yt0hwpd-dalycity", listStops.get(0).getId());
+
+        } catch (TransitLandAPIError transitLandAPIError) {
+            fail(transitLandAPIError);
+        }
+
+    }
+
+    @Test
+    void checkGetScheduleStopPairsByBBox(){
+        try {
+            /*
+            mockedTRL.getScheduleStopPairsByBBox(gps, gps);
+            verify(mockedTRL).getScheduleStopPairsByBBox(gps, gps);
+             */
+
+            List<ScheduleStopPair> listSch = apiWrapper.getScheduleStopPairsByBBox(new GPSCoordinates(46.197728, 8.639571), new GPSCoordinates(45.951284, 9.120199));
+            assertEquals("r-u0-flixbus-4efdb3-591d18", listSch.get(0).getRoute_stop_pattern_onestop_id());
+
+        } catch (TransitLandAPIError transitLandAPIError) {
+            fail(transitLandAPIError);
+        }
+
+    }
 
     @Test
     void SBB_Operator(){
