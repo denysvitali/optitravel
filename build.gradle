@@ -41,22 +41,23 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDir 'src'
+            srcDir 'src/main'
         }
 
         resources {
-            srcDir 'src/resources'
+            srcDir 'src/main/resources'
         }
     }
 
-    test {
-        java {
-            srcDir 'test'
-        }
-    }
+    //test {
+    //    java {
+    //        srcDir 'src/test'
+    //    }
+    //}
 }
 
 test {
+    useJUnitPlatform()
     reports {
         junitXml.enabled = false
         html.enabled = true

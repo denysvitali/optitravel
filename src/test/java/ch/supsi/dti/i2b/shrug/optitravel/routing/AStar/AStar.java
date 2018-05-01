@@ -1,6 +1,11 @@
-package ch.supsi.dti.i2b.shrug.optitravel.routing;
+package ch.supsi.dti.i2b.shrug.optitravel.routing.AStar;
 
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class AStar {
 
@@ -83,14 +88,42 @@ public class AStar {
         e.addNeighbour(g, 2);
         e.addNeighbour(k, 5);
 
+        Algorithm<String> astar = new Algorithm<>();
+        List<Node<String>> route = astar.route(s, e);
 
+        assertNotEquals(null, route);
+        assertEquals(5, route.size());
 
-        AstarAlgorithm<String> astar = new AstarAlgorithm<>();
+        // S,B,H,G,E is our path!
+        assertEquals("S", route.get(0).toString());
+        assertEquals("B", route.get(1).toString());
+        assertEquals("H", route.get(2).toString());
+        assertEquals("G", route.get(3).toString());
+        assertEquals("E", route.get(4).toString());
 
-        astar.route(s, e);
+        assertEquals(0, s.getG());
+        assertEquals(10, s.getH());
+        assertEquals(10, s.getF());
 
+        assertEquals(2, b.getG());
+        assertEquals(7, b.getH());
+        assertEquals(s, b.getFrom());
+        assertEquals(9, b.getF());
 
+        assertEquals(3, h.getG());
+        assertEquals(6, h.getH());
+        assertEquals(b, h.getFrom());
+        assertEquals(9, h.getF());
 
+        assertEquals(5, g.getG());
+        assertEquals(3, g.getH());
+        assertEquals(h, g.getFrom());
+        assertEquals(8, g.getF());
+
+        assertEquals(7, e.getG());
+        assertEquals(0, e.getH());
+        assertEquals(g, e.getFrom());
+        assertEquals(7, e.getF());
 
 
     }
