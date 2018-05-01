@@ -6,6 +6,29 @@ public class Algorithm<T> {
 
 
     public List<Node<T>> route(Node<T> from, Node<T> to){
+
+        TreeSet<Node<String>> calculatedNodes = new TreeSet<>((a, b) -> a.getF() >= b.getF() ? 1 : -1);
+
+        Node<String> first = new Node<>("first");
+        first.setG(1);
+        first.setH(1);
+        Node<String> middle = new Node<>("middle");
+        middle.setG(2);
+        middle.setH(1);
+        Node<String> last = new Node<>("last");
+        last.setG(3);
+        last.setH(1);
+        Node<String> newFirsteroni = new Node<>("newf");
+        newFirsteroni.setG(0);
+        newFirsteroni.setH(1);
+        calculatedNodes.add(middle);
+        calculatedNodes.add(last);
+        calculatedNodes.add(first);
+        Node<String> hh = calculatedNodes.pollFirst();
+        calculatedNodes.add(newFirsteroni);
+        boolean test = calculatedNodes.remove(newFirsteroni);
+        middle.setH(0);
+        middle.setG(0);
         Node<T> currentNode = from;
         from.setG(0);
         for(;;) {
@@ -20,6 +43,7 @@ public class Algorithm<T> {
                 if (n.getF() > newF || n.getG() == -1) {
                     n.setG(newG);
                     n.setFrom(currentNode);
+                  //  calculatedNodes.add(n);
                 }
                 if (!n.getVisited() && (closestNode == null || (closestNode.getF() > n.getF()))) {
                     closestNode = n;
