@@ -15,6 +15,8 @@ public class RouteStopPattern {
     private int created_or_updated_in_changeset_id;
     private String route_onestop_id;
     private ArrayList<String> stop_pattern;
+  //  private ArrayList<Stop> obj_stop_pattern;
+  //  private ArrayList<ScheduleStopPair> schedules;
     private ArrayList<Double> stop_distances;
     private String geometry_source;
     private String color;

@@ -6,6 +6,7 @@ import com.jsoniter.annotation.JsonCreator;
 import com.jsoniter.annotation.JsonObject;
 import com.jsoniter.annotation.JsonProperty;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 @JsonObject(asExtraForUnknownProperties = false)
@@ -15,6 +16,8 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     private String name;
     private ArrayList<Operator> operators_serving_stop;
     private ArrayList<Route> routes_serving_stop;
+
+//    private ArrayList<RouteStopPattern> contained_in;
 
     @JsonCreator
     public Stop(){

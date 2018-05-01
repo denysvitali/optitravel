@@ -10,6 +10,11 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
     public String description;
     public int type;
 
+    public Route(){}
+    public Route(String uid){
+        this.uid = uid;
+    }
+
     public String getUID() {
         return uid;
     }

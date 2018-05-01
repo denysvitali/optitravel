@@ -59,11 +59,12 @@ class TransitLandTest{
     @Test
     void checkGetRouteStopPatterns(){
         try {
-            /*
-             mockedTRL.getRouteStopPatterns(anyString());
-            verify(mockedTRL).getRouteStopPatterns(anyString());
-             */
             List<RouteStopPattern> rsp = apiWrapper.getRouteStopPatterns("8898293");
+            assertNotEquals(null, rsp);
+            assertNotEquals(0, rsp.size());
+            assertNotEquals(null, rsp.get(0));
+            assertNotEquals(null, rsp.get(0).getRoute());
+
             assertEquals("r-dr5r7-statenislandferry-b860bb-38447b", rsp.get(0).getId());
             assertEquals("r-dr5r7-statenislandferry",rsp.get(0).getRoute().getId());
         } catch (TransitLandAPIError transitLandAPIError) {
@@ -110,6 +111,44 @@ class TransitLandTest{
             fail(transitLandAPIError);
         }
 
+    }
+
+    @Test
+    void tl_utf8_stops(){
+        Stop s;
+        try {
+            s = apiWrapper.getStopById("s-u6s89d1jbh-södertäljesödertälje");
+            assertNotEquals(null, s);
+            assertEquals("Södertälje, Södertälje", s.getName());
+            assertEquals(new Coordinate(59.16239,17.64542), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-66tm8eyjyb-buenaventuraargandoña320~360");
+            assertNotEquals(null, s);
+            assertEquals("Buenaventura Argandoña, 320-360", s.getName());
+            assertEquals(new Coordinate(-29.9491153,-71.33668005), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-66tm9u5f1b-peñuelasnorte");
+            assertNotEquals(null, s);
+            assertEquals("Peñuelas Norte", s.getName());
+            assertEquals(new Coordinate(-29.94838554,-71.2850529), s.getCoordinate());s = apiWrapper.getStopById("s-66tm9u5f1b-peñuelasnorte");
+
+            s = apiWrapper.getStopById("s-u2fjpsd6xc-vpodbabě");
+            assertNotEquals(null, s);
+            assertEquals("V Podbabě", s.getName());
+            assertEquals(new Coordinate(50.122815,14.395523), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-u2fjpskpky-podhoří");
+            assertNotEquals(null, s);
+            assertEquals("Podhoří", s.getName());
+            assertEquals(new Coordinate(50.122279,14.397788), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-u2fm1qprwx-sídlištěĎáblice");
+            assertNotEquals(null, s);
+            assertEquals("Sídliště Ďáblice", s.getName());
+            assertEquals(new Coordinate(50.131942,14.479232), s.getCoordinate());
+        } catch (TransitLandAPIError e) {
+            fail(e);
+        }
     }
 
     @Test
