@@ -15,7 +15,7 @@ node {
 
     stage('Test') {
         sh './gradlew test'
-        junit 'build/test-results/**/*.xml'
+        junit 'build/test-places/**/*.xml'
     }
 
     stage('Push to SUPSI') {

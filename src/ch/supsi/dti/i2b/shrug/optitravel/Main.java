@@ -11,8 +11,8 @@ import java.util.ResourceBundle;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        ResourceBundle locale = ResourceBundle.getBundle("locale/strings");
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"), locale);
+//        ResourceBundle locale = ResourceBundle.getBundle("locale/strings");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/main.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setScene(scene);

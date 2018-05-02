@@ -7,6 +7,7 @@
 .combo-box.trip-filters .list-cell,
 .text-field.trip-filters,
 .combo-box.trip-filters,
+.combo-box.trip-filters > .text-field,
 .jfx-date-picker > .text-field,
 .jfx-time-picker > .text-field {
     -fx-prompt-text-fill: rgba(255,255,255,0.4);

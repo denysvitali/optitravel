@@ -1,21 +1,17 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
-import com.jfoenix.controls.*;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.GeocodingWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Place;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.Callback;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDatePicker;
+import com.jfoenix.controls.JFXTimePicker;
 import com.lynden.gmapsfx.GoogleMapView;
-import com.lynden.gmapsfx.MapComponentInitializedListener;
-import com.lynden.gmapsfx.javascript.object.GoogleMap;
-import com.lynden.gmapsfx.javascript.object.LatLong;
-import com.lynden.gmapsfx.javascript.object.MapOptions;
-import com.lynden.gmapsfx.javascript.object.MapTypeIdEnum;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableArray;
-import javafx.collections.ObservableList;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 
-import java.util.ResourceBundle;
+import java.util.List;
 
 public class MainController {
 
@@ -25,25 +21,41 @@ public class MainController {
     public JFXDatePicker dpDate;
     @FXML
     public JFXButton fabSend;
-    public FXCollections tripPeriodOptions;
-    @FXML
-    private JFXTextField tfEndPoint;
     @FXML
     private ComboBox cbTripPeriod;
     @FXML
-    private JFXTextField tfStartPoint;
+    private AutoCompleteTextField tfStartPoint;
+    @FXML
+    private AutoCompleteTextField tfEndPoint;
     @FXML
     private GoogleMapView mapView;
-    @FXML
-    private ResourceBundle resourceBundle;
-
 
     private MapController mapController;
+
+    public MainController() {
+    }
 
     @FXML
     private void initialize() {
 
-        mapController = new MapController(mapView);
+        tfStartPoint.setOnSelect((e) -> {
+            GeocodingWrapper.getPlacesAsync(tfStartPoint.getSelectedEntry().getDescription(), new Callback<List<Place>>() {
+                @Override
+                public void exec(List<Place> places) {
+                    Platform.runLater(() -> mapController.addMarker(places.get(0).getGeometry().getLocation(), MapController.NodeType.ORIGIN));
+                }
+            });
+        });
+        tfEndPoint.setOnSelect((e) -> {
+            GeocodingWrapper.getPlacesAsync(tfEndPoint.getSelectedEntry().getDescription(), new Callback<List<Place>>() {
+                @Override
+                public void exec(List<Place> places) {
+                    Platform.runLater(() -> mapController.addMarker(places.get(0).getGeometry().getLocation(), MapController.NodeType.DESTINAION));
+                }
+            });
+        });
+
+        mapController = new MapController(mapView, this);
         mapView.addMapInializedListener(mapController);
 
         cbTripPeriod.getSelectionModel().selectFirst();
@@ -53,6 +65,4 @@ public class MainController {
         tpTime.setIs24HourView(true);
 
     }
-
-
 }
