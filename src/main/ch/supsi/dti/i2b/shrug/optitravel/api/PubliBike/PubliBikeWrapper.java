@@ -1,192 +1,85 @@
-package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
+package ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Result;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.ResultArray;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Agency;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Route;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip;
-import ch.supsi.dti.i2b.shrug.optitravel.config.BuildConfig;
-import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
+import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models.Station;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GTFSrsWrapper {
-    public static final String HOST = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? "localhost": "gtfs.ded1.denv.it");
-    public static final int PORT = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? 8000 : 443);
-    public static final String SCHEME = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? "http" : "https");
+public class PubliBikeWrapper {
+    public static final String HOST = "api.publibike.ch";
+    public static final String ENDPOINT = "v1/public";
+    public static final String SCHEME = "https";
     private HttpClient client;
 
-    public GTFSrsWrapper(){
+    public PubliBikeWrapper(){
         this.client = new HttpClient();
     }
     
-    public boolean isOnline() throws GTFSrsError {
+    public boolean isOnline() throws PubliBikeError {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
-                .port(PORT)
                 .scheme(SCHEME)
-                .addPathSegments("api/")
+                .addPathSegments(ENDPOINT)
+                .addPathSegments("stations")
                 .build();
+        System.out.println(url);
         Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
+        if(response != null && response.isSuccessful()){
                 return response.isSuccessful();
         } else {
-            throw new GTFSrsError("Unable to get any response for this request");
+            throw new PubliBikeError("Unable to get any response for this request");
         }
     }
 
-    public List<Stop> getStopsByTrip(String tid) throws GTFSrsError {
-        // /api/stops/by-trip/<tid>
+    public List<Station> getStations() throws PubliBikeError {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
-                .port(PORT)
                 .scheme(SCHEME)
-                .addPathSegments("api/stops/by-trip/" + tid)
+                .addPathSegments(ENDPOINT)
+                .addPathSegments("stations")
                 .build();
+        System.out.println(url);
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult().asList().stream().map(e-> e.as(Stop.class)).collect(Collectors.toList());
+                return a.getResult()
+                        .asList()
+                        .stream()
+                        .map(e-> e.as(Station.class))
+                        .collect(Collectors.toList());/*
+                        .map(s->s.setWrapper(this))
+                        .collect(Collectors.toList());*/
             } catch(IOException ex){
                 return null;
             }
         } else {
-            throw new GTFSrsError("Unable to get any response for this request");
-        }
-    }
-    
-    public List<Route> getRoutes() throws GTFSrsError {
-        // /api/routes
-        HttpUrl url = new HttpUrl.Builder()
-                .host(HOST)
-                .port(PORT)
-                .scheme(SCHEME)
-                .addPathSegments("api/routes")
-                .build();
-        Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult().asList().stream().map(e-> e.as(Route.class)).collect(Collectors.toList());
-            } catch(IOException ex){
-                return null;
-            }
-        } else {
-            throw new GTFSrsError("Unable to get any response for this request");
-        }
-    }
-    
-    public Agency getAgency(String uid) throws GTFSrsError {
-        // /api/stops/by-trip/<tid>
-        HttpUrl url = new HttpUrl.Builder()
-                .host(HOST)
-                .port(PORT)
-                .scheme(SCHEME)
-                .addPathSegments("api/agency/" + uid)
-                .build();
-        Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult().as(Agency.class);
-            } catch(IOException ex){
-                return null;
-            }
-        } else {
-            throw new GTFSrsError("Unable to get any response for this request");
+            throw new PubliBikeError("Unable to get any response for this request");
         }
     }
 
-    public Route getRoute(String uid) throws GTFSrsError {
+    public Station getStation(int id) throws PubliBikeError {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
-                .port(PORT)
                 .scheme(SCHEME)
-                .addPathSegments("api/routes/" + uid)
-                .build();
-        Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                Result a = JsonIterator.deserialize(response.body().string()).as(Result.class);
-                return a.result.as(Route.class);
-            } catch(IOException ex){
-                return null;
-            }
-        } else {
-            throw new GTFSrsError("Unable to get any response for this request");
-        }
-    }
-
-    public List<Route> getRouteByStop(String uid) throws GTFSrsError {
-        HttpUrl url = new HttpUrl.Builder()
-                .host(HOST)
-                .port(PORT)
-                .scheme(SCHEME)
-                .addPathSegments("api/routes/by-stop/" + uid)
+                .addPathSegments("stations")
                 .build();
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                List<Route> routes = new ArrayList<>();
-                a.getResult().asList().forEach(e->routes.add(e.as(Route.class)));
-                return routes;
+                return a.getResult().as(Station.class).setWrapper(this);
             } catch(IOException ex){
                 return null;
             }
         } else {
-            throw new GTFSrsError("Unable to get any response for this request");
-        }
-    }
-
-    public Trip getTrip(String uid) throws GTFSrsError {
-        HttpUrl url = new HttpUrl.Builder()
-                .host(HOST)
-                .port(PORT)
-                .scheme(SCHEME)
-                .addPathSegments("api/trips/" + uid)
-                .build();
-        Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult().as(Trip.class);
-            } catch(IOException ex){
-                return null;
-            }
-        } else {
-            throw new GTFSrsError("Unable to get any response for this request");
-        }
-    }
-
-    public List<Trip> getTripsByBBox(BoundingBox boundingBox) throws GTFSrsError {
-        HttpUrl url = new HttpUrl.Builder()
-                .host(HOST)
-                .port(PORT)
-                .scheme(SCHEME)
-                .addPathSegments("api/trips/in/" + boundingBox)
-                .build();
-        Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult().asList().stream().map((e)->{
-                    return e.as(Trip.class);
-                }).collect(Collectors.toList());
-            } catch(IOException ex){
-                return null;
-            }
-        } else {
-            throw new GTFSrsError("Unable to get any response for this request");
+            throw new PubliBikeError("Unable to get any response for this request");
         }
     }
 }
