@@ -4,6 +4,9 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.PubliBikeError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.PubliBikeWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Location;
+import com.jsoniter.annotation.JsonCreator;
+import com.jsoniter.annotation.JsonIgnore;
+import com.jsoniter.any.Any;
 
 import java.util.ArrayList;
 
@@ -15,18 +18,14 @@ public class Station extends Location {
 
     private String name;
     private String address;
-    private int zip = -1;
+    private String zip;
     private String city;
 
-    private ArrayList<Vehicle> vehicles;
+    private ArrayList<Any> vehicles;
     private Network network;
-    private ArrayList<String> sponsors;
+    private ArrayList<Sponsor> sponsors;
 
-    private PubliBikeWrapper pbw;
-
-    Station(int id){
-        this.id = id;
-    }
+    @JsonIgnore private PubliBikeWrapper pbw;
 
     @Override
     public Coordinate getCoordinate() {
@@ -56,10 +55,11 @@ public class Station extends Location {
             this.zip = s.zip;
             this.network = s.network;
             this.sponsors = s.sponsors;
+            this.state = s.state;
         }
     }
 
-    private String getName() {
+    public String getName() {
         if(name != null){
             return name;
         }
@@ -77,7 +77,7 @@ public class Station extends Location {
         }
     }
 
-    public ArrayList<Vehicle> getVehicles() {
+    public ArrayList<Any> getVehicles() {
         if(vehicles != null){
             return vehicles;
         }
@@ -95,8 +95,8 @@ public class Station extends Location {
         }
     }
 
-    public int getZip() {
-        if(zip != -1){
+    public String getZip() {
+        if(zip != null){
             return zip;
         }
 
@@ -106,10 +106,10 @@ public class Station extends Location {
                 update(newStation);
                 return this.zip;
             } catch (PubliBikeError publiBikeError) {
-                return -1;
+                return null;
             }
         } else {
-            return -1;
+            return null;
         }
     }
 
@@ -167,7 +167,7 @@ public class Station extends Location {
         }
     }
 
-    public ArrayList<String> getSponsors() {
+    public ArrayList<Sponsor> getSponsors() {
         if(sponsors != null){
             return sponsors;
         }
@@ -185,6 +185,7 @@ public class Station extends Location {
         }
     }
 
+    @JsonIgnore
     public Station setWrapper(PubliBikeWrapper publiBikeWrapper) {
         this.pbw = publiBikeWrapper;
         return this;

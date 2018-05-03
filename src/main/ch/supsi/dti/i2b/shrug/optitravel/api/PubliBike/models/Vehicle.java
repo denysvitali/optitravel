@@ -5,6 +5,8 @@ public class Vehicle {
     private String name;
     private VehicleType type;
 
+    public Vehicle(){}
+
     public int getId() {
         return id;
     }

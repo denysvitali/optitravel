@@ -4,6 +4,8 @@ public class StationState {
     private int id;
     private String name;
 
+    public StationState(){}
+
     public String getName() {
         return name;
     }

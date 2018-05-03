@@ -1,6 +1,5 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.ResultArray;
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models.Station;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
@@ -44,18 +43,14 @@ public class PubliBikeWrapper {
                 .addPathSegments(ENDPOINT)
                 .addPathSegments("stations")
                 .build();
-        System.out.println(url);
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
-                ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult()
-                        .asList()
-                        .stream()
-                        .map(e-> e.as(Station.class))
-                        .collect(Collectors.toList());/*
-                        .map(s->s.setWrapper(this))
-                        .collect(Collectors.toList());*/
+                String body = response.body().string();
+                return JsonIterator.deserialize(body).asList().stream()
+                        .map(s -> s.as(Station.class))
+                        .map(s-> s.setWrapper(this))
+                        .collect(Collectors.toList());
             } catch(IOException ex){
                 return null;
             }
@@ -68,13 +63,15 @@ public class PubliBikeWrapper {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme(SCHEME)
+                .addPathSegments(ENDPOINT)
                 .addPathSegments("stations")
+                .addPathSegment(String.valueOf(id))
                 .build();
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
-                ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult().as(Station.class).setWrapper(this);
+                Station a = JsonIterator.deserialize(response.body().string(), Station.class);
+                return a.setWrapper(this);
             } catch(IOException ex){
                 return null;
             }
