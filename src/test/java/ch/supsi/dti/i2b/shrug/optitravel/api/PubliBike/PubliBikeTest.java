@@ -1,6 +1,8 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models.Station;
+import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models.Tariff;
+import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models.TariffModel;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
@@ -58,6 +60,32 @@ public class PubliBikeTest {
             assertEquals(new Coordinate(46.9436621,7.4325071), s.getCoordinate());
             assertEquals("Hauptsitz Postauto", s.getName());
             assertEquals("Bern", s.getNetwork().getName());
+        } catch(PubliBikeError e){
+            fail(e);
+        }
+    }
+
+    @Test
+    void getTariffs(){
+        try{
+            List<Tariff> tariffs = pbw.getTariffs();
+            assertNotEquals(0, tariffs);
+            assertNotEquals(null, tariffs.get(0));
+            assertEquals("QuickBike", tariffs.get(0).getName());
+            assertEquals("without annual fee", tariffs.get(0).getDescription());
+            assertEquals("0.-", tariffs.get(0).getBasePrice());
+            assertNotEquals(null, tariffs.get(0).getTariffModels());
+            for(TariffModel t : tariffs.get(0).getTariffModels()){
+                assertNotEquals(null, t);
+                assertNotEquals(null, t.getVehicleType());
+                assertNotEquals(null, t.getFixedPrice());
+                assertNotEquals(null, t.getFixedPriceDescription());
+                assertNotEquals(null, t.getMaxPrice());
+                assertNotEquals(null, t.getMaxPriceDescription());
+                assertNotEquals(null, t.getVarPrice());
+                assertNotEquals(null, t.getVarPriceDescription());
+            }
+
         } catch(PubliBikeError e){
             fail(e);
         }

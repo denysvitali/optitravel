@@ -1,8 +1,10 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models.Station;
+import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models.Tariff;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
+import com.jsoniter.any.Any;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 
@@ -72,6 +74,26 @@ public class PubliBikeWrapper {
             try {
                 Station a = JsonIterator.deserialize(response.body().string(), Station.class);
                 return a.setWrapper(this);
+            } catch(IOException ex){
+                return null;
+            }
+        } else {
+            throw new PubliBikeError("Unable to get any response for this request");
+        }
+    }
+
+    public List<Tariff> getTariffs() throws PubliBikeError {
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme(SCHEME)
+                .addPathSegments(ENDPOINT)
+                .addPathSegments("tariffs")
+                .build();
+        Response response = client.get(url);
+        if(response != null && response.isSuccessful() && response.body() != null){
+            try {
+                List<Any> a = JsonIterator.deserialize(response.body().string()).asList();
+                return a.stream().map(e->e.as(Tariff.class)).collect(Collectors.toList());
             } catch(IOException ex){
                 return null;
             }
