@@ -9,13 +9,13 @@ node {
     }
 
     stage('Build') {
-        sh './gradlew build'
+        sh './gradlew clean build -x test'
         archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
     }
 
     stage('Test') {
         sh './gradlew test'
-        junit 'build/test-places/**/*.xml'
+        junit 'build/test-results/**/*.xml'
     }
 
     stage('Push to SUPSI') {

@@ -34,29 +34,30 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     compile 'com.lynden:GMapsFX:2.12.0'
     compile 'com.jsoniter:jsoniter:0.9.19'
-    compile 'com.jfoenix:jfoenix:9.0.3'
-    compile 'de.jensd:fontawesomefx-commons:9.1.2'
-    compile 'de.jensd:fontawesomefx-materialicons:2.2.0-9.1.2'
+    //compile 'com.jfoenix:jfoenix:8.0.3' // Java 8
+    compile 'com.jfoenix:jfoenix:9.0.3' // Java 9
 }
 
 sourceSets {
     main {
         java {
-            srcDir 'src'
+            srcDir 'src/main'
         }
+
         resources {
-            srcDir 'resources'
+            srcDir 'src/main/resources'
         }
     }
 
-    test {
-        java {
-            srcDir 'test'
-        }
-    }
+    //test {
+    //    java {
+    //        srcDir 'src/test'
+    //    }
+    //}
 }
 
 test {
+    useJUnitPlatform()
     reports {
         junitXml.enabled = false
         html.enabled = true
