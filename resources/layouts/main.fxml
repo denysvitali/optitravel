@@ -20,7 +20,7 @@
             <padding>
                 <Insets bottom="24.0" left="8.0" right="8.0" top="8.0"/>
             </padding>
-            <HBox fx:id="routeOptionsContainer" alignment="CENTER">
+            <HBox alignment="CENTER">
                 <VBox.margin>
                     <Insets bottom="8.0"/>
                 </VBox.margin>

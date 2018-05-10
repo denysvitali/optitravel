@@ -6,13 +6,10 @@ import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTimePicker;
 import com.lynden.gmapsfx.GoogleMapView;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
 
 public class MainController {
 
@@ -30,8 +27,6 @@ public class MainController {
     private AutoCompleteTextField tfEndPoint;
     @FXML
     private GoogleMapView mapView;
-    @FXML
-    private HBox routeOptionsContainer;
     @FXML
     private ListView<String> lvRouteStops;
     @FXML
