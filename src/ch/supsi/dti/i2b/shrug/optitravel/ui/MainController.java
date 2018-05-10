@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.GeocodingWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXTimePicker;
@@ -8,8 +9,10 @@ import com.lynden.gmapsfx.GoogleMapView;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.Callback;
 
 public class MainController {
 
@@ -28,7 +31,7 @@ public class MainController {
     @FXML
     private GoogleMapView mapView;
     @FXML
-    private ListView<String> lvRouteStops;
+    private ListView<Stop> lvRouteStops;
     @FXML
     private AnchorPane mainContainer;
     @FXML
@@ -81,13 +84,21 @@ public class MainController {
         tpTime.getEditor().setOnMouseClicked(e -> tpTime.show());
         tpTime.setIs24HourView(true);
 
+        // Prepare listview
         lvRouteStops.setPrefWidth(280);
         mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight()));
         filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight()));
-        for(int i = 0; i < 20; i++) lvRouteStops.getItems().addAll("Aaaaaaaaaaaaaaaaaaaaa");
+        lvRouteStops.setCellFactory(new Callback<ListView<Stop>, ListCell<Stop>>() {
+            @Override
+            public ListCell<Stop> call(ListView<Stop> param) {
+                return new StopCellItem();
+            }
+        });
+        for(int i = 0; i < 50; i++) lvRouteStops.getItems().addAll(new TestStop());
 
         fabSend.toFront();
         lvRouteStops.toBack();
+
     }
 }
 
