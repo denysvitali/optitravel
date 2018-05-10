@@ -16,11 +16,11 @@
         <URL value="@main.css"/>
     </stylesheets>
     <AnchorPane>
-        <VBox style="-fx-background-color: #3f51b5;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox style="-fx-background-color: #3f51b5;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" prefWidth="280">
             <padding>
                 <Insets bottom="24.0" left="8.0" right="8.0" top="8.0"/>
             </padding>
-            <HBox alignment="CENTER">
+            <HBox fx:id="routeOptionsContainer" alignment="CENTER">
                 <VBox.margin>
                     <Insets bottom="8.0"/>
                 </VBox.margin>
@@ -70,20 +70,6 @@
                     </HBox.margin>
                 </JFXRippler>
             </HBox>
-            <!--<JFXComboBox fx:id="cbStartPoint" styleClass="trip-filters" labelFloat="true" editable="true"-->
-                         <!--prefHeight="26.0" prefWidth="264.0"-->
-                         <!--promptText="Starting point">-->
-                <!--<VBox.margin>-->
-                    <!--<Insets bottom="8.0" top="8.0"/>-->
-                <!--</VBox.margin>-->
-            <!--</JFXComboBox>-->
-            <!--<JFXComboBox fx:id="cbEndPoint" styleClass="trip-filters" labelFloat="true" editable="true"-->
-                         <!--prefHeight="26.0" prefWidth="264.0"-->
-                         <!--promptText="Destination">-->
-                <!--<VBox.margin>-->
-                    <!--<Insets bottom="8.0" top="8.0"/>-->
-                <!--</VBox.margin>-->
-            <!--</JFXComboBox>-->
             <AutoCompleteTextField fx:id="tfStartPoint" styleClass="trip-filters" labelFloat="true"
                                    prefHeight="26.0" prefWidth="264.0"
                                    promptText="Starting point">

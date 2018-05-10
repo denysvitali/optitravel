@@ -56,3 +56,16 @@
 .jfx-time-picker > .arrow-button > .arrow {
     -fx-padding: 0;
 }
+
+.jfx-decorator {
+    -fx-decorator-color: blue;
+}
+
+.jfx-decorator .jfx-decorator-buttons-container {
+    -fx-background-color: -fx-decorator-color;
+}
+
+.jfx-decorator .resize-border {
+    -fx-border-color: -fx-decorator-color;
+    -fx-border-width: 0 4 4 4;
+}
