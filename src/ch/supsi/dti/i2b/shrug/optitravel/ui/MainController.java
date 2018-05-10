@@ -91,6 +91,8 @@ public class MainController {
         filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight()));
         for(int i = 0; i < 20; i++) lvRouteStops.getItems().addAll("Aaaaaaaaaaaaaaaaaaaaa");
 
+        fabSend.toFront();
+        lvRouteStops.toBack();
     }
 }
 
