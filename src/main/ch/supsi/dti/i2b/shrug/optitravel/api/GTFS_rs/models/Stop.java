@@ -34,4 +34,9 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     public int getType() {
         return location_type;
     }
+
+    @Override
+    public void findNeighbours(int arrivalTime) {
+
+    }
 }

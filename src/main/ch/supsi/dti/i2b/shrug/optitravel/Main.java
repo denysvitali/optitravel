@@ -222,8 +222,8 @@ public class Main extends Application {
         System.out.println("ricevuti");
         System.out.println(routeStopPatternsInBBox.get(0).getId());
         System.out.println(stopsInBBox.get(0).getId());
-        stopsInBBox = transitLandAPIWrapper.sortStops(new GPSCoordinates(/*46.004962,8.950784*/46.003135, 8.759909), stopsInBBox);
-        GPSCoordinates c = new GPSCoordinates(46.004962,8.950784);
+   //     stopsInBBox = transitLandAPIWrapper.sortStops(new GPSCoordinates(/*46.004962,8.950784*/46.003135, 8.759909), stopsInBBox);
+        GPSCoordinates c = new GPSCoordinates(46.164871, 8.917476);
         List<Stop> list = transitLandAPIWrapper.sortStops(c, stopsInBBox);
         list.forEach(stop -> System.out.println(stop.getName() + " - " + Distance.distance(c.asCoordinate(), stop.getCoordinate())));
         System.out.println(list.get(0).getId());
