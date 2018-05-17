@@ -1,6 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.PlacesAutocompleteWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.PlacesAutocompletionService;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Prediction;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
@@ -91,7 +91,7 @@ public class AutoCompleteTextField extends JFXTextField implements ChangeListene
             queryTask = new TimerTask() {
                 @Override
                 public void run() {
-                    PlacesAutocompleteWrapper.getPredictionsAsync(s2, predictions -> {
+                    PlacesAutocompletionService.autocompleteAsync(s2, predictions -> {
                         if (predictions.size() > 0) {
                             populatePopup(predictions);
                             if (!entriesPopup.isShowing()) {

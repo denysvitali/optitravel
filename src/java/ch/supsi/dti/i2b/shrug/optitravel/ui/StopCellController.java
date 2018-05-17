@@ -4,6 +4,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
 import de.jensd.fx.glyphs.materialicons.MaterialIconView;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 
 import java.io.IOException;
@@ -23,11 +24,13 @@ public class StopCellController {
     @FXML
     private MaterialIconView icon;
 
+    private Node view;
+
     public StopCellController() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/layouts/listCellItem.fxml"));
         loader.setController(this);
         try {
-            loader.load();
+            view = loader.load();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -35,5 +38,9 @@ public class StopCellController {
 
     public void setStop(Stop stop) {
 
+    }
+
+    public Node getView() {
+        return view;
     }
 }

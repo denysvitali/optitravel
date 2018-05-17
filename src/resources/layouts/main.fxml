@@ -117,5 +117,5 @@
     <GoogleMapView fx:id="mapView" id="mapView" layoutX="280.0" AnchorPane.bottomAnchor="0.0"
                    AnchorPane.leftAnchor="280.0"
                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-    <JFXListView fx:id="lvRouteStops" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" />
+    <JFXListView styleClass="mylistview" fx:id="lvRouteStops" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" />
 </AnchorPane>

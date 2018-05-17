@@ -36,24 +36,25 @@ dependencies {
     compile 'com.jsoniter:jsoniter:0.9.19'
     //compile 'com.jfoenix:jfoenix:8.0.3' // Java 8
     compile 'com.jfoenix:jfoenix:9.0.3' // Java 9
+    compile group: 'de.jensd', name: 'fontawesomefx-materialicons', version: '2.2.0-9.1.2'
 }
 
 sourceSets {
     main {
         java {
-            srcDir 'src/main'
+            srcDir 'src/java'
         }
 
         resources {
-            srcDir 'src/main/resources'
+            srcDir 'src/resources'
         }
     }
 
-    //test {
-    //    java {
-    //        srcDir 'src/test'
-    //    }
-    //}
+    test {
+        java {
+            srcDir 'src/test'
+        }
+    }
 }
 
 test {

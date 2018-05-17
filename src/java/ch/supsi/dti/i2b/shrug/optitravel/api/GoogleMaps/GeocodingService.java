@@ -11,13 +11,13 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.util.List;
 
-public class GeocodingWrapper {
+public class GeocodingService {
 
     private static final String HOST = "maps.googleapis.com";
     private static final String SEGMENTS = "maps/api/geocode/json";
     private static final String KEY = "AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4";
 
-    public static List<Place> getPlaces(String s) {
+    public static List<Place> geocode(String s) {
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .addPathSegments(SEGMENTS)
@@ -27,18 +27,18 @@ public class GeocodingWrapper {
                 .build();
         HttpClient client = new HttpClient();
         Response response = client.get(url);
-        return parsePlacesResponse(response);
+        return parseResponse(response);
     }
 
-    public static void getPlacesAsync(String s, Callback<List<Place>> cb) {
+    public static void geocodeAsync(String s, Callback<List<Place>> cb) {
         Runnable r = ()->{
-            cb.exec(getPlaces(s));
+            cb.exec(geocode(s));
         };
         Thread t = new Thread(r);
         t.start();
     }
 
-    private static List<Place> parsePlacesResponse(Response response) {
+    private static List<Place> parseResponse(Response response) {
         if (response != null && response.isSuccessful() && response.body() != null) {
             try {
                 GeocodingResponse a = JsonIterator.deserialize(response.body().string(), GeocodingResponse.class);

@@ -1,9 +1,10 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.GeocodingWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.GeocodingService;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
+import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTimePicker;
 import com.lynden.gmapsfx.GoogleMapView;
 import javafx.application.Platform;
@@ -31,7 +32,7 @@ public class MainController {
     @FXML
     private GoogleMapView mapView;
     @FXML
-    private ListView<Stop> lvRouteStops;
+    private JFXListView<Stop> lvRouteStops;
     @FXML
     private AnchorPane mainContainer;
     @FXML
@@ -47,10 +48,10 @@ public class MainController {
 
         // Setup autocompletion on origin and destination text fields
         tfStartPoint.setOnSelect((e) ->
-                GeocodingWrapper.getPlacesAsync(tfStartPoint.getSelectedEntry().getDescription(),
+                GeocodingService.geocodeAsync(tfStartPoint.getSelectedEntry().getDescription(),
                         places -> Platform.runLater(() -> mapController.addMarker(places.get(0).getGeometry().getLocation(), MapController.NodeType.ORIGIN))));
         tfEndPoint.setOnSelect((e) ->
-                GeocodingWrapper.getPlacesAsync(tfEndPoint.getSelectedEntry().getDescription(),
+                GeocodingService.geocodeAsync(tfEndPoint.getSelectedEntry().getDescription(),
                         places -> Platform.runLater(() -> mapController.addMarker(places.get(0).getGeometry().getLocation(), MapController.NodeType.DESTINAION))));
 
         // Initialise map
@@ -86,15 +87,15 @@ public class MainController {
 
         // Prepare listview
         lvRouteStops.setPrefWidth(280);
-        mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight()));
-        filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight()));
+        mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 -fabSend.getPrefHeight()/2));
+        filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight()/2));
         lvRouteStops.setCellFactory(new Callback<ListView<Stop>, ListCell<Stop>>() {
             @Override
             public ListCell<Stop> call(ListView<Stop> param) {
                 return new StopCellItem();
             }
         });
-        for(int i = 0; i < 50; i++) lvRouteStops.getItems().addAll(new TestStop());
+        for(int i = 0; i < 10; i++) lvRouteStops.getItems().addAll(new TestStop());
 
         fabSend.toFront();
         lvRouteStops.toBack();
