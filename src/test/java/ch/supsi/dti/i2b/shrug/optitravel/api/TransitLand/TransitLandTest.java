@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
 import org.junit.jupiter.api.Test;
@@ -228,7 +229,11 @@ class TransitLandTest{
             verify(mockedTRL).getStopsByBBox(gps, gps);
              */
 
-            List<Stop> listStops = apiWrapper.getStopsByBBox(new GPSCoordinates(37.668,-122.000), new GPSCoordinates(37.719,-122.500));
+            List<Stop> listStops = apiWrapper.getStopsByBBox(new BoundingBox(
+                    new Coordinate(37.668,-122.000),
+                    new Coordinate(37.719,-122.500)
+                    )
+            );
             assertEquals("s-9q8yt0hwpd-dalycity", listStops.get(0).getId());
 
         } catch (TransitLandAPIError transitLandAPIError) {

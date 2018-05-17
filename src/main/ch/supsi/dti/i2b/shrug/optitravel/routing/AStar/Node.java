@@ -19,7 +19,6 @@ public class Node<T> {
         h = -1;
     }
     void addNeighbour(Node<T> neighbourElement, double distanceFromNode){
-
         neighbours.put(neighbourElement, distanceFromNode);
     }
 
@@ -47,9 +46,7 @@ public class Node<T> {
         this.h = h;
     }
 
-    public double getF(){
-        return g+h; }
-
+    public double getF(){ return g+h; }
     public void setFrom(Node<T> node) {
         from =  node;
     }
@@ -65,6 +62,7 @@ public class Node<T> {
     public Node<T> getFrom() {
         return from;
     }
+
     @Override
     public String toString(){ return element.toString(); }
 

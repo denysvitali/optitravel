@@ -2,6 +2,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.*;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
@@ -387,13 +388,20 @@ public class TransitLandAPIWrapper {
     }
 
 
-    public List<Stop> getStopsByBBox(GPSCoordinates coord1, GPSCoordinates coord2) throws TransitLandAPIError {
+    public List<Stop> getStopsByBBox(BoundingBox bbox) throws TransitLandAPIError {
 
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/stops")
-                .addQueryParameter("bbox", coord1.getLongitude()+","+coord1.getLatitude()+","+coord2.getLongitude()+","+coord2.getLatitude())
+                .addQueryParameter("bbox",
+                        String.format("%f,%f,%f,%f",
+                                bbox.getP1().getLng(),
+                                bbox.getP1().getLat(),
+                                bbox.getP2().getLng(),
+                                bbox.getP2().getLat()
+                        )
+                )
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
         return parseStopsResult(url);
@@ -444,10 +452,10 @@ public class TransitLandAPIWrapper {
         return stopsResult;
     }
 
-    public void AgetStopsByBBox(GPSCoordinates coord1, GPSCoordinates coord2, Callback<List<Stop>> cb){
+    public void AgetStopsByBBox(BoundingBox boundingBox, Callback<List<Stop>> cb){
         Runnable r = ()->{
             try {
-                cb.exec(getStopsByBBox(coord1, coord2));
+                cb.exec(getStopsByBBox(boundingBox));
             } catch (TransitLandAPIError transitLandAPIError) {
                 transitLandAPIError.printStackTrace();
                 cb.exec(null);
