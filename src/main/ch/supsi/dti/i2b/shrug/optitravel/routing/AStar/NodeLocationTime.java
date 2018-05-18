@@ -5,6 +5,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.routing.AStar;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Location;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
 
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +16,8 @@ public class NodeLocationTime {
     private double h;
     private boolean visited;
     private NodeLocationTime from;
-    private int/*TODO: Time Class*/ arrivalTime;
+    private LocalTime arrivalTime;
+    private String currentRsp;
 
     NodeLocationTime(Stop element){
         neighbours = new HashMap<>();
@@ -76,6 +78,22 @@ public class NodeLocationTime {
 
     public boolean getVisited() {
         return visited;
+    }
+
+    public LocalTime getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(LocalTime arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    public String getCurrentRsp() {
+        return currentRsp;
+    }
+
+    public void setCurrentRsp(String currentRsp) {
+        this.currentRsp = currentRsp;
     }
 
     public void findNeighbours() {
