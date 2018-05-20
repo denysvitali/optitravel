@@ -141,43 +141,6 @@ public class Main extends Application {
             }
         });
 
-        //When the 2 coordinates used for creating the bbox are determined, start this Thread.
-        Runnable r = ()->{
-            transitLandAPIWrapper.AgetStopsByBBox(new GPSCoordinates(46.197728, 8.639571), new GPSCoordinates(45.951284, 9.120199), (stops)->{
-
-                System.out.println(stops);
-                stopsInBBox = stops;
-                synchronized (transitLandAPIWrapper){
-                    count++;
-                    transitLandAPIWrapper.notify();
-                }
-
-            });
-            transitLandAPIWrapper.AgetRouteStopPatternsByBBox(new GPSCoordinates(46.197728, 8.639571), new GPSCoordinates(45.951284, 9.120199), (rsps)->{
-
-                System.out.println(rsps);
-                routeStopPatternsInBBox = rsps;
-                synchronized (transitLandAPIWrapper){
-                    count++;
-                    transitLandAPIWrapper.notify();
-                }
-
-            });
-            transitLandAPIWrapper.AgetScheduleStopPairsByBBox(new GPSCoordinates(46.197728, 8.639571), new GPSCoordinates(45.951284, 9.120199), (ssps)->{
-
-                System.out.println(ssps);
-                scheduleStopPairsInBBox = ssps;
-                synchronized (transitLandAPIWrapper){
-                    count++;
-                    transitLandAPIWrapper.notify();
-                }
-
-            });
-            organize();
-        };
-        Thread t = new Thread(r);
-        t.start();
-
     }
 
     private void addCircle(GoogleMapView mapView, LatLong s1, int i) {
@@ -208,39 +171,6 @@ public class Main extends Application {
         mapView.getMap().addMapShape(rect);
     }
 
-    private void organize(){
-
-        synchronized (transitLandAPIWrapper){
-            while(count!=3){
-                try {
-                    transitLandAPIWrapper.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        System.out.println("ricevuti");
-        System.out.println(routeStopPatternsInBBox.get(0).getId());
-        System.out.println(stopsInBBox.get(0).getId());
-   //     stopsInBBox = transitLandAPIWrapper.sortStops(new GPSCoordinates(/*46.004962,8.950784*/46.003135, 8.759909), stopsInBBox);
-        GPSCoordinates c = new GPSCoordinates(46.164871, 8.917476);
-        List<Stop> list = transitLandAPIWrapper.sortStops(c, stopsInBBox);
-        list.forEach(stop -> System.out.println(stop.getName() + " - " + Distance.distance(c.asCoordinate(), stop.getCoordinate())));
-        System.out.println(list.get(0).getId());
-        Map<String, Stop> mappaStops = new HashMap<>();
-        for(Stop stop : list){
-            mappaStops.put(stop.getId(), stop);
-        }
-        Map<String, RouteStopPattern> mappaRsps = new HashMap<>();
-        for(RouteStopPattern rsp : routeStopPatternsInBBox){
-            mappaRsps.put(rsp.getId(), rsp);
-        }
-        Map<ScheduleStopPair, String> mappaSsps = new HashMap<>();
-        for(ScheduleStopPair ssp : scheduleStopPairsInBBox){
-            mappaSsps.put(ssp, ssp.getRoute_stop_pattern_onestop_id());
-        }
-
-    }
     private void updateMapWithTrip(GoogleMapView mapView, List<RouteStopPattern> rsp){
         if(rsp.size() == 0){
             System.out.println("RSP is empty!");

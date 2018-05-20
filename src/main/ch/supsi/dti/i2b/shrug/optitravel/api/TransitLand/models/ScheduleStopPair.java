@@ -12,6 +12,7 @@ public class ScheduleStopPair {
     private String origin_onestop_id;
     private String origin_timezone;
     private String origin_arrival_time;
+    private String origin_departure_time;
     //origin timepoint source
     private Double origin_dist_traveled;
     private String destination_onestop_id;
@@ -58,6 +59,9 @@ public class ScheduleStopPair {
         return origin_arrival_time;
     }
 
+    public String getOrigin_departure_time() {
+        return origin_departure_time;
+    }
     public Double getOrigin_dist_traveled() {
         return origin_dist_traveled;
     }

@@ -96,7 +96,8 @@ public class NodeLocationTime {
         this.currentRsp = currentRsp;
     }
 
+    /*
     public void findNeighbours() {
         element.findNeighbours(arrivalTime);
-    }
+    }*/
 }
