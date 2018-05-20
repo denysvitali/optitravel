@@ -147,6 +147,11 @@ class TransitLandTest{
             assertNotEquals(null, s);
             assertEquals("Sídliště Ďáblice", s.getName());
             assertEquals(new Coordinate(50.131942,14.479232), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-u0nmsrxwft-montebrè");
+            assertNotEquals(null, s);
+            assertEquals("Monte Brè", s.getName());
+            assertEquals(new Coordinate(46.009183, 8.986241), s.getCoordinate());
         } catch (TransitLandAPIError e) {
             fail(e);
         }
