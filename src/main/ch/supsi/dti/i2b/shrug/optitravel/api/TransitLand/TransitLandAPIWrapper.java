@@ -105,8 +105,6 @@ public class TransitLandAPIWrapper {
             if (response != null && response.isSuccessful() && response.body() != null) {
                 try {
                     String str = response.body().string();
-                    byte ptext[] = str.getBytes("ISO-8859-1");
-                    str = new String(ptext, "UTF-8");
                     rspResult = JsonIterator.deserialize(str, RouteStopPatternsResult.class);
                     response.close();
                     listRsp.addAll(rspResult.getRouteStopPatterns());
@@ -238,8 +236,6 @@ public class TransitLandAPIWrapper {
             if (response != null && response.isSuccessful() && response.body() != null) {
                 try {
                     String str = response.body().string();
-                    byte ptext[] = str.getBytes("ISO-8859-1");
-                    str = new String(ptext, "UTF-8");
                     sspResult = JsonIterator.deserialize(str, ScheduleStopPairResult.class);
                     response.close();
                     listSch.addAll(sspResult.getScheduleStopPairs());
@@ -319,8 +315,6 @@ public class TransitLandAPIWrapper {
             try {
                 // TODO: @denvit Check
                 String str = response.body().string();
-                byte ptext[] = str.getBytes("ISO-8859-1");
-                str = new String(ptext, "UTF-8");
                 operator = JsonIterator.deserialize(str, OperatorsResult.class)
                         .getOperators()
                         .get(0);
@@ -442,8 +436,6 @@ public class TransitLandAPIWrapper {
         if(response != null) {
             if(response.body() != null) {
                 String str = response.body().string();
-                byte ptext[] = str.getBytes("ISO-8859-1");
-                str = new String(ptext, "UTF-8");
                 stopsResult = JsonIterator.deserialize(str, StopsResult.class);
                 listStop.addAll(stopsResult.getStops());
             }
