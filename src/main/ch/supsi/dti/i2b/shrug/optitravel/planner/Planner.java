@@ -1,5 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.planner;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
@@ -50,13 +52,29 @@ public class Planner {
         BoundingBox boundingBox = new BoundingBox(from, to);
         boundingBox = boundingBox.expand(1500); // Expand the BB by 1500 meters
 
-        try {
+		// TODO: Handle the case when there are no SSPs (or trips) in a BBox
+		// TODO: Dynamically switch between GTFS and TL
+
+        /*try {
             List<ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop>
                     tl_stops = dg.getwTL().getStopsByBBox(boundingBox);
             stops.addAll(tl_stops);
         } catch (TransitLandAPIError transitLandAPIError) {
             transitLandAPIError.printStackTrace();
-        }
+        }*/
+
+        try {
+			List<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop>
+					gtfs_stops = dg.getwGTFS().getStopsByBBox(boundingBox);
+		} catch (GTFSrsError gtfSrsError){
+        	gtfSrsError.printStackTrace();
+		}
+
+		try {
+			List<Trip> gtfs_trips = dg.getwGTFS().getTripsByBBox(boundingBox);
+		} catch (GTFSrsError gtfSrsError){
+			gtfSrsError.printStackTrace();
+		}
 
 
 

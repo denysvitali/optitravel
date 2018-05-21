@@ -5,6 +5,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.*;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
 import okhttp3.HttpUrl;
@@ -476,23 +477,29 @@ public class TransitLandAPIWrapper {
         }).collect(Collectors.toList());
     }
 
-    public List<ScheduleStopPair> getScheduleStopPairsByBBox(GPSCoordinates coord1, GPSCoordinates coord2) throws TransitLandAPIError {
+    public List<ScheduleStopPair> getScheduleStopPairsByBBox(BoundingBox bbox) throws TransitLandAPIError {
 
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/schedule_stop_pairs")
-                .addQueryParameter("bbox", coord1.getLongitude()+","+coord1.getLatitude()+","+coord2.getLongitude()+","+coord2.getLatitude())
+                .addQueryParameter("bbox",
+                        String.format("%f,%f,%f,%f",
+                                bbox.getP1().getLng(),
+                                bbox.getP1().getLat(),
+                                bbox.getP2().getLng(),
+                                bbox.getP2().getLat()
+                        ))
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
 
         return parseRouteStopPairResult(url);
     }
 
-    public void AgetScheduleStopPairsByBBox(GPSCoordinates coord1, GPSCoordinates coord2, Callback<List<ScheduleStopPair>> cb){
+    public void AgetScheduleStopPairsByBBox(BoundingBox bbox, Callback<List<ScheduleStopPair>> cb){
         Runnable r = ()->{
             try {
-                cb.exec(getScheduleStopPairsByBBox(coord1, coord2));
+                cb.exec(getScheduleStopPairsByBBox(bbox));
             } catch (TransitLandAPIError transitLandAPIError) {
                 transitLandAPIError.printStackTrace();
                 cb.exec(null);
@@ -506,5 +513,12 @@ public class TransitLandAPIWrapper {
         if(client != null){
             client.destroy();
         }
+    }
+
+    public List<Trip> getTripsByBBox(BoundingBox boundingBox)
+			throws TransitLandAPIError {
+		List<Trip> trips = new ArrayList<>();
+		// TODO: @fpura: Implement
+		return trips;
     }
 }

@@ -1,13 +1,12 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.DropOff;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.PickUp;
+import ch.supsi.dti.i2b.shrug.optitravel.models.DropOff;
+import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
-public class StopTrip {
+public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip {
     public Stop stop;
     public String arrival_time;
     public String departure_time;
@@ -15,12 +14,12 @@ public class StopTrip {
     public DropOff drop_off;
     public PickUp pickup;
 
-    public LocalTime getDeparture(){
-        return LocalTime.parse(departure_time);
+    public Time getDeparture(){
+        return new Time(departure_time);
     }
 
-    public LocalTime getArrival(){
-        return LocalTime.parse(arrival_time);
+    public Time getArrival(){
+        return new Time(arrival_time);
     }
 
     public DropOff getDropOff() {

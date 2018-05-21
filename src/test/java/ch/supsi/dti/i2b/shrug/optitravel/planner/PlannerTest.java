@@ -26,6 +26,7 @@ public class PlannerTest {
         p.computePlans();
         List<Plan> plans = p.getPlans();
         assertNotEquals(null, plans);
-        assertNotEquals(0, plans.get(0));
+        assertNotEquals(0, plans.size());
+        assertNotEquals(null, plans.get(0));
     }
 }

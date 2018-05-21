@@ -52,19 +52,27 @@ public class GTFSrsWrapper {
                 .addPathSegments("api/stops/by-trip/" + tid)
                 .build();
         Response response = client.get(url);
-        if(response != null && response.isSuccessful() && response.body() != null){
-            try {
-                ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult().asList().stream().map(e-> e.as(Stop.class)).collect(Collectors.toList());
-            } catch(IOException ex){
-                return null;
-            }
-        } else {
-            throw new GTFSrsError("Unable to get any response for this request");
-        }
+        return parseStopResponse(response);
     }
-    
-    public List<Route> getRoutes() throws GTFSrsError {
+
+	private List<Stop> parseStopResponse(Response response) throws GTFSrsError {
+		if(response != null && response.isSuccessful() && response.body() != null){
+			try {
+				ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
+				return a.getResult()
+						.asList()
+						.stream()
+						.map(e-> e.as(Stop.class))
+						.collect(Collectors.toList());
+			} catch(IOException ex){
+				return null;
+			}
+		} else {
+			throw new GTFSrsError("Unable to get any response for this request");
+		}
+    }
+
+	public List<Route> getRoutes() throws GTFSrsError {
         // /api/routes
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
@@ -179,14 +187,27 @@ public class GTFSrsWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
-                return a.getResult().asList().stream().map((e)->{
-                    return e.as(Trip.class);
-                }).collect(Collectors.toList());
+                return a.getResult()
+						.asList()
+						.stream()
+						.map((e)-> e.as(Trip.class))
+						.collect(Collectors.toList());
             } catch(IOException ex){
                 return null;
             }
         } else {
             throw new GTFSrsError("Unable to get any response for this request");
         }
+    }
+
+	public List<Stop> getStopsByBBox(BoundingBox boundingBox) throws GTFSrsError {
+		HttpUrl url = new HttpUrl.Builder()
+				.host(HOST)
+				.port(PORT)
+				.scheme(SCHEME)
+				.addPathSegments("api/stops/in/" + boundingBox)
+				.build();
+		Response response = client.get(url);
+		return parseStopResponse(response);
     }
 }

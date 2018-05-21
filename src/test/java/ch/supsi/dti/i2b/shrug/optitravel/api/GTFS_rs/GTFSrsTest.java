@@ -4,9 +4,10 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.models.DropOff;
+import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -176,6 +177,33 @@ class GTFSrsTest {
                 assertNotEquals(null, t.getRoute());
                 assertEquals(t.getRoute().getUID(), "r-5f39ec-7");
             */
+        } catch(GTFSrsError err){
+            fail(err);
+        }
+    }
+
+    @Test
+    public void testStopsInBBox(){
+        try {
+            BoundingBox bbox = new BoundingBox(new Coordinate(46.01946,8.974125),
+                    new Coordinate(46.023113,8.967738));
+            bbox = bbox.expand(1000);
+            List<Stop> stops = gtfSrsWrapper.getStopsByBBox(bbox);
+            assertNotEquals(null, stops);
+            assertNotEquals(0, stops.size());
+            Stop s = stops.get(0);
+            // Results are inconsistent!!!
+            assertNotEquals(null, s);
+            assertNotEquals(null, s.getName());
+            assertNotEquals(null, s.getCoordinate());
+            assertNotEquals(null, s.getLat());
+            assertNotEquals(null, s.getLng());
+            assertNotEquals(null, s.getUid());
+
+            for(Stop ms : stops){
+				System.out.println(ms.getName() +
+						" (" + ms.getCoordinate() + ")");
+			}
         } catch(GTFSrsError err){
             fail(err);
         }
