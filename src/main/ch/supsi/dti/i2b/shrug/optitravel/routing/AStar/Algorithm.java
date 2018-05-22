@@ -55,7 +55,56 @@ public class Algorithm<T> {
             }
         }
     }
+/*
+    public List<NodeLocationTime> routeNodeLocationTime(NodeLocationTime from, NodeLocationTime to){
 
+        // TODO: @denvit verify performance of tree set removeIf
+        TreeSet<NodeLocationTime> calculatedNodes = new TreeSet<>((a, b) -> a.getF() >= b.getF() ? 1 : -1);
+
+        NodeLocationTime currentNode = from;
+        from.setG(0);
+        currentNode.findNeighbours();
+        for(;;) {
+            if(currentNode == null){
+                return null;
+            }
+
+            NodeLocationTime closestNode = null;
+            for (NodeLocationTime n : currentNode.getNeighbours().keySet()) {
+                double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + currentNode.getNeighbours().get(n);
+                double newF = n.getH() + newG;
+
+                if(n.getG() == -1){
+                    n.setG(newG);
+                    n.setFrom(currentNode);
+                    calculatedNodes.add(n);
+                }
+                else if((n.getF() > newF) && !n.getVisited()){
+                    calculatedNodes.removeIf(s -> s == n);
+                    n.setG(newG);
+                    n.setFrom(currentNode);
+                    calculatedNodes.add(n);
+                }
+
+
+            }
+
+            currentNode.setVisited();
+            currentNode = calculatedNodes.pollFirst();
+
+            if(currentNode != null && currentNode.getElement() == to.getElement()){
+                List<NodeLocationTime> path = new ArrayList<>();
+                while(currentNode.getFrom() != null){
+                    path.add(currentNode);
+                    currentNode = currentNode.getFrom();
+                }
+                path.add(currentNode);
+                Collections.reverse(path);
+                return path;
+            }
+            currentNode.findNeighbours();
+        }
+    }*/
 
 
 }

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class TransitLandAPIWrapper {
     private static String HOST = "api.transit.land";
     private static int PER_PAGE = 200;
-    private static int MAX_REQUESTS = 1000/PER_PAGE;
+    private static int MAX_REQUESTS = 100000/PER_PAGE;
     private HttpClient client;
 
     public TransitLandAPIWrapper(){
@@ -483,6 +483,9 @@ public class TransitLandAPIWrapper {
                 .scheme("https")
                 .addPathSegments("api/v1/schedule_stop_pairs")
                 .addQueryParameter("bbox", coord1.getLongitude()+","+coord1.getLatitude()+","+coord2.getLongitude()+","+coord2.getLatitude())
+                .addQueryParameter("date", "2018-05-23")
+                .addQueryParameter("origin_departure_between", "10:00:00,12:00:00")
+
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
 

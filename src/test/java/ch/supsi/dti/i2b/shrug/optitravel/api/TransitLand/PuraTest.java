@@ -4,14 +4,16 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.ScheduleStopPair;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Location;
+import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.NodeLocationTime;
+import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Structure;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalTime;
+import java.util.*;
 
 public class PuraTest {
 
@@ -26,7 +28,9 @@ public class PuraTest {
 
 
         Runnable r = ()->{
-            transitLandAPIWrapper.AgetStopsByBBox(new GPSCoordinates(45.488243, 9.150641), new GPSCoordinates(45.455767, 9.205024), (stops)->{
+            GPSCoordinates gps1 = new GPSCoordinates(51.523587, -0.140157);
+            GPSCoordinates gps2 = new GPSCoordinates(51.501660, -0.088609);
+            transitLandAPIWrapper.AgetStopsByBBox(gps1, gps2, (stops)->{
 
                 System.out.println(stops);
                 stopsInBBox = stops;
@@ -36,7 +40,7 @@ public class PuraTest {
                 }
 
             });
-            transitLandAPIWrapper.AgetRouteStopPatternsByBBox(new GPSCoordinates(45.488243, 9.150641), new GPSCoordinates(45.455767, 9.205024), (rsps)->{
+            transitLandAPIWrapper.AgetRouteStopPatternsByBBox(gps1, gps2, (rsps)->{
 
                 System.out.println(rsps);
                 routeStopPatternsInBBox = rsps;
@@ -46,7 +50,7 @@ public class PuraTest {
                 }
 
             });
-            transitLandAPIWrapper.AgetScheduleStopPairsByBBox(new GPSCoordinates(45.488243, 9.150641), new GPSCoordinates(45.455767, 9.205024), (ssps)->{
+            transitLandAPIWrapper.AgetScheduleStopPairsByBBox(gps1, gps2, (ssps)->{
 
                 System.out.println(ssps);
                 scheduleStopPairsInBBox = ssps;
@@ -116,14 +120,84 @@ public class PuraTest {
                     rsps.add(rsp);
                 }
             }
+            List<ScheduleStopPair> schedulesWithSameRSP = new ArrayList<>();
             for (ScheduleStopPair ssp : scheduleStopPairsInBBox) {
 
+                if(ssp.getRoute_stop_pattern_onestop_id().equals(rsp.getId())){
+                    schedulesWithSameRSP.add(ssp);
+                }
+
+
+            }
+            for(ScheduleStopPair ssp : schedulesWithSameRSP){
                 List<ScheduleStopPair> ssps = schedulesFromStopInRSP.get(ssp.getOrigin_onestop_id());
                 if (ssps != null) {
                     ssps.add(ssp);
                 }
             }
             tripOfRSP.put(rsp.getId(), schedulesFromStopInRSP);
+        }
+
+
+
+
+        Stop stopP = mappaStops.get("s-gcpvj0wdme-embankmentundergroundstation");
+        Stop stopA = mappaStops.get("s-gcpvjdgx5r-farringdonundergroundstation"/*"s-gcpvjcxw36-bankdlrstation"*/);
+
+        Structure timeToTest = new Structure(stopA.getCoordinate(), mappaStops, mappaRsps, rspsTraversingStop, tripOfRSP);
+
+        NodeLocationTime nodeA = new NodeLocationTime(stopA);
+        NodeLocationTime nodeP = new NodeLocationTime(stopP);
+
+        nodeP.setArrivalTime(LocalTime.parse("10:10:00"));
+
+
+
+        // TODO: @denvit verify performance of tree set removeIf
+        TreeSet<NodeLocationTime> calculatedNodes = new TreeSet<>((a, b) -> a.getF() >= b.getF() ? 1 : -1);
+
+        List<Location> visited = new ArrayList<>();
+        NodeLocationTime currentNode = nodeP;
+        nodeP.setG(0);
+        currentNode.findNeighbours(timeToTest);
+        for(;;) {
+            if(currentNode == null){
+                break;
+            }
+
+            NodeLocationTime closestNode = null;
+            for (NodeLocationTime n : currentNode.getNeighbours().keySet()) {
+                double newG = currentNode.getG() + currentNode.getNeighbours().get(n);
+                double newF = n.getH() + newG;
+
+                if(!visited.contains(n.getElement())){
+                    n.setG(newG);
+                    n.setFrom(currentNode);
+                    calculatedNodes.add(n);
+                }
+                else {
+                    calculatedNodes.removeIf(s -> s.getElement() == n.getElement());
+                    n.setG(newG);
+                    n.setFrom(currentNode);
+                    calculatedNodes.add(n);
+                }
+
+            }
+
+            currentNode.setVisited();
+            visited.add(currentNode.getElement());
+            currentNode = calculatedNodes.pollFirst();
+
+            if(currentNode != null && currentNode.getElement().equals(nodeA.getElement())){
+                List<NodeLocationTime> path = new ArrayList<>();
+                while(currentNode.getFrom() != null){
+                    path.add(currentNode);
+                    currentNode = currentNode.getFrom();
+                }
+                path.add(currentNode);
+                Collections.reverse(path);
+            }
+            currentNode.findNeighbours(timeToTest);
         }
     }
 }

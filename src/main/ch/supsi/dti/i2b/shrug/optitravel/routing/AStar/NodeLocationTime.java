@@ -19,12 +19,15 @@ public class NodeLocationTime {
     private LocalTime arrivalTime;
     private String currentRsp;
 
-    NodeLocationTime(Stop element){
+    public NodeLocationTime(Stop element){
         neighbours = new HashMap<>();
         this.element = element;
         visited = false;
         g = -1;
         h = -1;
+        currentRsp = null;
+        arrivalTime = null;
+        from = null;
     }
     void addNeighbour(NodeLocationTime neighbourElement, double distanceFromNode){
 
@@ -96,8 +99,11 @@ public class NodeLocationTime {
         this.currentRsp = currentRsp;
     }
 
-    /*
-    public void findNeighbours() {
-        element.findNeighbours(arrivalTime);
-    }*/
+
+    public void findNeighbours(Structure timeToTest) {
+
+        timeToTest.addNearStopsAsNeighbours(this);
+        timeToTest.addSameRSPStopAsNeighbour(this);
+        timeToTest.addDifferentRSPStopsAsNeighbours(this);
+    }
 }
