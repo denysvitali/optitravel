@@ -22,4 +22,24 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     public Route getRoute() {
         return new Route(route_id);
     }
+
+    public String getHeadSign() {
+        return headsign;
+    }
+
+	public List<StopTrip> getStopSequence() {
+		return stop_sequence;
+	}
+
+	public int getDirectionId() {
+		return direction_id;
+	}
+
+	public String getServiceId() {
+		return service_id;
+	}
+
+	public String getShortName() {
+		return short_name;
+	}
 }

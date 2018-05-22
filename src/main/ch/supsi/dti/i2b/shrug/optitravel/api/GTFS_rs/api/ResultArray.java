@@ -9,4 +9,8 @@ public class ResultArray {
     public Any getResult(){
         return this.result;
     }
+
+    public Meta getMeta() {
+        return meta;
+    }
 }

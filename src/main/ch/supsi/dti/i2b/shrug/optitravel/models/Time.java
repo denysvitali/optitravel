@@ -31,4 +31,13 @@ public class Time {
 	public int getSecond(){
 		return localTime.getSecond();
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Time)){
+			return false;
+		}
+
+		return localTime.equals(((Time) obj).localTime);
+	}
 }

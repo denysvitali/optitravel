@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.planner;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.PaginatedList;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
@@ -71,7 +72,7 @@ public class Planner {
 		}
 
 		try {
-			List<Trip> gtfs_trips = dg.getwGTFS().getTripsByBBox(boundingBox);
+			PaginatedList<Trip> gtfs_trips = dg.getwGTFS().getTripsByBBox(boundingBox);
 		} catch (GTFSrsError gtfSrsError){
 			gtfSrsError.printStackTrace();
 		}

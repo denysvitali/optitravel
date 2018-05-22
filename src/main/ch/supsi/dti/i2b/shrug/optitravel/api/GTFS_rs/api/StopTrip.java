@@ -33,4 +33,8 @@ public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip 
     public Stop getStop() {
         return stop;
     }
+
+	public int getStopSequence() {
+        return stop_sequence;
+	}
 }
