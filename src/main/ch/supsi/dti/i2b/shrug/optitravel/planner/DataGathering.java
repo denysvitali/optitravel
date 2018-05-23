@@ -65,8 +65,9 @@ public class DataGathering{
 					gtfs_trips = gtfs_paginated_trips.getResult();
 
 			trips.addAll(gtfs_trips);
-			trips.addAll(getwTL().getTripsByBBox(boundingBox));
-		} catch(GTFSrsError | TransitLandAPIError err){
+			//trips.addAll(getwTL().getTripsByBBox(boundingBox));
+			// TODO: Add TL
+		} catch(GTFSrsError /*| TransitLandAPIError*/ err){
 			err.printStackTrace();
 		}
 

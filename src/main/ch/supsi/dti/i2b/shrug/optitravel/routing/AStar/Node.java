@@ -11,14 +11,14 @@ public class Node<T> {
     private boolean visited;
     private Node<T> from;
 
-    Node(T element){
+    public Node(T element){
         neighbours = new HashMap<>();
         this.element = element;
         visited = false;
         g = -1;
         h = -1;
     }
-    void addNeighbour(Node<T> neighbourElement, double distanceFromNode){
+    public void addNeighbour(Node<T> neighbourElement, double distanceFromNode){
         neighbours.put(neighbourElement, distanceFromNode);
     }
 

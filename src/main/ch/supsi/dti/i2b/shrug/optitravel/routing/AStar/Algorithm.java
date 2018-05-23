@@ -1,8 +1,12 @@
 package ch.supsi.dti.i2b.shrug.optitravel.routing.AStar;
 
-import java.util.*;
+import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
 
-public class Algorithm<T> {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class Algorithm<T extends TimedLocation> {
 
 
     public List<Node<T>> route(Node<T> from, Node<T> to){
@@ -30,7 +34,14 @@ public class Algorithm<T> {
             currentNode.setVisited();
             currentNode = closestNode;
 
-            if(currentNode == to && currentNode != null){
+            if(currentNode != null &&
+                    currentNode
+							.getElement()
+							.getLocation()
+							.equals(
+								to.getElement().getLocation()
+							)
+			){
                 List<Node<T>> path = new ArrayList<>();
                 while(currentNode.getFrom() != null){
                     path.add(currentNode);
@@ -39,6 +50,11 @@ public class Algorithm<T> {
                 path.add(currentNode);
                 Collections.reverse(path);
                 return path;
+            }
+
+            if(currentNode != null){
+                System.out.println(currentNode
+                        .getElement().getLocation() + " != " + to.getElement().getLocation());
             }
         }
     }

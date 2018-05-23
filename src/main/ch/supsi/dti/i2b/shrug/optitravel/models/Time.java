@@ -1,10 +1,5 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Route;
-import com.jsoniter.annotation.JsonCreator;
-import com.jsoniter.annotation.JsonIgnore;
-import com.jsoniter.annotation.JsonWrapper;
-
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
@@ -13,6 +8,14 @@ public class Time {
 
 	public Time(String time){
 		localTime = LocalTime.parse(time, DateTimeFormatter.ISO_TIME);
+	}
+
+	public static double diffMinutes(Time time1, Time time2) {
+		int hours = time1.getHour() - time2.getHour();
+		int minutes = time1.getMinute() - time2.getMinute();
+		int seconds = time1.getSecond() - time2.getSecond();
+
+		return hours*60 + minutes + seconds/60;
 	}
 
 	@Override
@@ -39,5 +42,39 @@ public class Time {
 		}
 
 		return localTime.equals(((Time) obj).localTime);
+	}
+
+	public boolean isAfter(Time t){
+		return Time.isAfter(this, t);
+	}
+
+	public static int compareTo(Time t1, Time t2){
+		return t1.localTime.compareTo(t2.localTime);
+	}
+
+	public static boolean isAfter(Time t1, Time t2){
+		if(t1.getHour() < t2.getHour()){
+			return false;
+		}
+
+		if(t1.getHour() > t2.getHour()){
+			return true;
+		}
+
+		if(t1.getMinute() < t2.getMinute()){
+			return false;
+		}
+
+		if(t1.getMinute() > t2.getMinute()){
+			return true;
+		}
+
+		return t1.getSecond() >= t2.getSecond();
+
+	}
+
+	@Override
+	public int hashCode() {
+		return localTime.hashCode();
 	}
 }

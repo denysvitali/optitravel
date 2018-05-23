@@ -7,12 +7,12 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 
 
 public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip {
-    public Stop stop;
-    public String arrival_time;
-    public String departure_time;
-    public int stop_sequence;
-    public DropOff drop_off;
-    public PickUp pickup;
+    private Stop stop;
+    private String arrival_time;
+    private String departure_time;
+    private int stop_sequence;
+    private DropOff drop_off;
+    private PickUp pickup;
 
     public Time getDeparture(){
         return new Time(departure_time);

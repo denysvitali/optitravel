@@ -7,22 +7,28 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
-import ch.supsi.dti.i2b.shrug.optitravel.models.Plan;
-import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
+import ch.supsi.dti.i2b.shrug.optitravel.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
+import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
+import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 import com.oracle.tools.packager.Log;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Planner {
     private Coordinate from;
     private Coordinate to;
     private List<Plan> plans = new ArrayList<>();
     private LocalDateTime start_time;
-    private static final Logger Log = Logger.getLogger( Planner.class.getName() );
+    private boolean alreadyComputed = false;
+    private static final Logger Log = Logger.getLogger(Planner.class.getName());
 
 
     Planner(Coordinate from, Coordinate to){
@@ -31,7 +37,7 @@ public class Planner {
     }
 
     List<Plan> getPlans(){
-        if(plans.size() == 0){
+        if(!alreadyComputed){
             computePlans();
         }
         return plans;
@@ -64,21 +70,161 @@ public class Planner {
             transitLandAPIError.printStackTrace();
         }*/
 
-        try {
-			List<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop>
-					gtfs_stops = dg.getwGTFS().getStopsByBBox(boundingBox);
-		} catch (GTFSrsError gtfSrsError){
-        	gtfSrsError.printStackTrace();
+        List<ch.supsi.dti.i2b.shrug.optitravel.models.Trip>
+				trips = dg.getTrips(boundingBox);
+
+        List<StopTime> stop_times = new ArrayList<>();
+
+        for(ch.supsi.dti.i2b.shrug.optitravel.models.Trip t : trips){
+        	stop_times.addAll(
+				t.getStopTrip().stream().map(e ->
+						new StopTime(e.getStop(), e.getArrival())
+				).collect(Collectors.toList())
+			);
 		}
 
-		try {
-			PaginatedList<Trip> gtfs_trips = dg.getwGTFS().getTripsByBBox(boundingBox);
-		} catch (GTFSrsError gtfSrsError){
-			gtfSrsError.printStackTrace();
+		System.out.println("Routing w/ " + stop_times.size() + " StopTimes");
+
+        // stop_times.forEach(e -> System.out.println(e.getStop() + "@" + e.getTime()));
+
+        List<StopTime> o_d = new ArrayList<>(stop_times);
+        sort_by_distancetime(o_d, from);
+
+        List<StopTime> d_d = new ArrayList<>(stop_times);
+        sort_by_distance(d_d, to);
+
+        HashMap<Stop, List<StopTime>> stop_stoptime = new HashMap<>();
+        stop_times.forEach(e->{
+        	stop_stoptime.computeIfAbsent(e.getStop(), k->new ArrayList<>());
+            stop_stoptime.get(e.getStop()).add(
+            		new StopTime(e.getStop(), e.getTime())
+			);
+        });
+
+        stop_stoptime.values().forEach(e -> {
+        	e.sort((a,b)-> Time.compareTo(a.getTime(),b.getTime()));
+		});
+
+        HashMap<Node<StopTime>, List<Node<StopTime>>> stop_stop_association = new HashMap<>();
+        HashMap<StopTime, Node<StopTime>> node_stoptime = new HashMap<>();
+
+        trips.forEach(t -> {
+            StopTime prevStop = null;
+            for(StopTrip st : t.getStopTrip()){
+                StopTime npStop = new StopTime(st.getStop(), st.getArrival());
+                if(prevStop != null){
+
+                	if(node_stoptime.get(prevStop) == null){
+                		node_stoptime.put(prevStop, new Node<>(prevStop));
+					}
+
+					Node<StopTime> pNST = node_stoptime.get(prevStop);
+
+                	if(node_stoptime.get(npStop) == null){
+                		node_stoptime.put(npStop, new Node<>(npStop));
+					}
+
+                	Node<StopTime> nNST = node_stoptime.get(npStop);
+
+					stop_stop_association.computeIfAbsent(
+							pNST, k -> new ArrayList<>()
+					);
+
+                    stop_stop_association.get(pNST).add(nNST);
+					//System.out.println("CS: " + npStop);
+					//System.out.println("PS: " + prevStop);
+                }
+                prevStop = npStop;
+            }
+        });
+
+        StopTime startingStop = o_d.get(0);
+        StopTime endingStop = d_d.get(0);
+
+		Algorithm<StopTime> algorithm = new Algorithm<>();
+		for(Node<StopTime> nst : stop_stop_association.keySet()){
+			List<Node<StopTime>> lnst = stop_stop_association.get(nst);
+			for(Node<StopTime> nst_n : lnst){
+				double weight = Distance.distance(
+						nst.getElement().getCoordinate(),
+						nst_n.getElement().getCoordinate()
+				);
+
+				nst.addNeighbour(nst_n, weight);
+			}
+
+			List<StopTime> near = new ArrayList<>(stop_times);
+			near = near.stream()
+					.filter((e)-> (!e.getTime().isAfter(nst.getElement().getTime()) && !nst.getElement().equals(e)))
+					.collect(Collectors.toList());
+			sort_by_distance(near, nst.getElement().getCoordinate());
+			for(StopTime st : near){
+				double weight;
+				double walk_distance = Distance.distance(
+						nst.getElement().getCoordinate(),
+						st.getCoordinate());
+				if(walk_distance < PlannerParams.WALKABLE_RADIUS_METERS){
+					double walk_time_s = walk_distance / PlannerParams.WALK_SPEED_MPS;
+					double walk_minutes = walk_time_s / 60;
+					double waiting_minutes = Time.diffMinutes(nst.getElement().getTime(), st.getTime());
+
+					if(waiting_minutes > PlannerParams.MAX_WAITING_TIME){
+						continue;
+					}
+
+					weight = PlannerParams.W_WALK * walk_minutes + walk_distance + PlannerParams.W_WAITING * waiting_minutes;
+					nst.addNeighbour(node_stoptime.get(st), weight);
+				}
+			}
 		}
 
+		List<Node<StopTime>> path =
+				algorithm.route(
+						node_stoptime.get(startingStop),
+						node_stoptime.get(endingStop)
+				);
 
+		System.out.println(path);
+		alreadyComputed = true;
+    }
 
+    private void sort_by_distance(List<StopTime> list, Coordinate target) {
+        list.sort((a,b)->{
+            double d_a = Distance.distance(
+                    a.getStop().getCoordinate(),
+                    target
+            );
+
+            double d_b = Distance.distance(
+                    b.getStop().getCoordinate(),
+                    target
+            );
+
+            return Double.compare(d_a, d_b);
+
+        });
+    }
+
+    private void sort_by_distancetime(List<StopTime> list, Coordinate target) {
+        list.sort((a,b)->{
+            double d_a = Distance.distance(
+                    a.getStop().getCoordinate(),
+                    target
+            );
+
+            double d_b = Distance.distance(
+                    b.getStop().getCoordinate(),
+                    target
+            );
+
+            int dc = Double.compare(d_a, d_b);
+            if(dc == 0){
+                return Time.compareTo(a.getTime(), b.getTime());
+            } else {
+                return dc;
+            }
+
+        });
     }
 
     public void setStartTime(LocalDateTime ldt) {
