@@ -82,7 +82,8 @@ public class Structure {
                         newNode.setArrivalTime(LocalTime.parse(ssp.getDestination_arrival_time()));
                         newNode.setH(Distance.distance(newNode.getElement().getCoordinate(), destinazione));
                         newNode.setCurrentRsp(rspAttuale.getId());
-                        node.addNeighbour(newNode, 1/*TODO: Calcolo del peso più specifico*/);
+                        long minutes = ChronoUnit.MINUTES.between(arrivalTime, LocalTime.parse(ssp.getDestination_arrival_time()));
+                        node.addNeighbour(newNode, 1+minutes/*TODO: Calcolo del peso più specifico*/);
                     }
                 }
 
