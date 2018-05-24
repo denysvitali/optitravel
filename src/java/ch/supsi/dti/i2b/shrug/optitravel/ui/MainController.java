@@ -2,6 +2,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.GeocodingService;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.utilities.TripTimeFrame;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXListView;
@@ -24,7 +25,7 @@ public class MainController {
     @FXML
     private JFXButton fabSend;
     @FXML
-    private ComboBox<TimeFrame> cbTripPeriod;
+    private ComboBox<TripTimeFrame> cbTripPeriod;
     @FXML
     private AutoCompleteTextField tfStartPoint;
     @FXML
@@ -60,7 +61,7 @@ public class MainController {
 
         // Setup trip period selection combobox
         cbTripPeriod.getSelectionModel().selectFirst();
-        cbTripPeriod.getItems().addAll(TimeFrame.LEAVE_NOW, TimeFrame.DEPART_AT, TimeFrame.ARRIVE_BY);
+        cbTripPeriod.getItems().addAll(TripTimeFrame.LEAVE_NOW, TripTimeFrame.DEPART_AT, TripTimeFrame.ARRIVE_BY);
         // Set date and time pickers to hide when combobox is set to "leave now"
         cbTripPeriod.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             switch (newValue) {
@@ -103,16 +104,3 @@ public class MainController {
     }
 }
 
-enum TimeFrame {
-    LEAVE_NOW("Leave now"), DEPART_AT("Depart at"), ARRIVE_BY("Arrive by");
-    String str;
-
-    TimeFrame(String str) {
-        this.str = str;
-    }
-
-    @Override
-    public String toString() {
-        return str;
-    }
-}
