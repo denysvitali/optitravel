@@ -28,5 +28,11 @@ public class PlannerTest {
         assertNotEquals(null, plans);
         assertNotEquals(0, plans.size());
         assertNotEquals(null, plans.get(0));
+
+        plans.get(0).getTrips()
+				.stream()
+				.map((e)->e.getRoute())
+                .forEach(System.out::println);
+
     }
 }

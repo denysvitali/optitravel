@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -219,6 +220,21 @@ public class Planner {
 
 		System.out.println(path);
 		alreadyComputed = true;
+
+		List<ch.supsi.dti.i2b.shrug.optitravel.models.Trip> plan_trips =
+				path.stream()
+						.map((e)->e.getElement().getTrip())
+						.distinct()
+						.collect(Collectors.toList());
+
+		Plan p = new Plan(plan_trips,
+				path.get(0).getElement().getTime(),
+				path.get(path.size()-1).getElement().getTime(),
+				path.get(0).getElement().getCoordinate(),
+				path.get(path.size()-1).getElement().getCoordinate()
+				);
+
+		plans.add(p);
     }
 
     private void addNeighbours(Node<StopTime> nst, List<StopTime> stop_times, HashMap<StopTime, Node<StopTime>> node_stoptime){

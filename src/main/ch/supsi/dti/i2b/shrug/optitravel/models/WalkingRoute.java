@@ -10,7 +10,7 @@ public class WalkingRoute extends Route {
 
 	@Override
 	public Operator getOperator() {
-		return null;
+		return new WalkingOperator();
 	}
 
 	@Override
@@ -24,5 +24,10 @@ public class WalkingRoute extends Route {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(getName());
+	}
+
+	@Override
+	public String toString() {
+		return getName();
 	}
 }

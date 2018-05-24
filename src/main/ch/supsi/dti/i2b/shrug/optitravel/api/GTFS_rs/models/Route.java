@@ -48,4 +48,9 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
     public Operator getOperator() {
         return new Agency(getAgencyUID());
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s", getUID());
+    }
 }
