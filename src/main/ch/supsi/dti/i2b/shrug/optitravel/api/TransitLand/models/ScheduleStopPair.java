@@ -5,6 +5,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.DropOff;
 import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import com.jsoniter.any.Any;
+import jdk.jshell.spi.ExecutionControl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -184,5 +185,11 @@ public class ScheduleStopPair extends ch.supsi.dti.i2b.shrug.optitravel.models.S
 		return new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Stop(
 				origin_onestop_id
 		);
+	}
+
+	@Override
+	public int getStopSequence() throws ExecutionControl.NotImplementedException {
+    	// TODO: @Pura Implement
+		throw new ExecutionControl.NotImplementedException("Not yet implemented!");
 	}
 }

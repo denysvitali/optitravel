@@ -8,11 +8,23 @@ import java.util.Objects;
 public class StopTime extends TimedLocation {
 	private Stop stop;
 	private Time time;
+	private Trip trip;
 
 	public StopTime(Stop s, Time t){
 		super(s,t);
 		stop = s;
 		time = t;
+	}
+
+	public StopTime(Stop s, Time t, Trip tr){
+		super(s,t);
+		stop = s;
+		time = t;
+		trip = tr;
+	}
+
+	public Trip getTrip() {
+		return trip;
 	}
 
 	public Stop getStop() {
@@ -30,7 +42,7 @@ public class StopTime extends TimedLocation {
 
 	@Override
 	public String toString() {
-		return getStop() + " @ " + getTime();
+		return getStop() + " @ " + getTime() + " (via " + trip.getRoute().getName() + ")";
 	}
 
 	@Override
@@ -38,8 +50,9 @@ public class StopTime extends TimedLocation {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		StopTime stopTime = (StopTime) o;
-		return Objects.equals(stop, stopTime.stop) &&
-				Objects.equals(time, stopTime.time);
+		return 	Objects.equals(stop, stopTime.stop) &&
+		Objects.equals(time, stopTime.time) &&
+		Objects.equals(trip, stopTime.trip);
 	}
 
 	@Override
@@ -50,5 +63,9 @@ public class StopTime extends TimedLocation {
 	@Override
 	public int hashCode() {
 		return Objects.hash(stop, time);
+	}
+
+	public void setTrip(Trip t) {
+		trip = t;
 	}
 }

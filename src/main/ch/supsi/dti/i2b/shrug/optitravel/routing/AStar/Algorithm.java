@@ -55,6 +55,8 @@ public class Algorithm<T extends TimedLocation> {
             if(currentNode != null){
                 System.out.println(currentNode
                         .getElement().getLocation() + " != " + to.getElement().getLocation());
+                System.out.println("CN: " + currentNode.getElement());
+                System.out.println("TO: " + to.getElement());
             }
         }
     }

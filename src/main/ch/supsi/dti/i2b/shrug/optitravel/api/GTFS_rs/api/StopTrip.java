@@ -14,6 +14,20 @@ public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip 
     private DropOff drop_off;
     private PickUp pickup;
 
+    public StopTrip(Stop stop,
+					String arrival_time,
+					String departure_time,
+					int stop_sequence,
+					DropOff drop_off,
+					PickUp pickup){
+    	this.stop = stop;
+    	this.arrival_time = arrival_time;
+    	this.departure_time = departure_time;
+    	this.stop_sequence = stop_sequence;
+    	this.drop_off = drop_off;
+    	this.pickup = pickup;
+	}
+
     public Time getDeparture(){
         return new Time(departure_time);
     }

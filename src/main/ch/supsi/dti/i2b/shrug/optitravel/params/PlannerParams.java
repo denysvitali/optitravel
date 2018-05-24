@@ -18,5 +18,7 @@ public class PlannerParams {
 	// Weights (ranging from 10 = worse, 0 = best)
 	public static final double W_WALK = 8 * PREF_WEIGHT;
 	public static final double W_WAITING = 7 * PREF_WEIGHT;
+	public static final double W_CHANGE = 6 * PREF_WEIGHT;
+	public static final double W_MOVING = 1 * PREF_WEIGHT;
 
 }

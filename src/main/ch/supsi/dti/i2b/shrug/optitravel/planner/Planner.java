@@ -78,7 +78,7 @@ public class Planner {
         for(ch.supsi.dti.i2b.shrug.optitravel.models.Trip t : trips){
         	stop_times.addAll(
 				t.getStopTrip().stream().map(e ->
-						new StopTime(e.getStop(), e.getArrival())
+						new StopTime(e.getStop(), e.getArrival(), t)
 				).collect(Collectors.toList())
 			);
 		}
@@ -97,7 +97,7 @@ public class Planner {
         stop_times.forEach(e->{
         	stop_stoptime.computeIfAbsent(e.getStop(), k->new ArrayList<>());
             stop_stoptime.get(e.getStop()).add(
-            		new StopTime(e.getStop(), e.getTime())
+            		new StopTime(e.getStop(), e.getTime(), e.getTrip())
 			);
         });
 
@@ -112,6 +112,7 @@ public class Planner {
             StopTime prevStop = null;
             for(StopTrip st : t.getStopTrip()){
                 StopTime npStop = new StopTime(st.getStop(), st.getArrival());
+                npStop.setTrip(t);
                 if(prevStop != null){
 
                 	if(node_stoptime.get(prevStop) == null){
@@ -131,6 +132,8 @@ public class Planner {
 					);
 
                     stop_stop_association.get(pNST).add(nNST);
+
+                    pNST.addNeighbour(nNST, 0); // Directly connected!
 					//System.out.println("CS: " + npStop);
 					//System.out.println("PS: " + prevStop);
                 }
@@ -145,10 +148,27 @@ public class Planner {
 		for(Node<StopTime> nst : stop_stop_association.keySet()){
 			List<Node<StopTime>> lnst = stop_stop_association.get(nst);
 			for(Node<StopTime> nst_n : lnst){
-				double weight = Distance.distance(
-						nst.getElement().getCoordinate(),
-						nst_n.getElement().getCoordinate()
+				double weight = 0.0;
+				double wait_time = Time.diffMinutes(nst_n.getElement().getTime(),
+				nst.getElement().getTime());
+
+				double distance = Distance.distance(
+							nst.getElement().getCoordinate(),
+							nst_n.getElement().getCoordinate()
 				);
+
+				if(wait_time > PlannerParams.MAX_WAITING_TIME){
+					continue;
+				}
+
+
+				if(!nst.getElement().getTrip().equals(nst_n.getElement().getTrip())){
+					weight += wait_time * PlannerParams.W_WAITING;
+					weight += PlannerParams.W_CHANGE;
+				} else {
+					weight += wait_time * PlannerParams.W_MOVING;
+				}
+
 
 				nst.addNeighbour(nst_n, weight);
 			}
@@ -172,8 +192,28 @@ public class Planner {
 						continue;
 					}
 
-					weight = PlannerParams.W_WALK * walk_minutes + walk_distance + PlannerParams.W_WAITING * waiting_minutes;
-					nst.addNeighbour(node_stoptime.get(st), weight);
+					weight = PlannerParams.W_WALK * walk_minutes + walk_distance +
+							PlannerParams.W_WAITING * waiting_minutes;
+
+					Node<StopTime> new_walking_node = new Node<>(st);
+					new_walking_node.getElement().setTrip(new WalkingTrip(
+							nst.getElement(), st
+					));
+
+					new_walking_node.setH(walk_distance);
+					nst.addNeighbour(new_walking_node, weight);
+
+					System.out.println("Connecting " + new_walking_node.getElement()
+							+ " w/ " + nst.getElement() + " because " +
+							"they're close-by.");
+
+					/*Node<StopTime> new_node = node_stoptime.get(st);
+					new_node.setH(
+							Distance.distance(new_node.getElement().getCoordinate(),
+							to));
+					System.out.println("Connecting " + new_node.getElement() + " w/ " + nst.getElement() + " because" +
+							" they're close-by.");
+					nst.addNeighbour(node_stoptime.get(st), weight);*/
 				}
 			}
 		}

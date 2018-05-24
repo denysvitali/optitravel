@@ -132,7 +132,7 @@ class GTFSrsTest {
             Trip t = gtfSrsWrapper.getTrip(uid);
             assertNotEquals(null, t);
             assertEquals(uid, t.getUID());
-            List<StopTrip> stopTrip = t.getStopTrip();
+            List<StopTrip> stopTrip = (List<StopTrip>) t.getStopTrip().stream();
             assertNotEquals(null, stopTrip);
             assertNotEquals(0, stopTrip.size());
 
@@ -238,7 +238,7 @@ class GTFSrsTest {
 			assertEquals(0, t.getDirectionId());
 			assertEquals(t.getRoute().getUID(), "r-acfc6d-7");
 
-			List<StopTrip> stop_trip = t.getStopTrip();
+			List<StopTrip> stop_trip = (List<StopTrip>) t.getStopTrip().stream();
 			assertNotEquals(null, stop_trip);
 
 			StopTrip st = stop_trip.get(0);
