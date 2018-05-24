@@ -6,6 +6,8 @@ public class Coordinate {
     private double lat;
     private double lng;
 
+    public Coordinate(){}
+
     public Coordinate(double lat, double lng){
         this.lat = lat;
         this.lng = lng;

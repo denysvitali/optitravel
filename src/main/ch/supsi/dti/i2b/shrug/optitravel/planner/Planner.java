@@ -154,6 +154,10 @@ public class Planner {
 					double wait_time = Time.diffMinutes(nst_n.getElement().getTime(),
 							nst.getElement().getTime());
 
+					if(wait_time < 0){
+						continue;
+					}
+
 					double distance = Distance.distance(
 							nst.getElement().getCoordinate(),
 							nst_n.getElement().getCoordinate()
@@ -217,10 +221,12 @@ public class Planner {
 		near = near.stream()
 				.filter((e)-> !nst.getElement().equals(e))
 				.collect(Collectors.toList());
-		sort_by_distance(near, nst.getElement().getCoordinate());
 		for(StopTime st : near){
 			double weight = 0.0;
-			double stop_distance_time = Time.diffMinutes(nst.getElement().getTime(), st.getTime());
+			double stop_distance_time = Time.diffMinutes(
+					nst.getElement().getTime(),
+					st.getTime()
+			);
 
 			if(nst.getElement().getStop().equals(st.getStop())){
 				// Same Stop, different times!
@@ -232,6 +238,8 @@ public class Planner {
 				nst.addNeighbour(nst, weight);
 				continue;
 			}
+
+			addWalkPathToCoordinate(node_stoptime.get(st), to);
 
 			double walk_distance = Distance.distance(
 					nst.getElement().getCoordinate(),
@@ -280,15 +288,94 @@ public class Planner {
 		nst.setComputedNeighbours(true);
 	}
 
-    private void sort_by_distance(List<StopTime> list, Coordinate target) {
+	private Node<StopTime> addWalkPathToCoordinate(Node<StopTime> nst, Coordinate to) {
+		double weight = 0.0;
+
+		double walk_distance = Distance.distance(
+				nst.getElement().getCoordinate(),
+				to);
+
+		if (walk_distance < PlannerParams.WALKABLE_RADIUS_METERS) {
+			double walk_time_s = walk_distance / PlannerParams.WALK_SPEED_MPS;
+			double walk_minutes = walk_time_s / 60;
+
+
+			weight += PlannerParams.W_WALK * walk_minutes;
+
+			Node<StopTime> new_walking_node = new Node<>(new WalkStopTime(to));
+			new_walking_node.getElement().setTrip(new WalkingTrip(
+					nst.getElement(), new_walking_node.getElement()
+			));
+
+			new_walking_node.setH(Distance.distance(
+					nst.getElement().getCoordinate(), to
+			));
+
+			nst.addNeighbour(new_walking_node, weight);
+			return new_walking_node;
+		}
+		return null;
+	}
+
+	private Node<StopTime> addWalkpathToNode(Node<StopTime> source, Node<StopTime> dest) {
+		double weight = 0.0;
+		double walk_distance = Distance.distance(
+				source.getElement().getCoordinate(),
+				to);
+
+		double stop_distance_time = Time.diffMinutes(
+				source.getElement().getTime(),
+				dest.getElement().getTime()
+		);
+
+
+		if (walk_distance < PlannerParams.WALKABLE_RADIUS_METERS) {
+			double walk_time_s = walk_distance / PlannerParams.WALK_SPEED_MPS;
+			double walk_minutes = walk_time_s / 60;
+			double waiting_minutes = stop_distance_time - walk_minutes;
+
+			if (waiting_minutes < 0) {
+				// Unreachable
+				return null;
+			}
+
+			if (waiting_minutes > PlannerParams.MAX_WAITING_TIME) {
+				return null;
+			}
+
+			if (waiting_minutes < 1) {
+				// The stops are close-by, but the change is hard
+				weight += PlannerParams.W_FAST_CHANGE;
+			}
+
+
+			weight += PlannerParams.W_WALK * walk_minutes +
+					PlannerParams.W_WAITING * waiting_minutes;
+
+			Node<StopTime> new_walking_node = dest;
+			new_walking_node.getElement().setTrip(new WalkingTrip(
+					source.getElement(), dest.getElement()
+			));
+
+			new_walking_node.setH(Distance.distance(
+					source.getElement().getCoordinate(), to
+			));
+
+			source.addNeighbour(new_walking_node, weight);
+			return new_walking_node;
+		}
+		return null;
+	}
+
+	private void sort_by_distance(List<StopTime> list, Coordinate target) {
         list.sort((a,b)->{
             double d_a = Distance.distance(
-                    a.getStop().getCoordinate(),
+                    a.getLocation().getCoordinate(),
                     target
             );
 
             double d_b = Distance.distance(
-                    b.getStop().getCoordinate(),
+                    b.getLocation().getCoordinate(),
                     target
             );
 
@@ -300,12 +387,12 @@ public class Planner {
     private void sort_by_distancetime(List<StopTime> list, Coordinate target) {
         list.sort((a,b)->{
             double d_a = Distance.distance(
-                    a.getStop().getCoordinate(),
+                    a.getLocation().getCoordinate(),
                     target
             );
 
             double d_b = Distance.distance(
-                    b.getStop().getCoordinate(),
+                    b.getLocation().getCoordinate(),
                     target
             );
 

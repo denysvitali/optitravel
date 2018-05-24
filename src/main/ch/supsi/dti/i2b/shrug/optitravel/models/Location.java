@@ -2,8 +2,19 @@ package ch.supsi.dti.i2b.shrug.optitravel.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 
-public abstract class Location {
-    public abstract Coordinate getCoordinate();
+public class Location {
+	private Coordinate coordinate;
+
+	public Location(){
+
+	}
+
+	public Location(Coordinate c){
+		coordinate = c;
+	}
+    public Coordinate getCoordinate() {
+		return this.coordinate;
+	}
 
     @Override
     public int hashCode() {

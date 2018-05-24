@@ -5,6 +5,7 @@ public class TimedLocation extends Location {
 
 	private Location location;
 	private Time time;
+	private Trip trip;
 
 	TimedLocation(Location location, Time time){
 		this.location = location;
@@ -17,6 +18,22 @@ public class TimedLocation extends Location {
 
 	public Time getTime(){
 		return time;
+	}
+
+	public Trip getTrip() {
+		return trip;
+	}
+
+	public void setTrip(Trip trip) {
+		this.trip = trip;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+
+	public void setTime(Time time) {
+		this.time = time;
 	}
 
 	@Override

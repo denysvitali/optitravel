@@ -93,9 +93,4 @@ public class Node<T> {
 				Objects.equals(neighbours, node.neighbours) &&
 				Objects.equals(from, node.from);
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(element);
-	}
 }

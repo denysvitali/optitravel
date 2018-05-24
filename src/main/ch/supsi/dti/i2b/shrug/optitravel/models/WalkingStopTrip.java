@@ -51,10 +51,4 @@ public class WalkingStopTrip extends StopTrip {
 	public int getStopSequence() {
 		return stop_sequence;
 	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(stop, arrival_time, departure_time, stop_sequence,
-				dropoff, pickup);
-	}
 }

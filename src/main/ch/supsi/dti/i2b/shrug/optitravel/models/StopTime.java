@@ -46,23 +46,8 @@ public class StopTime extends TimedLocation {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		StopTime stopTime = (StopTime) o;
-		return 	Objects.equals(stop, stopTime.stop) &&
-		Objects.equals(time, stopTime.time) &&
-		Objects.equals(trip, stopTime.trip);
-	}
-
-	@Override
 	public Coordinate getCoordinate() {
 		return stop.getCoordinate();
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(stop, time, trip);
 	}
 
 	public void setTrip(Trip t) {

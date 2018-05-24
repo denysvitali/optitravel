@@ -43,6 +43,19 @@ public class WalkingTrip extends Trip {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof WalkingTrip)){
+			return false;
+		}
+
+		WalkingTrip wt = (WalkingTrip) obj;
+		if(from.equals(wt.from) && to.equals(wt.to)){
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public int hashCode() {
 		return Objects.hash(from.getCoordinate(), to.getCoordinate(), WalkingRoute.class);
 	}
