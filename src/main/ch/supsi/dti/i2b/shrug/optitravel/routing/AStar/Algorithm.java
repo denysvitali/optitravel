@@ -1,6 +1,10 @@
 package ch.supsi.dti.i2b.shrug.optitravel.routing.AStar;
 
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
+import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
+import ch.supsi.dti.i2b.shrug.optitravel.planner.Planner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,7 +14,7 @@ import java.util.List;
 public class Algorithm<T extends TimedLocation> {
 
 
-    public List<Node<T>> route(Node<T> from, Node<T> to){
+    public List<Node<T>> route(Node<T> from, Coordinate to){
         Node<T> currentNode = from;
         from.setG(0);
         for(;;) {
@@ -21,20 +25,6 @@ public class Algorithm<T extends TimedLocation> {
             Node<T> closestNode = null;
             HashMap<Node<T>, Double> neighbours = currentNode.getNeighbours();
             for (Node<T> n : neighbours.keySet()) {
-            	if(n == null){
-					System.out.println("?");
-					System.exit(1);
-				}
-				if(neighbours == null){
-					System.out.println("??");
-					System.exit(1);
-				}
-
-				if(neighbours.get(n) == null){
-					System.out.println("???");
-					System.exit(1);
-
-				}
                 double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + neighbours.get(n);
                 double newF = n.getH() + newG;
                 if (n.getF() > newF || n.getG() == -1) {
@@ -51,12 +41,12 @@ public class Algorithm<T extends TimedLocation> {
             currentNode = closestNode;
 
             if(currentNode != null &&
+					Distance.distance(
                     currentNode
 							.getElement()
 							.getLocation()
-							.equals(
-								to.getElement().getLocation()
-							)
+							.getCoordinate()
+					, to) < PlannerParams.DESTINATION_RADIUS
 			){
                 List<Node<T>> path = new ArrayList<>();
                 while(currentNode.getFrom() != null){
@@ -70,9 +60,7 @@ public class Algorithm<T extends TimedLocation> {
 
             if(currentNode != null){
                 System.out.println(currentNode
-                        .getElement().getLocation() + " != " + to.getElement().getLocation());
-                System.out.println("CN: " + currentNode.getElement());
-                System.out.println("TO: " + to.getElement());
+                        .getElement().getLocation() + " is not close to " + to);
             }
         }
     }

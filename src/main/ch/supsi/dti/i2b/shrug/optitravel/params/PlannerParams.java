@@ -6,6 +6,9 @@ public class PlannerParams {
 	// Average walking speed (in m/s)
 	public static final double WALK_SPEED_MPS = 1.4; // = 5 km/h
 
+	// Radius in which the stop is considered final (close to our destination)
+	public static final double DESTINATION_RADIUS = 50;
+
 	// Maximum Waiting Time (in minutes)
 	public static final double MAX_WAITING_TIME = 50.0;
 

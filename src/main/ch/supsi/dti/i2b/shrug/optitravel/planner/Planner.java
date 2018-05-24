@@ -148,8 +148,12 @@ public class Planner {
 
 		for(Node<StopTime> nst : stop_stop_association.keySet()){
 			List<Node<StopTime>> lnst = stop_stop_association.get(nst);
+			if(nst.isComputedNeighbours()){
+				continue;
+			}
 			for(Node<StopTime> nst_n : lnst){
 				{
+
 					double weight = 0.0;
 					double wait_time = Time.diffMinutes(nst_n.getElement().getTime(),
 							nst.getElement().getTime());
@@ -165,6 +169,10 @@ public class Planner {
 
 					if (wait_time > PlannerParams.MAX_WAITING_TIME) {
 						continue;
+					}
+
+					if (!nst_n.getElement().getTime().isAfter(nst.getElement().getTime())) {
+						continue; // Don't add stops from the past!
 					}
 
 
@@ -198,15 +206,15 @@ public class Planner {
 				addNeighbours(nst, stop_times, node_stoptime);
 				addNeighbours(nst_n, stop_times, node_stoptime);
 			}
+			nst.setComputedNeighbours(true);
 		}
 
 		Node<StopTime> startingNST = node_stoptime.get(startingStop);
-		Node<StopTime> endingNST = node_stoptime.get(endingStop);
 
 		List<Node<StopTime>> path =
 				algorithm.route(
 						startingNST,
-						endingNST
+						to
 				);
 
 		System.out.println(path);
@@ -219,7 +227,7 @@ public class Planner {
 		}
 		List<StopTime> near = new ArrayList<>(stop_times);
 		near = near.stream()
-				.filter((e)-> !nst.getElement().equals(e))
+				.filter((e)-> e.getTime().isAfter(nst.getElement().getTime()) && !nst.getElement().equals(e))
 				.collect(Collectors.toList());
 		for(StopTime st : near){
 			double weight = 0.0;
@@ -228,9 +236,13 @@ public class Planner {
 					st.getTime()
 			);
 
+			if(stop_distance_time < 0){
+				continue;
+			}
+
 			if(nst.getElement().getStop().equals(st.getStop())){
 				// Same Stop, different times!
-				if(!nst.getElement().getTime().isAfter(st.getTime())){
+				if(!st.getTime().isAfter(nst.getElement().getTime())){
 					continue;
 				}
 				weight += PlannerParams.W_CHANGE;
