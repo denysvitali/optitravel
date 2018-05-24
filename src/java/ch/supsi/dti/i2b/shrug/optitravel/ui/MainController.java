@@ -1,19 +1,20 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.GeocodingService;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Place;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.TripTimeFrame;
-import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTimePicker;
+import com.jfoenix.validation.RequiredFieldValidator;
 import com.lynden.gmapsfx.GoogleMapView;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Callback;
 
@@ -24,7 +25,7 @@ public class MainController {
     @FXML
     private JFXDatePicker dpDate;
     @FXML
-    private JFXButton fabSend;
+    private Button fabSend;
     @FXML
     private ComboBox<TripTimeFrame> cbTripPeriod;
     @FXML
@@ -41,6 +42,8 @@ public class MainController {
     private AnchorPane filtersContainer;
 
     private MapController mapController;
+    private Place origin;
+    private Place destination;
 
     public MainController() {
     }
@@ -48,13 +51,23 @@ public class MainController {
     @FXML
     private void initialize() {
 
-        // Setup autocompletion on origin and destination text fields
-        tfStartPoint.setOnSelect((e) ->
-                GeocodingService.geocodeAsync(tfStartPoint.getSelectedEntry().getDescription(),
-                        places -> Platform.runLater(() -> mapController.addMarker(places.get(0).getGeometry().getLocation(), MapController.NodeType.ORIGIN))));
-        tfEndPoint.setOnSelect((e) ->
-                GeocodingService.geocodeAsync(tfEndPoint.getSelectedEntry().getDescription(),
-                        places -> Platform.runLater(() -> mapController.addMarker(places.get(0).getGeometry().getLocation(), MapController.NodeType.DESTINAION))));
+        // Save geocoded place from textfields on selection and add marker to map
+        tfStartPoint.setLocationGeocodedListener((origin, value) ->
+                mapController.addMarker(value.getGeometry().getLocation(), MapController.NodeType.ORIGIN));
+        tfEndPoint.setLocationGeocodedListener((origin, value) ->
+                mapController.addMarker(value.getGeometry().getLocation(), MapController.NodeType.DESTINATION));
+
+        // Validation for textfields
+        RequiredFieldValidator requiredFieldValidator = new RequiredFieldValidator();
+        requiredFieldValidator.setMessage("This field is required.");
+        tfStartPoint.getValidators().add(requiredFieldValidator);
+        requiredFieldValidator = new RequiredFieldValidator();
+        requiredFieldValidator.setMessage("This field is required.");
+        tfEndPoint.getValidators().add(requiredFieldValidator);
+        tfStartPoint.focusedProperty().addListener((o,oldVal,newVal) -> {if(!newVal) tfStartPoint.validate();});
+        tfEndPoint.focusedProperty().addListener((o,oldVal,newVal) -> {if(!newVal) tfEndPoint.validate();});
+
+
 
         // Initialise map
         mapController = new MapController(mapView, this);
@@ -89,25 +102,26 @@ public class MainController {
 
         // Prepare listview
         lvRouteStops.setPrefWidth(280);
-        mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 -fabSend.getPrefHeight()/2));
-        filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight()/2));
+        mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
+        filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
         lvRouteStops.setCellFactory(new Callback<ListView<Stop>, ListCell<Stop>>() {
             @Override
             public ListCell<Stop> call(ListView<Stop> param) {
                 return new StopCellItem();
             }
         });
-        for(int i = 0; i < 10; i++) lvRouteStops.getItems().addAll(new Stop() {
-            @Override
-            public String getName() {
-                return "name";
-            }
+        for (int i = 0; i < 10; i++)
+            lvRouteStops.getItems().addAll(new Stop() {
+                @Override
+                public String getName() {
+                    return "name";
+                }
 
-            @Override
-            public Coordinate getCoordinate() {
-                return new Coordinate(0,0);
-            }
-        });
+                @Override
+                public Coordinate getCoordinate() {
+                    return new Coordinate(0, 0);
+                }
+            });
 
         fabSend.toFront();
         lvRouteStops.toBack();

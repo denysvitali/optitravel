@@ -4,12 +4,8 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Location;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
-import com.lynden.gmapsfx.service.geocoding.GeocoderRequest;
-import com.lynden.gmapsfx.service.geocoding.GeocoderStatus;
-import com.lynden.gmapsfx.service.geocoding.GeocodingResult;
 import com.lynden.gmapsfx.service.geocoding.GeocodingService;
-
-import java.util.Arrays;
+import javafx.application.Platform;
 
 public class MapController implements MapComponentInitializedListener {
 
@@ -22,7 +18,7 @@ public class MapController implements MapComponentInitializedListener {
 
     private final MainController mainController;
 
-    public enum NodeType {ORIGIN, DESTINAION, TRANSIT}
+    public enum NodeType {ORIGIN, DESTINATION, TRANSIT}
 
     public MapController(GoogleMapView mapView, MainController mainController) {
         this.mapView = mapView;
@@ -50,7 +46,7 @@ public class MapController implements MapComponentInitializedListener {
     }
 
     public void addMarker(Location location, NodeType type) {
-        addMarker(new LatLong(location.getLatitude(), location.getLongitude()), type);
+        Platform.runLater(() -> addMarker(new LatLong(location.getLatitude(), location.getLongitude()), type));
     }
 
     public void addMarker(LatLong where, NodeType type) {
@@ -65,7 +61,7 @@ public class MapController implements MapComponentInitializedListener {
                 map.addMarker(origin);
                 map.panTo(where);
                 break;
-            case DESTINAION:
+            case DESTINATION:
                 if (destination != null) map.removeMarker(destination);
                 destination = new Marker(opt);
                 map.addMarker(destination);

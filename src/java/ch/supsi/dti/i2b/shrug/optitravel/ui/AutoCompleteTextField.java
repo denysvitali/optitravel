@@ -1,7 +1,10 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.GeocodingService;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.PlacesAutocompletionService;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Place;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Prediction;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.Callback;
 import com.jfoenix.controls.JFXTextField;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -12,7 +15,9 @@ import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 
+import javax.swing.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -28,10 +33,10 @@ public class AutoCompleteTextField extends JFXTextField implements ChangeListene
      * The popup used to select an entry.
      */
     private ContextMenu entriesPopup;
-    private Prediction selectedEntry;
     private TimerTask queryTask;
     private final Timer timer;
-    private EventHandler<ActionEvent> onSelect;
+    private Place place;
+    private LocationGeocodedListener listener;
 
     /**
      * Construct a new AutoCompleteTextField.
@@ -41,9 +46,7 @@ public class AutoCompleteTextField extends JFXTextField implements ChangeListene
         timer = new Timer();
         entriesPopup = new ContextMenu();
         textProperty().addListener(this);
-
         focusedProperty().addListener((observableValue, aBoolean, aBoolean2) -> Platform.runLater(entriesPopup::hide));
-
     }
 
 
@@ -62,15 +65,19 @@ public class AutoCompleteTextField extends JFXTextField implements ChangeListene
             Label entryLabel = new Label(result.getDescription());
             CustomMenuItem item = new CustomMenuItem(entryLabel, true);
             item.addEventHandler(ActionEvent.ACTION, (e) -> {
+                // Set description as textfield content
                 textProperty().removeListener(this);
-                selectedEntry = result;
                 Platform.runLater(() -> {
                     setText(result.getDescription());
                     entriesPopup.hide();
                     textProperty().addListener(this);
                 });
+                // Geocode the location returned by the autocompletion service
+                GeocodingService.geocodeAsync(result.getDescription(), places -> {
+                    place = places.get(0);
+                    listener.locationGeocoded(AutoCompleteTextField.this, place);
+                });
             });
-            if(onSelect != null) item.addEventHandler(ActionEvent.ACTION, onSelect);
             menuItems.add(item);
         }
         Platform.runLater(() -> {
@@ -108,11 +115,11 @@ public class AutoCompleteTextField extends JFXTextField implements ChangeListene
         }
     }
 
-    public Prediction getSelectedEntry() {
-        return selectedEntry;
+    public void setLocationGeocodedListener(LocationGeocodedListener listener) {
+        this.listener = listener;
     }
 
-    public void setOnSelect(EventHandler<ActionEvent> onSelect) {
-        this.onSelect = onSelect;
+    interface LocationGeocodedListener {
+        public void locationGeocoded(TextField origin, Place value);
     }
 }
