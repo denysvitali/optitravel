@@ -9,6 +9,7 @@ import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTimePicker;
 import com.jfoenix.validation.RequiredFieldValidator;
+import com.jfoenix.validation.base.ValidatorBase;
 import com.lynden.gmapsfx.GoogleMapView;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -42,8 +43,6 @@ public class MainController {
     private AnchorPane filtersContainer;
 
     private MapController mapController;
-    private Place origin;
-    private Place destination;
 
     public MainController() {
     }
@@ -61,13 +60,15 @@ public class MainController {
         RequiredFieldValidator requiredFieldValidator = new RequiredFieldValidator();
         requiredFieldValidator.setMessage("This field is required.");
         tfStartPoint.getValidators().add(requiredFieldValidator);
+        tfStartPoint.getValidators().add(new PlaceValidator("Please select a valid place."));
         requiredFieldValidator = new RequiredFieldValidator();
         requiredFieldValidator.setMessage("This field is required.");
         tfEndPoint.getValidators().add(requiredFieldValidator);
+        tfEndPoint.getValidators().add(new PlaceValidator("Please select a valid place."));
+
+
         tfStartPoint.focusedProperty().addListener((o,oldVal,newVal) -> {if(!newVal) tfStartPoint.validate();});
         tfEndPoint.focusedProperty().addListener((o,oldVal,newVal) -> {if(!newVal) tfEndPoint.validate();});
-
-
 
         // Initialise map
         mapController = new MapController(mapView, this);
@@ -104,24 +105,7 @@ public class MainController {
         lvRouteStops.setPrefWidth(280);
         mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
         filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
-        lvRouteStops.setCellFactory(new Callback<ListView<Stop>, ListCell<Stop>>() {
-            @Override
-            public ListCell<Stop> call(ListView<Stop> param) {
-                return new StopCellItem();
-            }
-        });
-        for (int i = 0; i < 10; i++)
-            lvRouteStops.getItems().addAll(new Stop() {
-                @Override
-                public String getName() {
-                    return "name";
-                }
-
-                @Override
-                public Coordinate getCoordinate() {
-                    return new Coordinate(0, 0);
-                }
-            });
+        lvRouteStops.setCellFactory(param -> new StopCellItem());
 
         fabSend.toFront();
         lvRouteStops.toBack();

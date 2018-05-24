@@ -49,6 +49,10 @@ public class AutoCompleteTextField extends JFXTextField implements ChangeListene
         focusedProperty().addListener((observableValue, aBoolean, aBoolean2) -> Platform.runLater(entriesPopup::hide));
     }
 
+    public Place getPlace() {
+        return place;
+    }
+
 
     /**
      * Populate the entry set with the given search results.  Display is limited to 10 entries, for performance.
@@ -120,6 +124,6 @@ public class AutoCompleteTextField extends JFXTextField implements ChangeListene
     }
 
     interface LocationGeocodedListener {
-        public void locationGeocoded(TextField origin, Place value);
+        void locationGeocoded(TextField origin, Place value);
     }
 }
