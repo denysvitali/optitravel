@@ -181,6 +181,11 @@ public class Planner {
 								to));
 					}
 
+					if(nst_n.equals(nst)){
+						// Don't add.
+						continue;
+					}
+
 					nst.addNeighbour(nst_n, weight);
 				}
 
@@ -210,7 +215,7 @@ public class Planner {
 		}
 		List<StopTime> near = new ArrayList<>(stop_times);
 		near = near.stream()
-				.filter((e)-> (!e.getTime().isAfter(nst.getElement().getTime()) && !nst.getElement().equals(e)))
+				.filter((e)-> !nst.getElement().equals(e))
 				.collect(Collectors.toList());
 		sort_by_distance(near, nst.getElement().getCoordinate());
 		for(StopTime st : near){
@@ -219,6 +224,9 @@ public class Planner {
 
 			if(nst.getElement().getStop().equals(st.getStop())){
 				// Same Stop, different times!
+				if(!nst.getElement().getTime().isAfter(st.getTime())){
+					continue;
+				}
 				weight += PlannerParams.W_CHANGE;
 				weight += stop_distance_time * PlannerParams.W_WAITING;
 				nst.addNeighbour(nst, weight);

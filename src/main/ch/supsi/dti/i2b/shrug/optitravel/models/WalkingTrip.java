@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class WalkingTrip extends Trip {
 
@@ -39,5 +40,10 @@ public class WalkingTrip extends Trip {
 	@Override
 	public Route getRoute() {
 		return new WalkingRoute();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(from.getCoordinate(), to.getCoordinate(), WalkingRoute.class);
 	}
 }

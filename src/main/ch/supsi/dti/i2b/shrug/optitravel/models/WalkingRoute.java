@@ -1,5 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
+import java.util.Objects;
+
 public class WalkingRoute extends Route {
 	@Override
 	public String getName() {
@@ -17,5 +19,10 @@ public class WalkingRoute extends Route {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(getName());
 	}
 }

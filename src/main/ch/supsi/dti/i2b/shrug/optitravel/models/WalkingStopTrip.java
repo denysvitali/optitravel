@@ -1,5 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
+import java.util.Objects;
+
 public class WalkingStopTrip extends StopTrip {
 
 	private Stop stop;
@@ -48,5 +50,11 @@ public class WalkingStopTrip extends StopTrip {
 	@Override
 	public int getStopSequence() {
 		return stop_sequence;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(stop, arrival_time, departure_time, stop_sequence,
+				dropoff, pickup);
 	}
 }

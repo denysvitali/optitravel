@@ -5,6 +5,8 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 
+import java.util.Objects;
+
 
 public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip {
     private Stop stop;
@@ -52,5 +54,11 @@ public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip 
 
 	public int getStopSequence() {
         return stop_sequence;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(stop, arrival_time, departure_time, stop_sequence,
+				drop_off, pickup);
 	}
 }

@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Node<T> {
     private T element;
-    private Map<Node<T>, Double> neighbours;
+    private HashMap<Node<T>, Double> neighbours;
     private double g;
     private double h;
     private boolean visited;
@@ -96,6 +96,6 @@ public class Node<T> {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(element, neighbours, g, h, visited, from, computed_neighbours);
+		return Objects.hash(element);
 	}
 }

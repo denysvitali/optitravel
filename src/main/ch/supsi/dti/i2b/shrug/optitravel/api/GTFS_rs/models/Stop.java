@@ -60,6 +60,6 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(super.hashCode(), uid, name, lat, lng, location_type, parent_station);
+		return Objects.hash(uid, name, lat, lng, location_type, parent_station);
 	}
 }

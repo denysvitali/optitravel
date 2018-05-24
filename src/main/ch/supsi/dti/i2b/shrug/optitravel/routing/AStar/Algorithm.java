@@ -19,6 +19,20 @@ public class Algorithm<T extends TimedLocation> {
 
             Node<T> closestNode = null;
             for (Node<T> n : currentNode.getNeighbours().keySet()) {
+            	if(n == null){
+					System.out.println("?");
+					System.exit(1);
+				}
+				if(currentNode.getNeighbours() == null){
+					System.out.println("??");
+					System.exit(1);
+				}
+
+				if(currentNode.getNeighbours().get(n) == null){
+					System.out.println("???");
+					System.exit(1);
+
+				}
                 double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + currentNode.getNeighbours().get(n);
                 double newF = n.getH() + newG;
                 if (n.getF() > newF || n.getG() == -1) {

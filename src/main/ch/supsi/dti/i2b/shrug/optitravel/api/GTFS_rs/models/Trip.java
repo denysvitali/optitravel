@@ -4,6 +4,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
@@ -43,5 +44,11 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 
 	public String getShortName() {
 		return short_name;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(uid, route_id, service_id, headsign, short_name,
+				direction_id, stop_sequence);
 	}
 }
