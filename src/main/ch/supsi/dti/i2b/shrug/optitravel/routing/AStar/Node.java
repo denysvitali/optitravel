@@ -24,7 +24,7 @@ public class Node<T> {
         neighbours.put(neighbourElement, distanceFromNode);
     }
 
-    public Map<Node<T>, Double> getNeighbours() {
+    public HashMap<Node<T>, Double> getNeighbours() {
         return neighbours;
     }
 

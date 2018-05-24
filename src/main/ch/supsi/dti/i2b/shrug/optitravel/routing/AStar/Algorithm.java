@@ -4,6 +4,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class Algorithm<T extends TimedLocation> {
@@ -18,22 +19,23 @@ public class Algorithm<T extends TimedLocation> {
             }
 
             Node<T> closestNode = null;
-            for (Node<T> n : currentNode.getNeighbours().keySet()) {
+            HashMap<Node<T>, Double> neighbours = currentNode.getNeighbours();
+            for (Node<T> n : neighbours.keySet()) {
             	if(n == null){
 					System.out.println("?");
 					System.exit(1);
 				}
-				if(currentNode.getNeighbours() == null){
+				if(neighbours == null){
 					System.out.println("??");
 					System.exit(1);
 				}
 
-				if(currentNode.getNeighbours().get(n) == null){
+				if(neighbours.get(n) == null){
 					System.out.println("???");
 					System.exit(1);
 
 				}
-                double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + currentNode.getNeighbours().get(n);
+                double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + neighbours.get(n);
                 double newF = n.getH() + newG;
                 if (n.getF() > newF || n.getG() == -1) {
                     n.setG(newG);
