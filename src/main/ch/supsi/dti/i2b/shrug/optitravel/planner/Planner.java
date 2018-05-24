@@ -145,88 +145,132 @@ public class Planner {
         StopTime endingStop = d_d.get(0);
 
 		Algorithm<StopTime> algorithm = new Algorithm<>();
+
 		for(Node<StopTime> nst : stop_stop_association.keySet()){
 			List<Node<StopTime>> lnst = stop_stop_association.get(nst);
 			for(Node<StopTime> nst_n : lnst){
-				double weight = 0.0;
-				double wait_time = Time.diffMinutes(nst_n.getElement().getTime(),
-				nst.getElement().getTime());
+				{
+					double weight = 0.0;
+					double wait_time = Time.diffMinutes(nst_n.getElement().getTime(),
+							nst.getElement().getTime());
 
-				double distance = Distance.distance(
+					double distance = Distance.distance(
 							nst.getElement().getCoordinate(),
 							nst_n.getElement().getCoordinate()
-				);
+					);
 
-				if(wait_time > PlannerParams.MAX_WAITING_TIME){
-					continue;
-				}
-
-
-				if(!nst.getElement().getTrip().equals(nst_n.getElement().getTrip())){
-					weight += wait_time * PlannerParams.W_WAITING;
-					weight += PlannerParams.W_CHANGE;
-				} else {
-					weight += wait_time * PlannerParams.W_MOVING;
-				}
-
-
-				nst.addNeighbour(nst_n, weight);
-			}
-
-			List<StopTime> near = new ArrayList<>(stop_times);
-			near = near.stream()
-					.filter((e)-> (!e.getTime().isAfter(nst.getElement().getTime()) && !nst.getElement().equals(e)))
-					.collect(Collectors.toList());
-			sort_by_distance(near, nst.getElement().getCoordinate());
-			for(StopTime st : near){
-				double weight;
-				double walk_distance = Distance.distance(
-						nst.getElement().getCoordinate(),
-						st.getCoordinate());
-				if(walk_distance < PlannerParams.WALKABLE_RADIUS_METERS){
-					double walk_time_s = walk_distance / PlannerParams.WALK_SPEED_MPS;
-					double walk_minutes = walk_time_s / 60;
-					double waiting_minutes = Time.diffMinutes(nst.getElement().getTime(), st.getTime());
-
-					if(waiting_minutes > PlannerParams.MAX_WAITING_TIME){
+					if (wait_time > PlannerParams.MAX_WAITING_TIME) {
 						continue;
 					}
 
-					weight = PlannerParams.W_WALK * walk_minutes + walk_distance +
-							PlannerParams.W_WAITING * waiting_minutes;
 
-					Node<StopTime> new_walking_node = new Node<>(st);
-					new_walking_node.getElement().setTrip(new WalkingTrip(
-							nst.getElement(), st
-					));
+					if (!nst.getElement().getTrip().equals(nst_n.getElement().getTrip())) {
+						weight += wait_time * PlannerParams.W_WAITING;
+						weight += PlannerParams.W_CHANGE;
+					} else {
+						weight += wait_time * PlannerParams.W_MOVING;
+					}
 
-					new_walking_node.setH(walk_distance);
-					nst.addNeighbour(new_walking_node, weight);
+					if(nst.getH() == -1){
+						nst.setH(Distance.distance(nst.getElement().getCoordinate(),
+								to));
+					}
 
-					System.out.println("Connecting " + new_walking_node.getElement()
-							+ " w/ " + nst.getElement() + " because " +
-							"they're close-by.");
+					if(nst_n.getH() == -1){
+						nst_n.setH(Distance.distance(nst_n.getElement().getCoordinate(),
+								to));
+					}
 
-					/*Node<StopTime> new_node = node_stoptime.get(st);
-					new_node.setH(
-							Distance.distance(new_node.getElement().getCoordinate(),
-							to));
-					System.out.println("Connecting " + new_node.getElement() + " w/ " + nst.getElement() + " because" +
-							" they're close-by.");
-					nst.addNeighbour(node_stoptime.get(st), weight);*/
+					nst.addNeighbour(nst_n, weight);
 				}
+
+
+				// Compute neighbours
+				addNeighbours(nst, stop_times, node_stoptime);
+				addNeighbours(nst_n, stop_times, node_stoptime);
 			}
 		}
 
+		Node<StopTime> startingNST = node_stoptime.get(startingStop);
+		Node<StopTime> endingNST = node_stoptime.get(endingStop);
+
 		List<Node<StopTime>> path =
 				algorithm.route(
-						node_stoptime.get(startingStop),
-						node_stoptime.get(endingStop)
+						startingNST,
+						endingNST
 				);
 
 		System.out.println(path);
 		alreadyComputed = true;
     }
+
+    private void addNeighbours(Node<StopTime> nst, List<StopTime> stop_times, HashMap<StopTime, Node<StopTime>> node_stoptime){
+    	if(nst.isComputedNeighbours()){
+    		return;
+		}
+		List<StopTime> near = new ArrayList<>(stop_times);
+		near = near.stream()
+				.filter((e)-> (!e.getTime().isAfter(nst.getElement().getTime()) && !nst.getElement().equals(e)))
+				.collect(Collectors.toList());
+		sort_by_distance(near, nst.getElement().getCoordinate());
+		for(StopTime st : near){
+			double weight = 0.0;
+			double stop_distance_time = Time.diffMinutes(nst.getElement().getTime(), st.getTime());
+
+			if(nst.getElement().getStop().equals(st.getStop())){
+				// Same Stop, different times!
+				weight += PlannerParams.W_CHANGE;
+				weight += stop_distance_time * PlannerParams.W_WAITING;
+				nst.addNeighbour(nst, weight);
+				continue;
+			}
+
+			double walk_distance = Distance.distance(
+					nst.getElement().getCoordinate(),
+					st.getCoordinate());
+
+			if(walk_distance < PlannerParams.WALKABLE_RADIUS_METERS){
+				double walk_time_s = walk_distance / PlannerParams.WALK_SPEED_MPS;
+				double walk_minutes = walk_time_s / 60;
+				double waiting_minutes = stop_distance_time - walk_minutes;
+
+				if(waiting_minutes < 0){
+					// Unreachable
+					continue;
+				}
+
+				if(waiting_minutes > PlannerParams.MAX_WAITING_TIME){
+					continue;
+				}
+
+				if(waiting_minutes < 1){
+					// The stops are close-by, but the change is hard
+					weight += PlannerParams.W_FAST_CHANGE;
+				}
+
+
+				weight += PlannerParams.W_WALK * walk_minutes +
+						PlannerParams.W_WAITING * waiting_minutes;
+
+				Node<StopTime> new_walking_node = new Node<>(st);
+				new_walking_node.getElement().setTrip(new WalkingTrip(
+						nst.getElement(), st
+				));
+
+				new_walking_node.setH(Distance.distance(
+						st.getCoordinate(), to
+				));
+
+				nst.addNeighbour(new_walking_node, weight);
+				node_stoptime.put(st, new_walking_node);
+
+				System.out.println("Connecting " + new_walking_node.getElement()
+						+ " w/ " + nst.getElement() + " because " +
+						"they're close-by.");
+			}
+		}
+		nst.setComputedNeighbours(true);
+	}
 
     private void sort_by_distance(List<StopTime> list, Coordinate target) {
         list.sort((a,b)->{

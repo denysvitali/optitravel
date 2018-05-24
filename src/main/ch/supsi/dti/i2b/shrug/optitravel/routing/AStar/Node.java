@@ -2,6 +2,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.routing.AStar;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Node<T> {
     private T element;
@@ -10,6 +11,7 @@ public class Node<T> {
     private double h;
     private boolean visited;
     private Node<T> from;
+    private boolean computed_neighbours = false;
 
     public Node(T element){
         neighbours = new HashMap<>();
@@ -69,4 +71,31 @@ public class Node<T> {
     public boolean getVisited() {
         return visited;
     }
+
+	public boolean isComputedNeighbours() {
+		return computed_neighbours;
+	}
+
+	public void setComputedNeighbours(boolean computed_neighbours) {
+		this.computed_neighbours = computed_neighbours;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Node<?> node = (Node<?>) o;
+		return Double.compare(node.g, g) == 0 &&
+				Double.compare(node.h, h) == 0 &&
+				visited == node.visited &&
+				computed_neighbours == node.computed_neighbours &&
+				Objects.equals(element, node.element) &&
+				Objects.equals(neighbours, node.neighbours) &&
+				Objects.equals(from, node.from);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(element, neighbours, g, h, visited, from, computed_neighbours);
+	}
 }

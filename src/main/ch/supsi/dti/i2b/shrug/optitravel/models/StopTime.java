@@ -42,7 +42,7 @@ public class StopTime extends TimedLocation {
 
 	@Override
 	public String toString() {
-		return getStop() + " @ " + getTime() + " (via " + trip.getRoute().getName() + ")";
+		return getStop() + " @ " + getTime() + " (via " + (trip == null ? "N/A" : trip) + ")";
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class StopTime extends TimedLocation {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(stop, time);
+		return Objects.hash(stop, time, trip);
 	}
 
 	public void setTrip(Trip t) {
