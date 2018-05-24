@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.GeocodingService;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.TripTimeFrame;
 import com.jfoenix.controls.JFXButton;
@@ -96,7 +97,17 @@ public class MainController {
                 return new StopCellItem();
             }
         });
-        for(int i = 0; i < 10; i++) lvRouteStops.getItems().addAll(new TestStop());
+        for(int i = 0; i < 10; i++) lvRouteStops.getItems().addAll(new Stop() {
+            @Override
+            public String getName() {
+                return "name";
+            }
+
+            @Override
+            public Coordinate getCoordinate() {
+                return new Coordinate(0,0);
+            }
+        });
 
         fabSend.toFront();
         lvRouteStops.toBack();
