@@ -1,8 +1,11 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
-import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
+import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
+import jdk.jshell.spi.ExecutionControl;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class StopTime extends TimedLocation {
@@ -25,6 +28,17 @@ public class StopTime extends TimedLocation {
 
 	public Trip getTrip() {
 		return trip;
+	}
+
+	@Override
+	public HashMap<Node<TimedLocation>, Double> getNeighbours() {
+		// TODO: Implement default
+		try {
+			List<StopTime> neighbors = stop.findNeighbors(time);
+		} catch (ExecutionControl.NotImplementedException e) {
+			e.printStackTrace();
+		}
+		return new HashMap<>();
 	}
 
 	public Stop getStop() {

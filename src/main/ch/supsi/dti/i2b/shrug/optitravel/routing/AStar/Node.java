@@ -1,10 +1,11 @@
 package ch.supsi.dti.i2b.shrug.optitravel.routing.AStar;
 
+import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
+
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
-public class Node<T> {
+public class Node<T extends TimedLocation> {
     private T element;
     private HashMap<Node<T>, Double> neighbours;
     private double g;
@@ -25,6 +26,9 @@ public class Node<T> {
     }
 
     public HashMap<Node<T>, Double> getNeighbours() {
+    	if(!computed_neighbours){
+    		neighbours = element.getNeighbours();
+		}
         return neighbours;
     }
 

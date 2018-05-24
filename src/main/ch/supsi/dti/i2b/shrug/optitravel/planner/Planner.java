@@ -88,6 +88,7 @@ public class Planner {
 
         // stop_times.forEach(e -> System.out.println(e.getStop() + "@" + e.getTime()));
 
+		/*
         List<StopTime> o_d = new ArrayList<>(stop_times);
         sort_by_distancetime(o_d, from);
 
@@ -142,8 +143,7 @@ public class Planner {
             }
         });
 
-        StopTime startingStop = o_d.get(0);
-        StopTime endingStop = d_d.get(0);
+        Stop startingStop = o_d.get(0).getStop();
 
 		Algorithm<StopTime> algorithm = new Algorithm<>();
 
@@ -208,10 +208,17 @@ public class Planner {
 				addNeighbours(nst_n, stop_times, node_stoptime);
 			}
 			nst.setComputedNeighbours(true);
-		}
+		}*/
 
-		Node<StopTime> startingNST = node_stoptime.get(startingStop);
+		Node<StopTime> startingNST = new Node<>(
+				new WalkStopTime(
+					from,
+						new Time(start_time.format(DateTimeFormatter.ISO_TIME))
+				)
+		);
 
+
+		Algorithm<StopTime> algorithm = new Algorithm<>();
 		List<Node<StopTime>> path =
 				algorithm.route(
 						startingNST,

@@ -1,7 +1,15 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
+import com.jsoniter.annotation.JsonIgnore;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
@@ -12,16 +20,44 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     private int location_type;
     private String parent_station;
 
+    @JsonIgnore
+    private GTFSrsWrapper gtfSrsWrapper;
+
     public String getName() {
         return this.name;
     }
+
+	@JsonIgnore
+    public void setWrapper(GTFSrsWrapper wrapper){
+    	gtfSrsWrapper = wrapper;
+	}
 
     @Override
     public Coordinate getCoordinate() {
         return new Coordinate(lat, lng);
     }
 
-    public double getLat() {
+	@Override
+	public List<StopTime> findNeighbors(Time time) {
+		if(gtfSrsWrapper == null){
+			return new ArrayList<>();
+		}
+
+		ArrayList<StopTime> stal = new ArrayList<>();
+		TripSearch ts = new TripSearch();
+		ts.stops_visited = new ArrayList<>();
+		ts.stops_visited.add(uid);
+		ts.departure_after = time.toString();
+
+		try {
+			PaginatedList<Trip> trips = gtfSrsWrapper.getTrips(ts);
+		} catch (GTFSrsError gtfSrsError) {
+			gtfSrsError.printStackTrace();
+		}
+		return stal;
+	}
+
+	public double getLat() {
         return lat;
     }
 

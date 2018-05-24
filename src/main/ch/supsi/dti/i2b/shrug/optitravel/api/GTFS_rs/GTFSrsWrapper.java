@@ -192,6 +192,28 @@ public class GTFSrsWrapper {
 				.scheme(SCHEME)
 				.addPathSegments("api/trips/in/" + boundingBox);
 
+		addTripSearch(builder, tripSearch);
+
+		HttpUrl url = builder.build();
+		Response response = client.get(url);
+		return getPaginatedTrips(response);
+	}
+
+	public PaginatedList<Trip> getTrips(TripSearch tripSearch) throws GTFSrsError {
+		HttpUrl.Builder builder = new HttpUrl.Builder()
+				.host(HOST)
+				.port(PORT)
+				.scheme(SCHEME)
+				.addPathSegments("api/trips/");
+
+		addTripSearch(builder, tripSearch);
+
+		HttpUrl url = builder.build();
+		Response response = client.get(url);
+		return getPaginatedTrips(response);
+	}
+
+	private void addTripSearch(HttpUrl.Builder builder, TripSearch tripSearch) {
 		if(tripSearch.stops_visited != null){
 			builder.addQueryParameter(
 					"stops_visited",
@@ -247,10 +269,6 @@ public class GTFSrsWrapper {
 					tripSearch.sort_order.toString()
 			);
 		}
-
-		HttpUrl url = builder.build();
-		Response response = client.get(url);
-		return getPaginatedTrips(response);
 	}
 
 	private List<Trip> getTrips(Response response) throws GTFSrsError {
