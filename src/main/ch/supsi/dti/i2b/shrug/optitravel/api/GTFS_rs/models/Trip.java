@@ -16,7 +16,15 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     public int direction_id;
     public List<StopTrip> stop_sequence;
 
-    public String getUID() {
+    public Trip(){
+
+	}
+
+	public Trip(String trip) {
+		this.uid = trip;
+	}
+
+	public String getUID() {
         return this.uid;
     }
     public List<ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip> getStopTrip() {

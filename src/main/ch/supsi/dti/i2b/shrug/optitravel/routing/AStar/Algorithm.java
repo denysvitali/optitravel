@@ -2,19 +2,38 @@ package ch.supsi.dti.i2b.shrug.optitravel.routing.AStar;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Location;
 import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
 import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
-import ch.supsi.dti.i2b.shrug.optitravel.planner.Planner;
+import ch.supsi.dti.i2b.shrug.optitravel.planner.DataGathering;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class Algorithm<T extends TimedLocation> {
+public class Algorithm<T extends TimedLocation, L extends Location> {
 
+    private DataGathering dg;
+    private HashMap<L, ArrayList<T>> timedlocation_by_location = new HashMap<>();
+    private ArrayList<L> locations = new ArrayList<>();
+    private HashMap<String, L> uid_location = new HashMap<>();
+    private Coordinate destination;
 
-    public List<Node<T>> route(Node<T> from, Coordinate to){
+    public Algorithm(DataGathering dg){
+    	this.dg = dg;
+	}
+
+	public HashMap<L, ArrayList<T>> getTimedLocationByLocation() {
+		return timedlocation_by_location;
+	}
+
+	public HashMap<String, L> getUidLocationHM() {
+		return uid_location;
+	}
+
+	public List<Node<T>> route(Node<T> from, Coordinate to){
+    	destination = to;
         Node<T> currentNode = from;
         from.setG(0);
         for(;;) {
@@ -23,7 +42,7 @@ public class Algorithm<T extends TimedLocation> {
             }
 
             Node<T> closestNode = null;
-            HashMap<Node<T>, Double> neighbours = currentNode.getNeighbours();
+            HashMap<Node<T>, Double> neighbours = dg.getNeighbours(currentNode, this);
             for (Node<T> n : neighbours.keySet()) {
                 double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + neighbours.get(n);
                 double newF = n.getH() + newG;
@@ -66,5 +85,11 @@ public class Algorithm<T extends TimedLocation> {
     }
 
 
+	public List<L> getLocations() {
+    	return this.locations;
+	}
 
+	public Coordinate getDestination() {
+    	return destination;
+	}
 }

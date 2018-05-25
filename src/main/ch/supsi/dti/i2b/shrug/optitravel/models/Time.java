@@ -6,8 +6,16 @@ import java.time.format.DateTimeFormatter;
 public class Time {
 	private LocalTime localTime;
 
+	public Time(){
+
+	}
+
 	public Time(String time){
 		localTime = LocalTime.parse(time, DateTimeFormatter.ISO_TIME);
+	}
+
+	public Time(LocalTime time){
+		localTime = time;
 	}
 
 	public static double diffMinutes(Time time1, Time time2) {
@@ -20,7 +28,7 @@ public class Time {
 
 	@Override
 	public String toString() {
-		return localTime.toString();
+		return localTime.format(DateTimeFormatter.ISO_TIME);
 	}
 
 	public int getHour(){
@@ -73,8 +81,14 @@ public class Time {
 
 	}
 
+	public static Time addMinutes(Time t1, int minutes){
+		return new Time(t1.localTime.plusMinutes(minutes));
+	}
+
 	@Override
 	public int hashCode() {
 		return localTime.hashCode();
 	}
+
+
 }

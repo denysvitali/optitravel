@@ -20,6 +20,14 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     private int location_type;
     private String parent_station;
 
+    public Stop(){
+
+	}
+
+    public Stop(String uid){
+		this.uid = uid;
+	}
+
     @JsonIgnore
     private GTFSrsWrapper gtfSrsWrapper;
 
@@ -37,7 +45,6 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
         return new Coordinate(lat, lng);
     }
 
-	@Override
 	public List<StopTime> findNeighbors(Time time) {
 		if(gtfSrsWrapper == null){
 			return new ArrayList<>();
@@ -86,12 +93,7 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Stop stop = (Stop) o;
-		return Double.compare(stop.lat, lat) == 0 &&
-				Double.compare(stop.lng, lng) == 0 &&
-				location_type == stop.location_type &&
-				Objects.equals(uid, stop.uid) &&
-				Objects.equals(name, stop.name) &&
-				Objects.equals(parent_station, stop.parent_station);
+		return Objects.equals(this.uid, stop.uid);
 	}
 
 	@Override

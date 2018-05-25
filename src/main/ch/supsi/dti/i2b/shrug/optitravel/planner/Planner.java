@@ -2,6 +2,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.planner;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.PaginatedList;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
@@ -16,10 +17,7 @@ import com.oracle.tools.packager.Log;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -210,15 +208,47 @@ public class Planner {
 			nst.setComputedNeighbours(true);
 		}*/
 
+		double minutes = 0.0;
+		minutes += (PlannerParams.WALKABLE_RADIUS_METERS/PlannerParams.WALK_SPEED_MPS) / 60;
+		minutes += PlannerParams.MAX_WAITING_TIME;
+
+		Time s_time = new Time(start_time.format(DateTimeFormatter.ISO_TIME));
+		Time s_time2 = Time.addMinutes(s_time, (int) minutes);
+
 		Node<StopTime> startingNST = new Node<>(
-				new WalkStopTime(
-					from,
-						new Time(start_time.format(DateTimeFormatter.ISO_TIME))
-				)
+				new WalkStopTime(from, s_time)
 		);
 
+		Algorithm<StopTime, Location> algorithm = new Algorithm<>(dg);
+		HashMap<String, Location> uid_location_hm = algorithm.getUidLocationHM();
 
-		Algorithm<StopTime> algorithm = new Algorithm<>();
+		/*PaginatedList<StopTimes> walkableStopTimes;
+		try {
+			walkableStopTimes = dg.getwGTFS().getStopTimesBetween(s_time, s_time2, from,
+					PlannerParams.SOURCE_RADIUS);
+			List<Node<StopTime>> wst = (List<Node<StopTime>>) walkableStopTimes.getResult().stream().map(e -> {
+				if (uid_location_hm.get(e.stop) == null) {
+					try {
+						uid_location_hm.put(e.stop, dg.getwGTFS().getStop(e.stop));
+					} catch (GTFSrsError gtfSrsError) {
+						return null;
+					}
+				}
+
+				return e.time.stream().map(et -> {
+					StopTime st = new StopTime(
+							(Stop) uid_location_hm.get(e.stop),
+							new Time(et.time));
+					st.setTrip(new WalkingTrip(startingNST.getElement(), st));
+					return new Node<>(st);
+				}).collect(Collectors.toList());
+			}).filter(Objects::nonNull).flatMap(List::stream).collect(Collectors.toList());
+			System.out.println(wst);
+		} catch (GTFSrsError gtfSrsError) {
+			gtfSrsError.printStackTrace();
+		}*/
+
+
 		List<Node<StopTime>> path =
 				algorithm.route(
 						startingNST,

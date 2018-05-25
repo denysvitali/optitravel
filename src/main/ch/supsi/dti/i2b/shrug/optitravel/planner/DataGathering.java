@@ -3,16 +3,20 @@ package ch.supsi.dti.i2b.shrug.optitravel.planner;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.PaginatedList;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes;
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.PubliBikeWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
-import ch.supsi.dti.i2b.shrug.optitravel.models.Route;
-import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
-import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
+import ch.supsi.dti.i2b.shrug.optitravel.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
+import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
+import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DataGathering{
     private TransitLandAPIWrapper wTL = new TransitLandAPIWrapper();
@@ -72,5 +76,133 @@ public class DataGathering{
 		}
 
 		return trips;
+	}
+
+	public <T extends TimedLocation, L extends Location> HashMap<Node<T>, Double>
+		getNeighbours(Node<T> currentNode, Algorithm<T,L> algorithm) {
+
+    	HashMap<L, ArrayList<T>> timedlocation_by_location =
+				algorithm.getTimedLocationByLocation();
+
+    	double max_minutes =
+				(
+						PlannerParams.WALKABLE_RADIUS_METERS /
+						PlannerParams.WALK_SPEED_MPS
+				) / 60;
+
+    	int total_time =
+				(int) (Math.ceil(max_minutes) + PlannerParams.MAX_WAITING_TIME);
+
+    	Time t = currentNode.getElement().getTime();
+    	Time t_max = Time.addMinutes(
+    			currentNode.getElement().getTime(),
+				(int) Math.floor(max_minutes)
+		);
+    	Coordinate s = currentNode.getElement().getCoordinate();
+
+
+    	HashMap<String, ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop>
+				uid_stop_hm =
+				(HashMap<String, ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop>)
+						algorithm.getUidLocationHM();
+
+    	// Get Stops from GTFS
+		try {
+			List<StopTimes> st = wGTFS
+					.getStopTimesBetween(t, t_max, s, PlannerParams.WALKABLE_RADIUS_METERS)
+					.getResult();
+			List<Node<T>> result = st.stream().map(e -> {
+
+				if(uid_stop_hm.get(e.stop) == null){
+					try {
+						uid_stop_hm.put(e.stop, wGTFS.getStop(e.stop));
+					} catch (GTFSrsError gtfSrsError) {
+						return null;
+					}
+				}
+
+				ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop stop =
+						uid_stop_hm.get(e.stop);
+
+				timedlocation_by_location.computeIfAbsent(
+						(L) stop,
+						k -> new ArrayList<>()
+				);
+
+				return e.time.stream().map(
+						tt -> {
+							ArrayList<T> times =
+									timedlocation_by_location.get(stop);
+							StopTime tl = new StopTime(stop,
+									new Time(tt.time));
+							times.add((T) tl);
+							tl.setTrip(new ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip(tt.trip));
+							Node<T> nst = new Node<T>((T) tl);
+							return nst;
+						}
+				).collect(Collectors.toList());
+			}).flatMap(Collection::stream).collect(Collectors.toList());
+			HashMap<Node<T>, Double> neighbours = new HashMap<Node<T>, Double>(result.stream().map((Node<T> n) ->
+					calculateWeight(currentNode, n, algorithm.getDestination())
+			).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+			System.out.println(neighbours);
+			return neighbours;
+		} catch (GTFSrsError gtfSrsError) {
+			gtfSrsError.printStackTrace();
+		}
+		return new HashMap<>();
+	}
+
+	private static <T extends TimedLocation> Map.Entry<Node<T>, Double>
+	 calculateWeight(Node<T> c, Node<T> n, Coordinate d) {
+    	double weight = 0.0;
+    	weight += Distance.distance(c.getElement().getCoordinate(),
+    	n.getElement().getCoordinate());
+
+		if(c.getElement().getTrip() == null && n.getElement() != null
+		|| c.getElement().getTrip() != null && n.getElement().getTrip() == null ||
+		!c.getElement().getTrip().equals(n.getElement().getTrip())){
+			weight += PlannerParams.W_CHANGE;
+		}
+
+		if(c.getElement().getLocation() instanceof Stop &&
+			n.getElement().getLocation() instanceof  Stop &&
+			c.getElement().getLocation().getClass().equals(n.getElement().getLocation().getClass()))
+		{
+			Stop c_s = (Stop) c.getElement().getLocation();
+			Stop n_s = (Stop) n.getElement().getLocation();
+
+			/*
+				Watch out!
+				----------
+				Weight calculation between two stops can only be performed
+				if they're the same Stop (but w/ a different
+				time and a different trip).
+				This means that we have the Same Stop, but different StopTimes.
+				To connect two stops together, we use a WalkTrip.
+				Therefore the following assertion should always be valid.
+				E.g:	Lugano - Locarno via Giubiasco
+						Lugano (12:56 PM) 	- Giubiasco (1:22 PM)
+						Giubiasco (1:34 PM)	- Locarno
+				-------------------------------------------------------------
+			*/
+
+			assert(c_s.equals(n_s));
+		}
+
+		/*
+			Time Weight
+			------------
+			This weight will define how bad for the user to wait
+			at a stop for the difference in time.
+		 */
+		double minute_wait = Time.diffMinutes(n.getElement().getTime(),
+				c.getElement().getTime());
+		assert(minute_wait>=0);
+		weight += PlannerParams.W_WAITING * minute_wait;
+
+		// Return the weighted arc.
+
+		return new AbstractMap.SimpleEntry<>(n, weight);
 	}
 }

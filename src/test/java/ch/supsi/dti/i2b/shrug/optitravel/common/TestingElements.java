@@ -8,4 +8,7 @@ public class TestingElements {
 			new Coordinate(45.951414, 8.865225),
 			new Coordinate(46.059679, 9.036543)
 	);
+
+	public static Coordinate LUGANO_COORDINATE =
+			new Coordinate(46, 8.95);
 }

@@ -6,6 +6,8 @@ public class PlannerParams {
 	// Average walking speed (in m/s)
 	public static final double WALK_SPEED_MPS = 1.4; // = 5 km/h
 
+	// Radius in which the stop is considered close to our source point
+	public static final double SOURCE_RADIUS = 500.0;
 	// Radius in which the stop is considered final (close to our destination)
 	public static final double DESTINATION_RADIUS = 50;
 

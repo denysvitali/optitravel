@@ -55,7 +55,6 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
         return new Coordinate(coordinates.getLatitude(), coordinates.getLongitude());
     }
 
-    @Override
     public List<StopTime> findNeighbors(Time time) throws ExecutionControl.NotImplementedException {
         throw new ExecutionControl.NotImplementedException("Not implemented yet.");
     }

@@ -33,11 +33,11 @@ public class StopTime extends TimedLocation {
 	@Override
 	public HashMap<Node<TimedLocation>, Double> getNeighbours() {
 		// TODO: Implement default
-		try {
+		/*try {
 			List<StopTime> neighbors = stop.findNeighbors(time);
 		} catch (ExecutionControl.NotImplementedException e) {
 			e.printStackTrace();
-		}
+		}*/
 		return new HashMap<>();
 	}
 

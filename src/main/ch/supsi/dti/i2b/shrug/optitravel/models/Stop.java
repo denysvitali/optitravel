@@ -14,6 +14,4 @@ public abstract class Stop extends Location {
     }
 
     public abstract Coordinate getCoordinate();
-
-	public abstract List<StopTime> findNeighbors(Time time) throws ExecutionControl.NotImplementedException;
 }

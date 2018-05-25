@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LUGANO_BBOX;
+import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LUGANO_COORDINATE;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GTFSrsTest {
@@ -288,4 +289,61 @@ class GTFSrsTest {
             fail(err);
         }
     }
+
+    @Test
+	public void testStopTimesNearCoordinate(){
+    	try {
+			Coordinate c = LUGANO_COORDINATE;
+			double radius = 500.0;
+			Time after = new Time("13:00:00");
+
+			PaginatedList<StopTimes> st =
+					gtfSrsWrapper.getStopTimes(after, c, radius);
+
+			assertNotEquals(null, st);
+			assertNotEquals(null, st.getResult());
+			assertNotEquals(null, st.getMeta());
+			assertNotEquals(0, st.getResult().size());
+			testStopTimes(st);
+
+
+		} catch(GTFSrsError err){
+    		fail(err);
+		}
+	}
+
+	@Test
+	public void testStopTimesNearCoordinateBetween(){
+		try {
+			Coordinate c = LUGANO_COORDINATE;
+			double radius = 500.0;
+			Time after = new Time("13:00:00");
+			Time before = new Time("13:30:00");
+
+			PaginatedList<StopTimes> st =
+					gtfSrsWrapper.getStopTimesBetween(after, before, c, radius);
+
+			assertNotEquals(null, st);
+			assertNotEquals(null, st.getResult());
+			assertNotEquals(null, st.getMeta());
+			assertNotEquals(0, st.getResult().size());
+			testStopTimes(st);
+
+
+		} catch(GTFSrsError err){
+			fail(err);
+		}
+	}
+
+	private void testStopTimes(PaginatedList<StopTimes> st) {
+		st.getResult()
+				.forEach(e->{
+					assertNotEquals(null, e.stop);
+					assertNotEquals(null, e.time);
+					e.time.forEach(t->{
+						assertNotEquals(null, t.time);
+						assertNotEquals(null, t.trip);
+					});
+				});
+	}
 }
