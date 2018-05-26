@@ -14,7 +14,9 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LUGANO_BBOX;
 import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LUGANO_COORDINATE;
@@ -133,7 +135,7 @@ class GTFSrsTest {
             Trip t = gtfSrsWrapper.getTrip(uid);
             assertNotEquals(null, t);
             assertEquals(uid, t.getUID());
-            List<StopTrip> stopTrip = (List<StopTrip>) t.getStopTrip().stream();
+            List<ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip> stopTrip = t.getStopTrip();
             assertNotEquals(null, stopTrip);
             assertNotEquals(0, stopTrip.size());
 
@@ -142,7 +144,7 @@ class GTFSrsTest {
             assertNotEquals(null, stopTrip.get(0).getStop());
 
             // May change based on the feed version!
-            assertEquals("s-fcf74e-pregassonapiazzadigiro", stopTrip.get(0).getStop().getUid());
+            assertEquals("s-fcf74e-pregassonapiazzadigiro", ((StopTrip) stopTrip.get(0)).getStop().getUid());
             assertEquals("Pregassona, Piazza di Giro", stopTrip.get(0).getStop().getName());
 
             assertEquals(new Coordinate(46.01946, 8.974125), stopTrip.get(0).getStop().getCoordinate());
@@ -239,10 +241,10 @@ class GTFSrsTest {
 			assertEquals(0, t.getDirectionId());
 			assertEquals(t.getRoute().getUID(), "r-acfc6d-7");
 
-			List<StopTrip> stop_trip = (List<StopTrip>) t.getStopTrip().stream();
+			List<ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip> stop_trip = t.getStopTrip();
 			assertNotEquals(null, stop_trip);
 
-			StopTrip st = stop_trip.get(0);
+			StopTrip st = (StopTrip) stop_trip.get(0);
 			assertNotEquals(null, st);
 
 			Stop s = st.getStop();
@@ -313,6 +315,36 @@ class GTFSrsTest {
 	}
 
 	@Test
+	public void testStopTimesByStop(){
+		try {
+			String stop_uid = "s-c1829f-bioggiopianoni";
+			Time after = new Time("13:00:00");
+
+			StopTimes st =
+					gtfSrsWrapper.getStopTimesByStop(stop_uid, after);
+
+			assertNotEquals(null, st);
+			assertNotEquals(null, st.getStop());
+			assertNotEquals(null, st.getTime());
+			assertNotEquals(0, st.getTime().size());
+			testListTripTime(st.getTime());
+
+
+		} catch(GTFSrsError err){
+			fail(err);
+		}
+	}
+
+	private void testListTripTime(List<TripTime> time) {
+    	time.stream().forEach(
+    			e -> {
+    				assertNotEquals(null, e.getTime());
+    				assertNotEquals(null, e.getTrip());
+				}
+		);
+	}
+
+	@Test
 	public void testStopTimesNearCoordinateBetween(){
 		try {
 			Coordinate c = LUGANO_COORDINATE;
@@ -338,9 +370,9 @@ class GTFSrsTest {
 	private void testStopTimes(PaginatedList<StopTimes> st) {
 		st.getResult()
 				.forEach(e->{
-					assertNotEquals(null, e.stop);
-					assertNotEquals(null, e.time);
-					e.time.forEach(t->{
+					assertNotEquals(null, e.getStop());
+					assertNotEquals(null, e.getTime());
+					e.getTime().forEach(t->{
 						assertNotEquals(null, t.time);
 						assertNotEquals(null, t.trip);
 					});

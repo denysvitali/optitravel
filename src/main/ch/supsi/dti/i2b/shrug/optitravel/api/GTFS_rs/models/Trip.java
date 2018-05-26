@@ -59,4 +59,13 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 		return Objects.hash(uid, route_id, service_id, headsign, short_name,
 				direction_id, stop_sequence);
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Trip trip = (Trip) o;
+		return direction_id == trip.direction_id &&
+				Objects.equals(uid, trip.uid);
+	}
 }

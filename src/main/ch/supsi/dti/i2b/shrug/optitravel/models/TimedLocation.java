@@ -4,7 +4,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 
 import java.util.HashMap;
 
-public abstract class TimedLocation<T extends TimedLocation> extends Location {
+public abstract class TimedLocation extends Location {
 
 	private Location location;
 	private Time time;
@@ -27,7 +27,7 @@ public abstract class TimedLocation<T extends TimedLocation> extends Location {
 		return trip;
 	}
 
-	public abstract HashMap<Node<T>, Double> getNeighbours();
+	public abstract HashMap<Node<?,?>, Double> getNeighbours();
 
 	public void setTrip(Trip trip) {
 		this.trip = trip;

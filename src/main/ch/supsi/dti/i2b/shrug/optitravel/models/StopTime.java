@@ -31,7 +31,7 @@ public class StopTime extends TimedLocation {
 	}
 
 	@Override
-	public HashMap<Node<TimedLocation>, Double> getNeighbours() {
+	public HashMap<Node<?,?>, Double> getNeighbours() {
 		// TODO: Implement default
 		/*try {
 			List<StopTime> neighbors = stop.findNeighbors(time);

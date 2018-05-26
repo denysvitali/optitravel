@@ -7,6 +7,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.config.BuildConfig;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
@@ -248,6 +249,37 @@ public class GTFSrsWrapper {
 		HttpUrl url = builder.build();
 		Response response = client.get(url);
 		return getPaginatedStopTimes(response);
+	}
+
+	public StopTimes getStopTimesByStop(String stop_uid, Time after) throws GTFSrsError {
+		HttpUrl.Builder builder = new HttpUrl.Builder()
+				.host(HOST)
+				.port(PORT)
+				.scheme(SCHEME)
+				.addPathSegments("api/stop_times/by-stop/")
+				.addPathSegment(stop_uid)
+				.addPathSegment("after")
+				.addPathSegment(after.toString());
+
+		HttpUrl url = builder.build();
+		Response response = client.get(url);
+		return parseSingleStopTimes(response);
+	}
+
+	private StopTimes parseSingleStopTimes(Response response) throws GTFSrsError {
+		if(response != null && response.isSuccessful() && response.body() != null){
+			try {
+				Result a = JsonIterator.deserialize(
+						response.body().string(),
+						Result.class);
+				return a.getResult()
+								.as(StopTimes.class);
+			} catch(IOException ex){
+				return null;
+			}
+		} else {
+			throw new GTFSrsError("Unable to get any response for this request");
+		}
 	}
 
 	private PaginatedList<StopTimes> getPaginatedStopTimes(Response response) throws GTFSrsError {

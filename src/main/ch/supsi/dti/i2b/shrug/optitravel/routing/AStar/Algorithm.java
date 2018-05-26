@@ -19,6 +19,7 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
     private ArrayList<L> locations = new ArrayList<>();
     private HashMap<String, L> uid_location = new HashMap<>();
     private Coordinate destination;
+    private ArrayList<Node<T,L>> visited = new ArrayList<>();
 
     public Algorithm(DataGathering dg){
     	this.dg = dg;
@@ -32,18 +33,22 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
 		return uid_location;
 	}
 
-	public List<Node<T>> route(Node<T> from, Coordinate to){
+	public ArrayList<Node<T, L>> getVisited() {
+		return visited;
+	}
+
+	public List<Node<T,L>> route(Node<T,L> from, Coordinate to){
     	destination = to;
-        Node<T> currentNode = from;
+		Node<T,L> currentNode = from;
         from.setG(0);
         for(;;) {
             if(currentNode == null){
                 return null;
             }
 
-            Node<T> closestNode = null;
-            HashMap<Node<T>, Double> neighbours = dg.getNeighbours(currentNode, this);
-            for (Node<T> n : neighbours.keySet()) {
+			Node<T,L> closestNode = null;
+            HashMap<Node<T,L>, Double> neighbours = currentNode.getNeighbours();
+            for (Node<T,L> n : neighbours.keySet()) {
                 double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + neighbours.get(n);
                 double newF = n.getH() + newG;
                 if (n.getF() > newF || n.getG() == -1) {
@@ -57,6 +62,7 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
             }
 
             currentNode.setVisited();
+            visited.add(currentNode);
             currentNode = closestNode;
 
             if(currentNode != null &&
@@ -67,7 +73,7 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
 							.getCoordinate()
 					, to) < PlannerParams.DESTINATION_RADIUS
 			){
-                List<Node<T>> path = new ArrayList<>();
+                List<Node<T,L>> path = new ArrayList<>();
                 while(currentNode.getFrom() != null){
                     path.add(currentNode);
                     currentNode = currentNode.getFrom();

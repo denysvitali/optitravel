@@ -1,33 +1,45 @@
 package ch.supsi.dti.i2b.shrug.optitravel.routing.AStar;
 
+import ch.supsi.dti.i2b.shrug.optitravel.models.Location;
 import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
+import ch.supsi.dti.i2b.shrug.optitravel.planner.DataGathering;
 
 import java.util.HashMap;
 import java.util.Objects;
 
-public class Node<T extends TimedLocation> {
+public class Node<T extends TimedLocation, L extends Location> {
     private T element;
-    private HashMap<Node<T>, Double> neighbours;
+    private HashMap<Node<T,L>, Double> neighbours;
     private double g;
     private double h;
     private boolean visited;
-    private Node<T> from;
+    private Node<T,L> from;
     private boolean computed_neighbours = false;
+    private DataGathering dg;
+    private Algorithm<T,L> algorithm;
 
-    public Node(T element){
+	public void setDg(DataGathering dg) {
+		this.dg = dg;
+	}
+
+	public void setAlgorithm(Algorithm<T, L> algorithm) {
+		this.algorithm = algorithm;
+	}
+
+	public Node(T element){
         neighbours = new HashMap<>();
         this.element = element;
         visited = false;
         g = -1;
         h = -1;
     }
-    public void addNeighbour(Node<T> neighbourElement, double distanceFromNode){
+    public void addNeighbour(Node<T,L> neighbourElement, double distanceFromNode){
         neighbours.put(neighbourElement, distanceFromNode);
     }
 
-    public HashMap<Node<T>, Double> getNeighbours() {
-    	if(!computed_neighbours){
-    		neighbours = element.getNeighbours();
+    public HashMap<Node<T,L>, Double> getNeighbours() {
+    	if(!computed_neighbours && dg != null){
+    		neighbours = dg.getNeighbours(this, algorithm);
 		}
         return neighbours;
     }
@@ -53,7 +65,7 @@ public class Node<T extends TimedLocation> {
     }
 
     public double getF(){ return g+h; }
-    public void setFrom(Node<T> node) {
+    public void setFrom(Node<T,L> node) {
         from =  node;
     }
 
@@ -65,7 +77,7 @@ public class Node<T extends TimedLocation> {
         visited = b;
     }
 
-    public Node<T> getFrom() {
+    public Node<T,L> getFrom() {
         return from;
     }
 
@@ -88,13 +100,7 @@ public class Node<T extends TimedLocation> {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		Node<?> node = (Node<?>) o;
-		return Double.compare(node.g, g) == 0 &&
-				Double.compare(node.h, h) == 0 &&
-				visited == node.visited &&
-				computed_neighbours == node.computed_neighbours &&
-				Objects.equals(element, node.element) &&
-				Objects.equals(neighbours, node.neighbours) &&
-				Objects.equals(from, node.from);
+		Node<?,?> node = (Node<?,?>) o;
+		return Objects.equals(node.element, element);
 	}
 }

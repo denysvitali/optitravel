@@ -78,74 +78,86 @@ public class DataGathering{
 		return trips;
 	}
 
-	public <T extends TimedLocation, L extends Location> HashMap<Node<T>, Double>
-		getNeighbours(Node<T> currentNode, Algorithm<T,L> algorithm) {
+	public <T extends TimedLocation, L extends Location> HashMap<Node<T,L>, Double>
+		getNeighbours(Node<T,L> currentNode, Algorithm<T,L> algorithm) {
 
     	HashMap<L, ArrayList<T>> timedlocation_by_location =
 				algorithm.getTimedLocationByLocation();
 
-    	double max_minutes =
-				(
-						PlannerParams.WALKABLE_RADIUS_METERS /
-						PlannerParams.WALK_SPEED_MPS
-				) / 60;
+    	double max_minutes = (
+    			PlannerParams.WALKABLE_RADIUS_METERS /
+				PlannerParams.WALK_SPEED_MPS
+		) / 60;
 
-    	int total_time =
-				(int) (Math.ceil(max_minutes) + PlannerParams.MAX_WAITING_TIME);
+    	int total_time = (int) (Math.ceil(max_minutes) +
+				PlannerParams.MAX_WAITING_TIME);
 
     	Time t = currentNode.getElement().getTime();
     	Time t_max = Time.addMinutes(
     			currentNode.getElement().getTime(),
-				(int) Math.floor(max_minutes)
+				total_time
 		);
     	Coordinate s = currentNode.getElement().getCoordinate();
 
+    	/*
+    		Get Stops from GTFS
+    	 */
 
     	HashMap<String, ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop>
 				uid_stop_hm =
 				(HashMap<String, ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop>)
 						algorithm.getUidLocationHM();
 
-    	// Get Stops from GTFS
 		try {
 			List<StopTimes> st = wGTFS
 					.getStopTimesBetween(t, t_max, s, PlannerParams.WALKABLE_RADIUS_METERS)
 					.getResult();
-			List<Node<T>> result = st.stream().map(e -> {
+			List<Node<T,L>> result = st.stream().map(e -> {
 
-				if(uid_stop_hm.get(e.stop) == null){
+				if(uid_stop_hm.get(e.getStop()) == null){
 					try {
-						uid_stop_hm.put(e.stop, wGTFS.getStop(e.stop));
+						uid_stop_hm.put(e.getStop(), wGTFS.getStop(e.getStop()));
 					} catch (GTFSrsError gtfSrsError) {
 						return null;
 					}
 				}
 
 				ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop stop =
-						uid_stop_hm.get(e.stop);
+						uid_stop_hm.get(e.getStop());
 
 				timedlocation_by_location.computeIfAbsent(
 						(L) stop,
 						k -> new ArrayList<>()
 				);
 
-				return e.time.stream().map(
-						tt -> {
-							ArrayList<T> times =
-									timedlocation_by_location.get(stop);
-							StopTime tl = new StopTime(stop,
-									new Time(tt.time));
-							times.add((T) tl);
-							tl.setTrip(new ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip(tt.trip));
-							Node<T> nst = new Node<T>((T) tl);
-							return nst;
-						}
+				return e.getTime().stream().map(
+					tt -> {
+						ArrayList<T> times =
+								timedlocation_by_location.get(stop);
+						StopTime tl = new StopTime(stop,
+								new Time(tt.time));
+						times.add((T) tl);
+						tl.setTrip(new ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip(tt.trip));
+						Node<T,L> nst = new Node<>((T) tl);
+						nst.setDg(this);
+						nst.setAlgorithm(algorithm);
+						return nst;
+					}
 				).collect(Collectors.toList());
 			}).flatMap(Collection::stream).collect(Collectors.toList());
-			HashMap<Node<T>, Double> neighbours = new HashMap<Node<T>, Double>(result.stream().map((Node<T> n) ->
-					calculateWeight(currentNode, n, algorithm.getDestination())
-			).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
-			System.out.println(neighbours);
+
+			HashMap<Node<T,L>, Double> neighbours = new HashMap<>
+			(
+				result
+						.stream()
+						.filter(n-> !(n.equals(currentNode)))
+						.filter(n-> !algorithm.getVisited().contains(n))
+						.peek((n) -> n.setFrom(currentNode))
+						.map((Node<T,L> n) -> calculateWeight(currentNode, n, algorithm.getDestination()))
+						.filter(Objects::nonNull)
+						.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+			);
+			currentNode.setComputedNeighbours(true);
 			return neighbours;
 		} catch (GTFSrsError gtfSrsError) {
 			gtfSrsError.printStackTrace();
@@ -153,16 +165,22 @@ public class DataGathering{
 		return new HashMap<>();
 	}
 
-	private static <T extends TimedLocation> Map.Entry<Node<T>, Double>
-	 calculateWeight(Node<T> c, Node<T> n, Coordinate d) {
+	private static <T extends TimedLocation, L extends Location> Map.Entry<Node<T,L>, Double>
+	 calculateWeight(Node<T,L> c, Node<T,L> n, Coordinate d) {
     	double weight = 0.0;
-    	weight += Distance.distance(c.getElement().getCoordinate(),
-    	n.getElement().getCoordinate());
+    	boolean same_trip = true;
+    	/*weight += Distance.distance(c.getElement().getCoordinate(),
+    	n.getElement().getCoordinate());*/
 
 		if(c.getElement().getTrip() == null && n.getElement() != null
 		|| c.getElement().getTrip() != null && n.getElement().getTrip() == null ||
 		!c.getElement().getTrip().equals(n.getElement().getTrip())){
 			weight += PlannerParams.W_CHANGE;
+			weight += Distance.distance(c.getElement().getCoordinate(),
+					n.getElement().getCoordinate());
+			same_trip = false;
+		} else {
+			System.out.println("Same trip :)");
 		}
 
 		if(c.getElement().getLocation() instanceof Stop &&
@@ -177,7 +195,7 @@ public class DataGathering{
 				----------
 				Weight calculation between two stops can only be performed
 				if they're the same Stop (but w/ a different
-				time and a different trip).
+				time and a different trip) or are directly connected by a trip.
 				This means that we have the Same Stop, but different StopTimes.
 				To connect two stops together, we use a WalkTrip.
 				Therefore the following assertion should always be valid.
@@ -187,7 +205,9 @@ public class DataGathering{
 				-------------------------------------------------------------
 			*/
 
-			assert(c_s.equals(n_s));
+			if(!(c_s.equals(n_s) || same_trip)){
+				return null;
+			}
 		}
 
 		/*
@@ -200,6 +220,8 @@ public class DataGathering{
 				c.getElement().getTime());
 		assert(minute_wait>=0);
 		weight += PlannerParams.W_WAITING * minute_wait;
+
+		n.setH(Distance.distance(n.getElement().getLocation().getCoordinate(), d));
 
 		// Return the weighted arc.
 
