@@ -2,11 +2,12 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 
-public class TripTime {
+public class TripTimeStop {
 	public String trip;
 	public String time;
+	public String next_stop;
 
-	public TripTime(){
+	public TripTimeStop(){
 	}
 
 	public Time getTime() {
@@ -15,5 +16,9 @@ public class TripTime {
 
 	public String getTrip() {
 		return trip;
+	}
+
+	public String getNextStop() {
+		return next_stop;
 	}
 }

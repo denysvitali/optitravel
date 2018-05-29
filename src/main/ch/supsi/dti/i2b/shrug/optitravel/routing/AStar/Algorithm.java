@@ -7,10 +7,8 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
 import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.DataGathering;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Algorithm<T extends TimedLocation, L extends Location> {
 
@@ -23,6 +21,10 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
 
     public Algorithm(DataGathering dg){
     	this.dg = dg;
+	}
+
+	public void setDestination(Coordinate destination) {
+		this.destination = destination;
 	}
 
 	public HashMap<L, ArrayList<T>> getTimedLocationByLocation() {
@@ -41,12 +43,14 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
     	destination = to;
 		Node<T,L> currentNode = from;
         from.setG(0);
-        for(;;) {
-            if(currentNode == null){
-                return null;
-            }
+		TreeSet<Node<T,L>> treeset = new TreeSet<>(Comparator.comparingDouble(Node::getF));
+		for(;;) {
+			if(currentNode == null){
+				currentNode = from;
+				System.out.println("Unexpected end.");
+				return null;
+			}
 
-			Node<T,L> closestNode = null;
             HashMap<Node<T,L>, Double> neighbours = currentNode.getNeighbours();
             for (Node<T,L> n : neighbours.keySet()) {
                 double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + neighbours.get(n);
@@ -54,18 +58,16 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
                 if (n.getF() > newF || n.getG() == -1) {
                     n.setG(newG);
                     n.setFrom(currentNode);
-                }
-                if (!n.getVisited() && (closestNode == null || (closestNode.getF() > n.getF()))) {
-                    closestNode = n;
-                }
-
+                    if(!treeset.contains(n) && !visited.contains(n)) {
+						treeset.add(n);
+					}
+				}
             }
 
-            currentNode.setVisited();
+			currentNode = treeset.pollFirst();
             visited.add(currentNode);
-            currentNode = closestNode;
 
-            if(currentNode != null &&
+			if(currentNode != null &&
 					Distance.distance(
                     currentNode
 							.getElement()
@@ -73,8 +75,8 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
 							.getCoordinate()
 					, to) < PlannerParams.DESTINATION_RADIUS
 			){
-                List<Node<T,L>> path = new ArrayList<>();
-                while(currentNode.getFrom() != null){
+				List<Node<T,L>> path = new ArrayList<>();
+				while(currentNode.getFrom() != null){
                     path.add(currentNode);
                     currentNode = currentNode.getFrom();
                 }
@@ -84,6 +86,12 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
             }
 
             if(currentNode != null){
+				System.out.println("Distance: " + Distance.distance(
+						currentNode
+								.getElement()
+								.getLocation()
+								.getCoordinate()
+						, to));
                 System.out.println(currentNode
                         .getElement().getLocation() + " is not close to " + to);
             }

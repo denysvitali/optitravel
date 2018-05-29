@@ -45,25 +45,6 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
         return new Coordinate(lat, lng);
     }
 
-	public List<StopTime> findNeighbors(Time time) {
-		if(gtfSrsWrapper == null){
-			return new ArrayList<>();
-		}
-
-		ArrayList<StopTime> stal = new ArrayList<>();
-		TripSearch ts = new TripSearch();
-		ts.stops_visited = new ArrayList<>();
-		ts.stops_visited.add(uid);
-		ts.departure_after = time.toString();
-
-		try {
-			PaginatedList<Trip> trips = gtfSrsWrapper.getTrips(ts);
-		} catch (GTFSrsError gtfSrsError) {
-			gtfSrsError.printStackTrace();
-		}
-		return stal;
-	}
-
 	public double getLat() {
         return lat;
     }

@@ -11,4 +11,10 @@ public class TestingElements {
 
 	public static Coordinate LUGANO_COORDINATE =
 			new Coordinate(46, 8.95);
+
+	public static Coordinate LAMONE_FFS_COORDINATE =
+			new Coordinate(46.0396684,8.932392);
+
+	public static Coordinate SUPSI_COORDINATE =
+			new Coordinate(46.023346, 8.917129);
 }

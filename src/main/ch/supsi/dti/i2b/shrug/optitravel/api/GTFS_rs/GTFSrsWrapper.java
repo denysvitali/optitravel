@@ -7,7 +7,6 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.config.BuildConfig;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
-import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
@@ -251,6 +250,22 @@ public class GTFSrsWrapper {
 		return getPaginatedStopTimes(response);
 	}
 
+	public StopTimes getStopTimesBetween(Time after, Time before, Stop stop) throws GTFSrsError {
+		HttpUrl.Builder builder = new HttpUrl.Builder()
+				.host(HOST)
+				.port(PORT)
+				.scheme(SCHEME)
+				.addPathSegments("api/stop_times/by-stop/")
+				.addPathSegment(stop.getUid())
+				.addPathSegment("between")
+				.addPathSegment(after.toString())
+				.addPathSegment(before.toString());
+
+		HttpUrl url = builder.build();
+		Response response = client.get(url);
+		return parseSingleStopTimes(response);
+	}
+
 	public StopTimes getStopTimesByStop(String stop_uid, Time after) throws GTFSrsError {
 		HttpUrl.Builder builder = new HttpUrl.Builder()
 				.host(HOST)
@@ -435,6 +450,42 @@ public class GTFSrsWrapper {
 					throw new GTFSrsError("Request not successful");
 				}
 				return a.result.as(Stop.class);
+			} catch(IOException ex){
+				return null;
+			}
+		} else {
+			throw new GTFSrsError("Unable to get any response for this request");
+		}
+	}
+
+	public PaginatedList<StopDistance> getStopsNear(Coordinate coordinate) throws GTFSrsError {
+		HttpUrl.Builder builder = new HttpUrl.Builder()
+				.host(HOST)
+				.port(PORT)
+				.scheme(SCHEME)
+				.addPathSegments("api/stops/near/")
+				.addPathSegment(String.valueOf(coordinate.getLat()))
+				.addPathSegment(String.valueOf(coordinate.getLng()));
+
+		HttpUrl url = builder.build();
+		Response response = client.get(url);
+		return getPaginatedStopDistances(response);
+	}
+
+	private PaginatedList<StopDistance> getPaginatedStopDistances(Response response) throws GTFSrsError {
+		if(response != null && response.isSuccessful() && response.body() != null){
+			try {
+				ResultArray a = JsonIterator.deserialize(
+						response.body().string(),
+						ResultArray.class);
+				return new PaginatedList<>(
+						a.getResult()
+								.asList()
+								.stream()
+								.map((e) -> e.as(StopDistance.class))
+								.collect(Collectors.toList()),
+						a.getMeta()
+				);
 			} catch(IOException ex){
 				return null;
 			}

@@ -97,6 +97,7 @@ public class Planner<T extends TimedLocation, L extends Location> {
 		);
 
 		System.out.println(path);
+		assert(path!=null);
 		alreadyComputed = true;
 
 		List<Trip> plan_trips = path.stream()

@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Meta;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Result;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.AscDesc;
@@ -10,17 +11,18 @@ import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.DropOff;
 import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
+import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LUGANO_BBOX;
 import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LUGANO_COORDINATE;
+import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.SUPSI_COORDINATE;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 class GTFSrsTest {
     private GTFSrsWrapper gtfSrsWrapper;
@@ -292,11 +294,11 @@ class GTFSrsTest {
         }
     }
 
-    @Test
+    /*@Test
 	public void testStopTimesNearCoordinate(){
     	try {
 			Coordinate c = LUGANO_COORDINATE;
-			double radius = 500.0;
+			double radius = 200.0;
 			Time after = new Time("13:00:00");
 
 			PaginatedList<StopTimes> st =
@@ -312,7 +314,7 @@ class GTFSrsTest {
 		} catch(GTFSrsError err){
     		fail(err);
 		}
-	}
+	}*/
 
 	@Test
 	public void testStopTimesByStop(){
@@ -335,7 +337,7 @@ class GTFSrsTest {
 		}
 	}
 
-	private void testListTripTime(List<TripTime> time) {
+	private void testListTripTime(List<TripTimeStop> time) {
     	time.stream().forEach(
     			e -> {
     				assertNotEquals(null, e.getTime());
@@ -377,5 +379,86 @@ class GTFSrsTest {
 						assertNotEquals(null, t.trip);
 					});
 				});
+	}
+
+	@Test
+	public void testStopsNear(){
+		Coordinate c = SUPSI_COORDINATE;
+		try {
+			PaginatedList<StopDistance> stops = gtfSrsWrapper.getStopsNear(c);
+			assertNotEquals(null, stops);
+			List<StopDistance> result = stops.getResult();
+			assertNotEquals(null, result);
+			assertNotEquals(null, stops.getMeta());
+			assertNotEquals(0, result.size());
+
+			result.forEach(e->{
+				assertNotEquals(null, e);
+				Stop s = e.getStop();
+				assertNotEquals(null, s);
+				assertNotEquals(null, e.getDistance());
+				assertNotEquals(null, s.getType());
+				assertNotEquals(null, s.getUid());
+				assertNotEquals(null, s.getName());
+				assertNotEquals(null, s.getCoordinate());
+			});
+		} catch (GTFSrsError gtfSrsError) {
+			fail(gtfSrsError);
+		}
+	}
+
+	@Test
+	public void testStopTimesBetween(){
+		Stop s = Mockito.mock(Stop.class);
+		when(s.getUid()).thenReturn("s-c1829f-bioggiopianoni");
+
+		Time t1 = new Time("13:00:00");
+		Time t2 = new Time("13:40:00");
+
+		try{
+			StopTimes stopTimes =
+					gtfSrsWrapper.getStopTimesBetween(t1, t2, s);
+			assertNotEquals(null, stopTimes);
+
+			checkStopTimesContent(stopTimes);
+
+		} catch(GTFSrsError err){
+			fail(err);
+		}
+	}
+
+	@Test
+	public void testStopTimesBetween2(){
+		Stop s = Mockito.mock(Stop.class);
+		when(s.getUid()).thenReturn("s-aefcaa-mannocentrodicalcolo");
+
+		Time t1 = new Time("16:30:00");
+		Time t2 = new Time("17:26:00");
+
+		try{
+			StopTimes stopTimes =
+					gtfSrsWrapper.getStopTimesBetween(t1, t2, s);
+			assertNotEquals(null, stopTimes);
+
+			checkStopTimesContent(stopTimes);
+
+			assertEquals(4, stopTimes.getTime().size());
+			TripTimeStop tts = stopTimes.getTime().get(0);
+			assertEquals("s-e9f3cd-mannolamonda", tts.getNextStop());
+			assertEquals(new Time("16:37:00"), tts.getTime());
+			assertEquals("t-03353d-59ta20449j1815r", tts.getTrip());
+
+		} catch(GTFSrsError err){
+			fail(err);
+		}
+	}
+
+	private void checkStopTimesContent(StopTimes stopTimes) {
+		stopTimes.getTime().stream().forEach(e->{
+			assertNotEquals(null, e);
+			assertNotEquals(null, e.getNextStop());
+			assertNotEquals(null, e.getTime());
+			assertNotEquals(0, e.getTrip());
+		});
 	}
 }

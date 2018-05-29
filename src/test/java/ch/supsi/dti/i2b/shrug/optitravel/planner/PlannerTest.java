@@ -8,13 +8,15 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LAMONE_FFS_COORDINATE;
+import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.SUPSI_COORDINATE;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class PlannerTest {
     @Test
     public void planSUPSI_Lamone(){
-        Coordinate supsi = new Coordinate(46.023346, 8.917129);
-        Coordinate lamone_ffs = new Coordinate(46.0396684,8.932392);
+        Coordinate supsi = SUPSI_COORDINATE;
+        Coordinate lamone_ffs = LAMONE_FFS_COORDINATE;
         Planner p = new Planner(
           supsi,
           lamone_ffs

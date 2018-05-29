@@ -4,13 +4,13 @@ import java.util.List;
 
 public class StopTimes {
 	private String stop;
-	private List<TripTime> time;
+	private List<TripTimeStop> time;
 
 	public StopTimes(){
 
 	}
 
-	public List<TripTime> getTime() {
+	public List<TripTimeStop> getTime() {
 		return time;
 	}
 
