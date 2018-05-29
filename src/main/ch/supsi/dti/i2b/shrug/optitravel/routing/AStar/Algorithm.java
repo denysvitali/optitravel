@@ -86,14 +86,15 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
             }
 
             if(currentNode != null){
-				System.out.println("Distance: " + Distance.distance(
+				System.out.println(currentNode.getElement());
+				/*System.out.println("Distance: " + Distance.distance(
 						currentNode
 								.getElement()
 								.getLocation()
 								.getCoordinate()
 						, to));
                 System.out.println(currentNode
-                        .getElement().getLocation() + " is not close to " + to);
+                        .getElement().getLocation() + " is not close to " + to);*/
             }
         }
     }

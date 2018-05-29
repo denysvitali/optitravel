@@ -472,6 +472,21 @@ public class GTFSrsWrapper {
 		return getPaginatedStopDistances(response);
 	}
 
+	public PaginatedList<StopDistance> getStopsNear(Coordinate coordinate, double radius) throws GTFSrsError {
+		HttpUrl.Builder builder = new HttpUrl.Builder()
+				.host(HOST)
+				.port(PORT)
+				.scheme(SCHEME)
+				.addPathSegments("api/stops/near/")
+				.addPathSegment(String.valueOf(coordinate.getLat()))
+				.addPathSegment(String.valueOf(coordinate.getLng()))
+				.addPathSegment(String.valueOf(radius));
+
+		HttpUrl url = builder.build();
+		Response response = client.get(url);
+		return getPaginatedStopDistances(response);
+	}
+
 	private PaginatedList<StopDistance> getPaginatedStopDistances(Response response) throws GTFSrsError {
 		if(response != null && response.isSuccessful() && response.body() != null){
 			try {

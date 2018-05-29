@@ -12,6 +12,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
@@ -27,12 +28,21 @@ public class DataGathering{
     private List<Trip> trips = new ArrayList<>();
     private List<Stop> stops = new ArrayList<>();
     private List<Route> routes = new ArrayList<>();
+    private PlanPreference pp = new DefaultPlanPreference();
 
     DataGathering(){
 
     }
 
-    public GTFSrsWrapper getwGTFS() {
+	public void setPlanPreference(PlanPreference pp) {
+		this.pp = pp;
+	}
+
+	public PlanPreference getPlanPreference() {
+		return pp;
+	}
+
+	public GTFSrsWrapper getwGTFS() {
         return wGTFS;
     }
 
@@ -172,7 +182,8 @@ public class DataGathering{
 
 		try {
 			List<StopDistance> st = wGTFS
-					.getStopsNear(currentNode.getElement().getCoordinate())
+					.getStopsNear(currentNode.getElement().getCoordinate(),
+							getPlanPreference().walkable_radius_meters())
 					.getResult();
 			List<Node<T, L>> result = st.stream().map(e -> {
 				ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop es = e.getStop();
@@ -187,7 +198,7 @@ public class DataGathering{
 						Distance.distance(es.getCoordinate(),
 								currentNode.getElement().getCoordinate());
 
-				double walk_seconds = distance * PlannerParams.WALK_SPEED_MPS;
+				double walk_seconds = distance * getPlanPreference().walk_speed_mps();
 				Time start = t;
 				Time.addMinutes(start, (int) Math.ceil(walk_seconds / 60.0));
 
@@ -225,17 +236,26 @@ public class DataGathering{
 		return neighbours;
 	}
 
-	private static <T extends TimedLocation, L extends Location> Map.Entry<Node<T,L>, Double>
+	private <T extends TimedLocation, L extends Location> Map.Entry<Node<T,L>, Double>
 	 calculateWeight(Node<T,L> c, Node<T,L> n, Coordinate d) {
     	double weight = 0.0;
     	boolean same_trip = true;
     	/*weight += Distance.distance(c.getElement().getCoordinate(),
     	n.getElement().getCoordinate());*/
 
-		if(c.getElement().getTrip() == null && n.getElement() != null
-		|| c.getElement().getTrip() != null && n.getElement().getTrip() == null ||
-		!c.getElement().getTrip().equals(n.getElement().getTrip())){
-			weight += PlannerParams.W_CHANGE;
+    	T ce = c.getElement();
+    	T ne = n.getElement();
+
+    	if(ce == null || ne == null){
+    		return null;
+		}
+
+		if(
+				ce.getTrip() == null && ne.getTrip() != null ||
+				ce.getTrip() != null && ne.getTrip() == null ||
+				!ce.getTrip().equals(ne.getTrip())
+		){
+			weight += getPlanPreference().w_change();
 			weight += Distance.distance(c.getElement().getCoordinate(),
 					n.getElement().getCoordinate());
 			same_trip = false;
@@ -243,9 +263,11 @@ public class DataGathering{
 			System.out.println("Same trip :)");
 		}
 
-		if(c.getElement().getLocation() instanceof Stop &&
-			n.getElement().getLocation() instanceof  Stop &&
-			c.getElement().getLocation().getClass().equals(n.getElement().getLocation().getClass()))
+		Location cl = c.getElement().getLocation();
+		Location nl = n.getElement().getLocation();
+
+		if(cl instanceof Stop && nl instanceof Stop &&
+				cl.getClass().equals(nl.getClass()))
 		{
 			Stop c_s = (Stop) c.getElement().getLocation();
 			Stop n_s = (Stop) n.getElement().getLocation();
@@ -279,12 +301,25 @@ public class DataGathering{
 		double minute_wait = Time.diffMinutes(n.getElement().getTime(),
 				c.getElement().getTime());
 		assert(minute_wait>=0);
-		weight += PlannerParams.W_WAITING * minute_wait;
+		weight += getPlanPreference().w_waiting() * minute_wait;
 
-		n.setH(Distance.distance(n.getElement().getLocation().getCoordinate(), d));
+		n.setH(
+				Distance.distance(nl.getCoordinate(), d));
 
 		// Return the weighted arc.
 
 		return new AbstractMap.SimpleEntry<>(n, weight);
+	}
+
+	public Trip fetchTrip(Trip e) {
+    	if(e instanceof ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip){
+			ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip t = (ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip) e;
+			try {
+				return wGTFS.getTrip(t.getUID());
+			} catch (GTFSrsError gtfSrsError) {
+				gtfSrsError.printStackTrace();
+			}
+		}
+		return e;
 	}
 }

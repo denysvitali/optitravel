@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ public class Planner<T extends TimedLocation, L extends Location> {
     private List<Plan> plans = new ArrayList<>();
     private LocalDateTime start_time;
     private boolean alreadyComputed = false;
+    private PlanPreference pp;
     private static final Logger Log = Logger.getLogger(Planner.class.getName());
 
     private DataGathering dg;
@@ -52,6 +54,7 @@ public class Planner<T extends TimedLocation, L extends Location> {
 		}
 		DataGathering dg = new DataGathering();
 		this.dg = dg;
+		this.dg.setPlanPreference(pp);
 		
 		Algorithm<T, L> algorithm = new Algorithm<>(dg);
 		this.algorithm = algorithm;
@@ -102,6 +105,8 @@ public class Planner<T extends TimedLocation, L extends Location> {
 
 		List<Trip> plan_trips = path.stream()
 						.map((e)->e.getElement().getTrip())
+						.filter(Objects::nonNull)
+						.map(dg::fetchTrip)
 						.distinct()
 						.collect(Collectors.toList());
 
@@ -118,4 +123,8 @@ public class Planner<T extends TimedLocation, L extends Location> {
     public void setStartTime(LocalDateTime ldt) {
         start_time = ldt;
     }
+
+	public void setPlanPreference(PlanPreference pp) {
+		this.pp = pp;
+	}
 }

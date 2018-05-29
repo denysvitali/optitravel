@@ -61,6 +61,14 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 	}
 
 	@Override
+	public String toString() {
+    	if(getHeadSign() != null){
+			return String.format("%s (%s)", getHeadSign(), getUID());
+		}
+		return String.format("%s", getUID());
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;

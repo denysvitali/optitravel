@@ -12,6 +12,15 @@ public class TestingElements {
 	public static Coordinate LUGANO_COORDINATE =
 			new Coordinate(46, 8.95);
 
+	public static Coordinate ZURICH_COORDINATE =
+			new Coordinate(47.3673, 8.55);
+
+	public static Coordinate LUGANO_CENTRO_COORDINATE =
+			new Coordinate(46.0065117,8.9523121);
+
+	public static Coordinate PREGASSONA_COORDINATE =
+			new Coordinate(46.020805, 8.975589);
+
 	public static Coordinate LAMONE_FFS_COORDINATE =
 			new Coordinate(46.0396684,8.932392);
 
