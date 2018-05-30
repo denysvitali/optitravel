@@ -15,7 +15,6 @@ public class TestingElements {
 	public static Coordinate BELLINZONA_COORDINATE =
 			new Coordinate(46.198494, 9.026918);
 
-
 	public static Coordinate ZURICH_COORDINATE =
 			new Coordinate(47.3673, 8.55);
 
@@ -30,4 +29,12 @@ public class TestingElements {
 
 	public static Coordinate SUPSI_COORDINATE =
 			new Coordinate(46.023346, 8.917129);
+
+	public static Coordinate CHANNEL_4_LONDON_COORDINATE =
+			new Coordinate(51.4958084,-0.1329832);
+
+	public static Coordinate TOWER_OF_LONDON_COORDINATE =
+			new Coordinate(51.5082319,-0.0759482);
+
+
 }

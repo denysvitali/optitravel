@@ -16,7 +16,7 @@ public class LongTripPreference implements PlanPreference {
 
 	@Override
 	public double walkable_radius_meters() {
-		return 50;
+		return 200;
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class LongTripPreference implements PlanPreference {
 
 	@Override
 	public double w_fast_change() {
-		return 10 * PREF_WEIGHT;
+		return 1 * PREF_WEIGHT;
 	}
 
 	@Override

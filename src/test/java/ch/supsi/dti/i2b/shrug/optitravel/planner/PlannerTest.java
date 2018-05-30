@@ -30,6 +30,20 @@ public class PlannerTest {
 	}
 
 	@Test
+	public void planSUPSI_Lamone_LTP(){
+		testPlan(SUPSI_COORDINATE,
+				LAMONE_FFS_COORDINATE,
+				LocalDateTime.of(2018,
+						5,
+						17,
+						16,
+						30,
+						0),
+				new LongTripPreference(Distance.distance(SUPSI_COORDINATE,
+						LAMONE_FFS_COORDINATE)));
+	}
+
+	@Test
 	public void planPregassona_LuganoCentro(){
 		testPlan(PREGASSONA_COORDINATE,
 				LUGANO_CENTRO_COORDINATE,
@@ -68,6 +82,19 @@ public class PlannerTest {
 						0
 				),
 				new LongTripPreference(Distance.distance(LUGANO_COORDINATE, ZURICH_COORDINATE)));
+	}
+	@Test
+	public void planLondonC4_LondonTOL(){
+		testPlan(CHANNEL_4_LONDON_COORDINATE,
+				TOWER_OF_LONDON_COORDINATE,
+				LocalDateTime.of(2018,
+						5,
+						17,
+						13,
+						26,
+						0
+				),
+				new DefaultPlanPreference());
 	}
 
 	@Test

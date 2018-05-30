@@ -130,63 +130,64 @@ public class DataGathering{
 						st.getStop();
 				try {
 					StopTimes stopTimes = wGTFS.getStopTimesBetween(t, t_max, gtfs_stop);
-					stopTimes
-							.getTime()
-							.stream()
-							.map(tt->{
-								Stop next_stop = (Stop) algorithm.getUidLocationHM().get(tt.getNextStop());
-								if(next_stop == null){
-									try {
-										next_stop = getwGTFS().getStop(tt.getNextStop());
-										algorithm.getUidLocationHM()
-												.put(tt.getNextStop(), (L) next_stop);
-									} catch (GTFSrsError gtfSrsError) {
+					if(stopTimes != null) {
+						stopTimes
+								.getTime()
+								.stream()
+								.map(tt -> {
+									Stop next_stop = (Stop) algorithm.getUidLocationHM().get(tt.getNextStop());
+									if (next_stop == null) {
+										try {
+											next_stop = getwGTFS().getStop(tt.getNextStop());
+											algorithm.getUidLocationHM()
+													.put(tt.getNextStop(), (L) next_stop);
+										} catch (GTFSrsError gtfSrsError) {
+											return null;
+										}
+									}
+									ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip newTrip
+											= new ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip(tt.getTrip());
+
+
+									StopTime next_stoptime = new StopTime(
+											next_stop,
+											tt.getTime(),
+											newTrip
+									);
+
+									if (st.equals(next_stoptime) && newTrip.equals(
+											st.getTrip())
+									) {
+										// https://arxiv.org/pdf/1607.01299.pdf
+										// Page 3:
+										// "We require that trips never overtake
+										//  another trip of the same line;"
 										return null;
 									}
-								}
-								ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip newTrip
-										= new ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip(tt.getTrip());
 
-								if(gtfs_stop.equals(next_stop) && newTrip.equals(
-										st.getTrip())
-								) {
-									// https://arxiv.org/pdf/1607.01299.pdf
-									// Page 3:
-									// "We require that trips never overtake
-									//  another trip of the same line;"
-									return null;
-								}
+									Node n = new Node<T, L>((T) next_stoptime);
+									n.setFrom(currentNode);
 
-
-								StopTime stoptime = new StopTime(
-										next_stop,
-										tt.getTime(),
-										newTrip
-								);
-
-								Node n = new Node<T, L> ((T) stoptime);
-								n.setFrom(currentNode);
-
-								n.setH(Distance.distance(
-										algorithm.getDestination(),
-										next_stop.getCoordinate())
-								);
-								n.setDg(this);
-								n.setAlgorithm(algorithm);
-								return n;
-							})
-							.filter(Objects::nonNull)
-							.forEach(e->{
-								double weight = Time.diffMinutes(
-										e.getElement().getTime(),
-										t) * getPlanPreference().w_moving();
-								if(!e.getElement().getTrip().equals(currentNode.getElement().getTrip()))
-								{
-									// Trip Changed!
-									weight += getPlanPreference().w_change();
-								}
-								neighbours.put(e, weight);
-							});
+									n.setH(Distance.distance(
+											algorithm.getDestination(),
+											next_stop.getCoordinate())
+									);
+									n.setDg(this);
+									n.setAlgorithm(algorithm);
+									return n;
+								})
+								.filter(Objects::nonNull)
+								.forEach(e -> {
+									double weight = Time.diffMinutes(
+											e.getElement().getTime(),
+											t) * getPlanPreference().w_moving();
+									if (!e.getElement().getTrip().equals(currentNode.getElement().getTrip())) {
+										// Trip Changed!
+										weight += getPlanPreference().w_change();
+									}
+									neighbours.put(e, weight);
+								});
+					}
 				} catch (GTFSrsError gtfSrsError) {
 					gtfSrsError.printStackTrace();
 				}
@@ -273,14 +274,14 @@ public class DataGathering{
 				weight += Distance.distance(c.getElement().getCoordinate(),
 						n.getElement().getCoordinate());
 				same_trip = false;
-				System.out.println(ce.getTrip() + ", " + ne.getTrip());
+				//System.out.println(ce.getTrip() + ", " + ne.getTrip());
 			}
 		} else {
 			weight += getPlanPreference().w_change();
 			weight += Distance.distance(c.getElement().getCoordinate(),
 					n.getElement().getCoordinate());
 			same_trip = false;
-			System.out.println(ce.getTrip() + ", " + ne.getTrip());
+			//System.out.println(ce.getTrip() + ", " + ne.getTrip());
 		}
 
 		Location cl = c.getElement().getLocation();

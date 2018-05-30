@@ -49,10 +49,8 @@ public class WalkingTrip extends Trip {
 		}
 
 		WalkingTrip wt = (WalkingTrip) obj;
-		if(from.equals(wt.from) && to.equals(wt.to)){
-			return true;
-		}
-		return false;
+		return from.hashCode() == wt.from.hashCode() &&
+				to.hashCode() == wt.to.hashCode();
 	}
 
 	@Override
