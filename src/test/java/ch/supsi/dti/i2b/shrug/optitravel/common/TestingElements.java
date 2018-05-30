@@ -12,6 +12,10 @@ public class TestingElements {
 	public static Coordinate LUGANO_COORDINATE =
 			new Coordinate(46, 8.95);
 
+	public static Coordinate BELLINZONA_COORDINATE =
+			new Coordinate(46.198494, 9.026918);
+
+
 	public static Coordinate ZURICH_COORDINATE =
 			new Coordinate(47.3673, 8.55);
 

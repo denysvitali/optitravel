@@ -96,12 +96,12 @@ public class DataGathering{
 				algorithm.getTimedLocationByLocation();
 
     	double max_minutes = (
-    			PlannerParams.WALKABLE_RADIUS_METERS /
-				PlannerParams.WALK_SPEED_MPS
+    			getPlanPreference().walkable_radius_meters()/
+				getPlanPreference().walk_speed_mps()
 		) / 60;
 
     	int total_time = (int) (Math.ceil(max_minutes) +
-				PlannerParams.MAX_WAITING_TIME);
+				getPlanPreference().max_waiting_time());
 
     	Time t = currentNode.getElement().getTime();
     	Time t_max = Time.addMinutes(
@@ -144,11 +144,26 @@ public class DataGathering{
 										return null;
 									}
 								}
+								ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip newTrip
+										= new ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip(tt.getTrip());
+
+								if(gtfs_stop.equals(next_stop) && newTrip.equals(
+										st.getTrip())
+								) {
+									// https://arxiv.org/pdf/1607.01299.pdf
+									// Page 3:
+									// "We require that trips never overtake
+									//  another trip of the same line;"
+									return null;
+								}
+
+
 								StopTime stoptime = new StopTime(
 										next_stop,
 										tt.getTime(),
-										new ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip(tt.getTrip())
+										newTrip
 								);
+
 								Node n = new Node<T, L> ((T) stoptime);
 								n.setFrom(currentNode);
 
@@ -164,11 +179,11 @@ public class DataGathering{
 							.forEach(e->{
 								double weight = Time.diffMinutes(
 										e.getElement().getTime(),
-										t) * PlannerParams.W_MOVING;
+										t) * getPlanPreference().w_moving();
 								if(!e.getElement().getTrip().equals(currentNode.getElement().getTrip()))
 								{
 									// Trip Changed!
-									weight += PlannerParams.W_CHANGE;
+									weight += getPlanPreference().w_change();
 								}
 								neighbours.put(e, weight);
 							});
@@ -250,17 +265,22 @@ public class DataGathering{
     		return null;
 		}
 
-		if(
-				ce.getTrip() == null && ne.getTrip() != null ||
-				ce.getTrip() != null && ne.getTrip() == null ||
-				!ce.getTrip().equals(ne.getTrip())
-		){
+		if(ce.getTrip() != null && ce.getTrip() != null){
+			if(ce.getTrip().equals(ne.getTrip())){
+				System.out.println("Same trip :)");
+			} else {
+				weight += getPlanPreference().w_change();
+				weight += Distance.distance(c.getElement().getCoordinate(),
+						n.getElement().getCoordinate());
+				same_trip = false;
+				System.out.println(ce.getTrip() + ", " + ne.getTrip());
+			}
+		} else {
 			weight += getPlanPreference().w_change();
 			weight += Distance.distance(c.getElement().getCoordinate(),
 					n.getElement().getCoordinate());
 			same_trip = false;
-		} else {
-			System.out.println("Same trip :)");
+			System.out.println(ce.getTrip() + ", " + ne.getTrip());
 		}
 
 		Location cl = c.getElement().getLocation();

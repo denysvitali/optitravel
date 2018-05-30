@@ -70,6 +70,20 @@ public class PlannerTest {
 				new LongTripPreference(Distance.distance(LUGANO_COORDINATE, ZURICH_COORDINATE)));
 	}
 
+	@Test
+	public void planLugano_Bellinzona(){
+		testPlan(LUGANO_COORDINATE,
+				BELLINZONA_COORDINATE,
+				LocalDateTime.of(2018,
+						5,
+						17,
+						13,
+						26,
+						0
+				),
+				new LongTripPreference(Distance.distance(LUGANO_COORDINATE, BELLINZONA_COORDINATE)));
+	}
+
 	private void testPlan(Coordinate from, Coordinate to, LocalDateTime ldt, PlanPreference pp){
 		Planner p = new Planner(
 				from,
