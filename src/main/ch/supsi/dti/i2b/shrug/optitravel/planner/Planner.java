@@ -58,6 +58,7 @@ public class Planner<T extends TimedLocation, L extends Location> {
 		
 		Algorithm<T, L> algorithm = new Algorithm<>(dg);
 		this.algorithm = algorithm;
+		dg.setFromDate(new Date(start_time.toLocalDate()));
 
 		BoundingBox boundingBox = new BoundingBox(from, to);
 		boundingBox = boundingBox.expand(1500); // Expand the BB by 1500 meters
@@ -65,8 +66,8 @@ public class Planner<T extends TimedLocation, L extends Location> {
 		// TODO: Handle the case when there are no SSPs (or trips) in a BBox
 		// TODO: Dynamically switch between GTFS and TL
 
-		List<Trip>
-				trips = dg.getTrips(boundingBox);
+		/*List<Trip>
+				trips = dg.getTrips(boundingBox);*/
 
 		/*List<StopTime> stop_times = new ArrayList<>();
 

@@ -54,4 +54,14 @@ public class ComfortPlanPreference implements PlanPreference {
 	public double w_moving() {
 		return 0.1 * PREF_WEIGHT;
 	}
+
+	@Override
+	public double max_total_waiting_time() {
+		return 10.0;
+	}
+
+	@Override
+	public int max_total_changes() {
+		return 3;
+	}
 }

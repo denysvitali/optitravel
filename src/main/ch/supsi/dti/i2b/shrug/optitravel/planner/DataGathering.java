@@ -12,6 +12,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Date;
 import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
@@ -30,9 +31,15 @@ public class DataGathering{
     private List<Route> routes = new ArrayList<>();
     private PlanPreference pp = new DefaultPlanPreference();
 
+    private Date from_date;
+
     DataGathering(){
 
     }
+
+	public void setFromDate(Date from_date) {
+		this.from_date = from_date;
+	}
 
 	public void setPlanPreference(PlanPreference pp) {
 		this.pp = pp;
@@ -129,7 +136,7 @@ public class DataGathering{
 				ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop gtfs_stop = (ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop)
 						st.getStop();
 				try {
-					StopTimes stopTimes = wGTFS.getStopTimesBetween(t, t_max, gtfs_stop);
+					StopTimes stopTimes = wGTFS.getStopTimesBetween(t, t_max, from_date, gtfs_stop);
 					if(stopTimes != null) {
 						stopTimes
 								.getTime()
@@ -172,6 +179,8 @@ public class DataGathering{
 											algorithm.getDestination(),
 											next_stop.getCoordinate())
 									);
+									n.setWaitTotal(currentNode.getWaitTotal());
+									n.setChanges(currentNode.getChanges());
 									n.setDg(this);
 									n.setAlgorithm(algorithm);
 									return n;
@@ -183,6 +192,10 @@ public class DataGathering{
 											t) * getPlanPreference().w_moving();
 									if (!e.getElement().getTrip().equals(currentNode.getElement().getTrip())) {
 										// Trip Changed!
+										if(currentNode.getChanges() + 1 > pp.max_total_changes()){
+											return;
+										}
+										e.setChanges(currentNode.getChanges() + 1);
 										weight += getPlanPreference().w_change();
 									}
 									neighbours.put(e, weight);
@@ -218,11 +231,13 @@ public class DataGathering{
 				Time start = t;
 				Time.addMinutes(start, (int) Math.ceil(walk_seconds / 60.0));
 
-						StopTime tl = new StopTime(es, t);
+						StopTime tl = new StopTime(es, start);
 						tl.setTrip(new WalkingTrip((StopTime)
 								currentNode.getElement(),
 								tl));
 						Node<T, L> nst = new Node<>((T) tl);
+						nst.setWaitTotal(currentNode.getWaitTotal());
+						nst.setChanges(currentNode.getChanges());
 						nst.setDg(this);
 						nst.setAlgorithm(algorithm);
 						nst.setH(distance);
@@ -322,6 +337,21 @@ public class DataGathering{
 		double minute_wait = Time.diffMinutes(n.getElement().getTime(),
 				c.getElement().getTime());
 		assert(minute_wait>=0);
+
+		if(c.getWaitTotal() + minute_wait > pp.max_total_waiting_time()){
+			// Waiting time limit exceeded
+			return null;
+		}
+
+		if(!same_trip){
+			if(n.getChanges() + 1 > pp.max_total_changes()){
+				return null;
+			}
+			n.addChange();
+		}
+
+		n.setWaitTotal(c.getWaitTotal());
+		n.addToWaitTotal(minute_wait);
 		weight += getPlanPreference().w_waiting() * minute_wait;
 
 		n.setH(

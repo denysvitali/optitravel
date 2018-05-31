@@ -4,15 +4,15 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Meta;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Result;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Route;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.AscDesc;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.sort.TripSort;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
-import ch.supsi.dti.i2b.shrug.optitravel.models.DropOff;
-import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
-import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
-import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
+import ch.supsi.dti.i2b.shrug.optitravel.models.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -414,10 +414,11 @@ class GTFSrsTest {
 
 		Time t1 = new Time("13:00:00");
 		Time t2 = new Time("13:40:00");
+		Date date = new Date("2018-05-30");
 
 		try{
 			StopTimes stopTimes =
-					gtfSrsWrapper.getStopTimesBetween(t1, t2, s);
+					gtfSrsWrapper.getStopTimesBetween(t1, t2, date, s);
 			assertNotEquals(null, stopTimes);
 
 			checkStopTimesContent(stopTimes);
@@ -434,10 +435,11 @@ class GTFSrsTest {
 
 		Time t1 = new Time("16:30:00");
 		Time t2 = new Time("17:26:00");
+		Date date = new Date("2018-05-30");
 
 		try{
 			StopTimes stopTimes =
-					gtfSrsWrapper.getStopTimesBetween(t1, t2, s);
+					gtfSrsWrapper.getStopTimesBetween(t1, t2, date, s);
 			assertNotEquals(null, stopTimes);
 
 			checkStopTimesContent(stopTimes);

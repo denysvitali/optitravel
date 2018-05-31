@@ -13,4 +13,7 @@ public interface PlanPreference {
 	double w_fast_change();
 	double w_change();
 	double w_moving();
+
+	double max_total_waiting_time();
+	int max_total_changes();
 }

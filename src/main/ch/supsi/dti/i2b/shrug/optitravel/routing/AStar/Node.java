@@ -17,6 +17,8 @@ public class Node<T extends TimedLocation, L extends Location> {
     private boolean computed_neighbours = false;
     private DataGathering dg;
     private Algorithm<T,L> algorithm;
+    private double wait_total = 0.0;
+    private int changes = 0;
 
 	public void setDg(DataGathering dg) {
 		this.dg = dg;
@@ -102,5 +104,29 @@ public class Node<T extends TimedLocation, L extends Location> {
 		if (o == null || getClass() != o.getClass()) return false;
 		Node<?,?> node = (Node<?,?>) o;
 		return Objects.equals(node.element, element);
+	}
+
+	public double getWaitTotal() {
+		return wait_total;
+	}
+
+	public int getChanges() {
+		return changes;
+	}
+
+	public void addToWaitTotal(double minute_wait) {
+		wait_total += minute_wait;
+	}
+
+	public void setChanges(int i) {
+		changes = i;
+	}
+
+	public void setWaitTotal(double waitTotal) {
+		wait_total = waitTotal;
+	}
+
+	public void addChange() {
+		changes++;
 	}
 }

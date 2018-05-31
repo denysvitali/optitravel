@@ -36,5 +36,11 @@ public class TestingElements {
 	public static Coordinate TOWER_OF_LONDON_COORDINATE =
 			new Coordinate(51.5082319,-0.0759482);
 
+	public static Coordinate OXFORD_CIRCUS_UNDERGROUND_STATION_COORDINATE =
+			new Coordinate(51.515715, -0.142042);
+
+	public static Coordinate TEMPLE_LONDON_COORDINATE =
+			new Coordinate(51.5110611,-0.1143763);
+
 
 }

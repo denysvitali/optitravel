@@ -52,4 +52,14 @@ public class DefaultPlanPreference implements PlanPreference {
 	public double w_moving() {
 		return PlannerParams.W_MOVING;
 	}
+
+	@Override
+	public double max_total_waiting_time() {
+		return 20.0;
+	}
+
+	@Override
+	public int max_total_changes() {
+		return 3;
+	}
 }

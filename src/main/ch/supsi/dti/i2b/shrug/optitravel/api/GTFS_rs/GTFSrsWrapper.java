@@ -7,6 +7,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.config.BuildConfig;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Date;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
@@ -183,7 +184,7 @@ public class GTFSrsWrapper {
                 .scheme(SCHEME)
                 .addPathSegments("api/trips/in/" + boundingBox)
                 .build();
-        Response response = client.get(url);
+        Response response = client.get(url, 20 * 1000);
 		return getPaginatedTrips(response);
 	}
 
@@ -250,7 +251,7 @@ public class GTFSrsWrapper {
 		return getPaginatedStopTimes(response);
 	}
 
-	public StopTimes getStopTimesBetween(Time after, Time before, Stop stop) throws GTFSrsError {
+	public StopTimes getStopTimesBetween(Time after, Time before, Date date, Stop stop) throws GTFSrsError {
 		HttpUrl.Builder builder = new HttpUrl.Builder()
 				.host(HOST)
 				.port(PORT)
@@ -259,10 +260,11 @@ public class GTFSrsWrapper {
 				.addPathSegment(stop.getUid())
 				.addPathSegment("between")
 				.addPathSegment(after.toString())
-				.addPathSegment(before.toString());
+				.addPathSegment(before.toString())
+				.addPathSegment(date.toString());
 
 		HttpUrl url = builder.build();
-		Response response = client.get(url);
+		Response response = client.get(url, 50 * 1000);
 		return parseSingleStopTimes(response);
 	}
 

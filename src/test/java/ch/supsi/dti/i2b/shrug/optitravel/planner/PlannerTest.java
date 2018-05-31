@@ -7,6 +7,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.Plan;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.params.ComfortPlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
+import ch.supsi.dti.i2b.shrug.optitravel.params.FastPlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.params.LongTripPreference;
 import org.junit.jupiter.api.Test;
 
@@ -71,6 +72,25 @@ public class PlannerTest {
 	}
 
 	@Test
+	public void planOxfordStreet_Temple(){
+		testPlan(OXFORD_CIRCUS_UNDERGROUND_STATION_COORDINATE,
+				TEMPLE_LONDON_COORDINATE,
+				LocalDateTime.of(2018,
+						5,
+						17,
+						13,
+						26,
+						0
+				),
+				new LongTripPreference(
+						Distance.distance(
+							OXFORD_CIRCUS_UNDERGROUND_STATION_COORDINATE,
+							TEMPLE_LONDON_COORDINATE
+						)
+				));
+	}
+
+	@Test
 	public void planLugano_Zurigo(){
 		testPlan(LUGANO_COORDINATE,
 				ZURICH_COORDINATE,
@@ -90,11 +110,14 @@ public class PlannerTest {
 				LocalDateTime.of(2018,
 						5,
 						17,
-						13,
-						26,
+						12,
+						00,
 						0
 				),
-				new DefaultPlanPreference());
+				new FastPlanPreference(Distance.distance(
+						CHANNEL_4_LONDON_COORDINATE,
+						TOWER_OF_LONDON_COORDINATE
+				)));
 	}
 
 	@Test
