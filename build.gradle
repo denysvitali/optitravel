@@ -49,11 +49,11 @@ sourceSets {
         }
     }
 
-    //test {
-    //    java {
-    //        srcDir 'src/test'
-    //    }
-    //}
+    test {
+        java {
+            srcDir 'src/test'
+        }
+    }
 }
 
 test {

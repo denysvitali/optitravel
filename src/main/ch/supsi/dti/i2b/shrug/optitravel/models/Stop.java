@@ -1,8 +1,17 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import jdk.jshell.spi.ExecutionControl;
 
-public abstract class Stop extends Location{
+import java.util.List;
+
+public abstract class Stop extends Location {
     public abstract String getName();
-    public abstract void findNeighbours(int/*TODO: Time Class*/ arrivalTime);
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    public abstract Coordinate getCoordinate();
 }

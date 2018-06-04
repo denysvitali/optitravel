@@ -1,10 +1,18 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.parser.ScheduleStopPairResultParser;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.ScheduleStopPairResult;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
-import com.jsoniter.JsonIterator;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
@@ -13,6 +21,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import java.util.List;
 
 
+import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LUGANO_BBOX;
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.mockito.Mockito.*;
@@ -146,6 +155,11 @@ class TransitLandTest{
             assertNotEquals(null, s);
             assertEquals("Sídliště Ďáblice", s.getName());
             assertEquals(new Coordinate(50.131942,14.479232), s.getCoordinate());
+
+            s = apiWrapper.getStopById("s-u0nmsrxwft-montebrè");
+            assertNotEquals(null, s);
+            assertEquals("Monte Brè", s.getName());
+            assertEquals(new Coordinate(46.009183, 8.986241), s.getCoordinate());
         } catch (TransitLandAPIError e) {
             fail(e);
         }
@@ -184,6 +198,31 @@ class TransitLandTest{
     }
 
     @Test
+	void testParsingSSP(){
+		FileInputStream parser_result = null;
+		try {
+			parser_result = new FileInputStream(new File(
+					"src/test/" +
+					"resources/mock/api/transitland/results/" +
+					"ssp_parser_result.json"));
+		} catch (FileNotFoundException e) {
+			fail(e);
+		}
+		try {
+			String json = new String(
+					parser_result.readAllBytes(),
+					StandardCharsets.UTF_8);
+			ScheduleStopPairResult ssp = ScheduleStopPairResultParser.parse(json);
+			assertNotEquals(null, ssp);
+			assertNotEquals(null, ssp.getMeta());
+			assertNotEquals(null, ssp.getScheduleStopPairs());
+			assertNotEquals(0, ssp.getScheduleStopPairs().size());
+		} catch (IOException e) {
+			fail(e);
+		}
+	}
+
+    @Test
     void checkGetScheduleStopPairRSP(){
         try {
             /*
@@ -194,7 +233,10 @@ class TransitLandTest{
 
             RouteStopPattern mockedRSP = mock(RouteStopPattern.class);
             when(mockedRSP.getId()).thenReturn("r-u0n7-r28-9609af-a3c09c");
-            assertEquals("s-u0n7t3zfxx-saronno",apiWrapper.getScheduleStopPair(mockedRSP).get(0).getOrigin_onestop_id());
+            assertEquals("s-u0n7t3zfxx-saronno",
+					apiWrapper.getScheduleStopPair(mockedRSP)
+							.get(0).getOrigin_onestop_id()
+			);
 
         } catch (TransitLandAPIError transitLandAPIError) {
             fail(transitLandAPIError);
@@ -228,7 +270,11 @@ class TransitLandTest{
             verify(mockedTRL).getStopsByBBox(gps, gps);
              */
 
-            List<Stop> listStops = apiWrapper.getStopsByBBox(new GPSCoordinates(37.668,-122.000), new GPSCoordinates(37.719,-122.500));
+            List<Stop> listStops = apiWrapper.getStopsByBBox(new BoundingBox(
+                    new Coordinate(37.668,-122.000),
+                    new Coordinate(37.719,-122.500)
+                    )
+            );
             assertEquals("s-9q8yt0hwpd-dalycity", listStops.get(0).getId());
 
         } catch (TransitLandAPIError transitLandAPIError) {
@@ -245,7 +291,11 @@ class TransitLandTest{
             verify(mockedTRL).getScheduleStopPairsByBBox(gps, gps);
              */
 
-            List<ScheduleStopPair> listSch = apiWrapper.getScheduleStopPairsByBBox(new GPSCoordinates(46.197728, 8.639571), new GPSCoordinates(45.951284, 9.120199));
+            List<ScheduleStopPair> listSch = apiWrapper.getScheduleStopPairsByBBox(
+            		new BoundingBox(
+            				new Coordinate(46.197728, 8.639571),
+							new Coordinate(45.951284, 9.120199)
+					));
             assertEquals("r-u0-flixbus-4efdb3-591d18", listSch.get(0).getRoute_stop_pattern_onestop_id());
 
         } catch (TransitLandAPIError transitLandAPIError) {
@@ -310,6 +360,18 @@ class TransitLandTest{
         } catch (TransitLandAPIError transitLandAPIError) {
             fail(transitLandAPIError);
         }
+    }
 
+    @Test
+    void tripsByBBox(){
+		List<Trip> trips = null;
+		try {
+			trips = apiWrapper.getTripsByBBox(LUGANO_BBOX);
+			assertNotEquals(null, trips);
+			// TODO: Complete test when getTripsByBBox is ready
+			// assertNotEquals(0, trips.size());
+		} catch (TransitLandAPIError transitLandAPIError) {
+			fail(transitLandAPIError);
+		}
     }
 }

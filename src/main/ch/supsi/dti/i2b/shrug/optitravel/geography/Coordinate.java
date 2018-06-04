@@ -1,8 +1,12 @@
 package ch.supsi.dti.i2b.shrug.optitravel.geography;
 
+import java.util.Objects;
+
 public class Coordinate {
     private double lat;
     private double lng;
+
+    public Coordinate(){}
 
     public Coordinate(double lat, double lng){
         this.lat = lat;
@@ -45,7 +49,12 @@ public class Coordinate {
         return true;
     }
 
-    @Override
+	@Override
+	public int hashCode() {
+		return Objects.hash(lat, lng);
+	}
+
+	@Override
     public String toString(){
         return String.format("%f,%f", lat, lng);
     }

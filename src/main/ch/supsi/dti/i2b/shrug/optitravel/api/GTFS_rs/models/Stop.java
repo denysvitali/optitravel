@@ -1,6 +1,16 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
+import com.jsoniter.annotation.JsonIgnore;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     private String uid;
@@ -10,16 +20,32 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     private int location_type;
     private String parent_station;
 
+    public Stop(){
+
+	}
+
+    public Stop(String uid){
+		this.uid = uid;
+	}
+
+    @JsonIgnore
+    private GTFSrsWrapper gtfSrsWrapper;
+
     public String getName() {
         return this.name;
     }
+
+	@JsonIgnore
+    public void setWrapper(GTFSrsWrapper wrapper){
+    	gtfSrsWrapper = wrapper;
+	}
 
     @Override
     public Coordinate getCoordinate() {
         return new Coordinate(lat, lng);
     }
 
-    public double getLat() {
+	public double getLat() {
         return lat;
     }
 
@@ -36,7 +62,23 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     }
 
     @Override
-    public void findNeighbours(int arrivalTime) {
-
+    public String toString() {
+        return String.format("\"%s\" - %s (%s)",
+				getName(),
+				getUid(),
+				getCoordinate());
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Stop stop = (Stop) o;
+		return Objects.equals(this.uid, stop.uid);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(uid, name, lat, lng, location_type, parent_station);
+	}
 }
