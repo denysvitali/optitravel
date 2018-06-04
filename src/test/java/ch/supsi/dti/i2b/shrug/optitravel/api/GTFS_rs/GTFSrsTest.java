@@ -455,6 +455,26 @@ class GTFSrsTest {
 		}
 	}
 
+	@Test
+	public void stopTimesBetweenInBBox(){
+		BoundingBox bbox = LUGANO_BBOX;
+		Time start_time = new Time("13:00:00");
+		Time end_time = new Time("14:00:00");
+
+		try {
+			PaginatedList<StopTimes> stoptimes = gtfSrsWrapper.getStopTimesInBBoxBetween(
+					bbox, start_time, end_time
+			);
+			assertNotEquals(null, stoptimes);
+			assertNotEquals(null, stoptimes.getMeta());
+			assertNotEquals(null, stoptimes.getResult());
+			stoptimes.getResult().forEach(this::checkStopTimesContent);
+
+		} catch (GTFSrsError gtfSrsError) {
+			fail(gtfSrsError);
+		}
+	}
+
 	private void checkStopTimesContent(StopTimes stopTimes) {
 		stopTimes.getTime().stream().forEach(e->{
 			assertNotEquals(null, e);

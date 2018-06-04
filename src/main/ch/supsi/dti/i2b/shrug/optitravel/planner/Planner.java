@@ -53,20 +53,24 @@ public class Planner<T extends TimedLocation, L extends Location> {
             );
 		}
 		DataGathering dg = new DataGathering();
+        dg.setPlanPreference(pp);
+		dg.setFromDate(new Date(start_time.toLocalDate()));
+		dg.setStartTime(new Time(start_time.toLocalTime()));
+		dg.setSource(from);
+		dg.setDestination(to);
+
 		this.dg = dg;
-		this.dg.setPlanPreference(pp);
-		
+
 		Algorithm<T, L> algorithm = new Algorithm<>(dg);
 		this.algorithm = algorithm;
-		dg.setFromDate(new Date(start_time.toLocalDate()));
-
-		BoundingBox boundingBox = new BoundingBox(from, to);
-		boundingBox = boundingBox.expand(1500); // Expand the BB by 1500 meters
 
 		// TODO: Handle the case when there are no SSPs (or trips) in a BBox
 		// TODO: Dynamically switch between GTFS and TL
 
-		/*List<Trip>
+		/*
+		BoundingBox boundingBox = new BoundingBox(from, to);
+		boundingBox = boundingBox.expand(1500); // Expand the BB by 1500 meters
+		List<Trip>
 				trips = dg.getTrips(boundingBox);*/
 
 		/*List<StopTime> stop_times = new ArrayList<>();
@@ -84,6 +88,8 @@ public class Planner<T extends TimedLocation, L extends Location> {
 		double minutes = 0.0;
 		minutes += (PlannerParams.WALKABLE_RADIUS_METERS/PlannerParams.WALK_SPEED_MPS) / 60;
 		minutes += PlannerParams.MAX_WAITING_TIME;
+
+		dg.fetchData();
 
 		Time s_time = new Time(start_time.format(DateTimeFormatter.ISO_TIME));
 

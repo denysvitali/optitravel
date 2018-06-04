@@ -8,6 +8,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.config.BuildConfig;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Date;
+import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
@@ -509,5 +510,27 @@ public class GTFSrsWrapper {
 		} else {
 			throw new GTFSrsError("Unable to get any response for this request");
 		}
+	}
+
+	public PaginatedList<Route> getRoutesByBBox(BoundingBox boundingBox) {
+    	// Not Yet Implemented
+		return null;
+	}
+
+	public PaginatedList<StopTimes> getStopTimesInBBoxBetween(BoundingBox boundingBox,
+															  Time start_time,
+															  Time end_time) throws GTFSrsError {
+		HttpUrl url = new HttpUrl.Builder()
+				.host(HOST)
+				.port(PORT)
+				.scheme(SCHEME)
+				.addPathSegments("api/stop_times/between/")
+				.addPathSegment(start_time.toString())
+				.addPathSegment(end_time.toString())
+				.addPathSegment("in")
+				.addPathSegment(boundingBox.toString())
+				.build();
+		Response response = client.get(url);
+		return getPaginatedStopTimes(response);
 	}
 }

@@ -5,6 +5,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.StopDistance;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.PaginatedList;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.PubliBikeWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
@@ -22,16 +23,22 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class DataGathering{
-    private TransitLandAPIWrapper wTL = new TransitLandAPIWrapper();
+	private static final double AVG_MOVING_SPEED_KMH = 15;
+	private static final double AVG_MOVING_SPEED = AVG_MOVING_SPEED_KMH / 60 * 1000; // in m/minute
+	private TransitLandAPIWrapper wTL = new TransitLandAPIWrapper();
     private GTFSrsWrapper wGTFS = new GTFSrsWrapper();
     private PubliBikeWrapper wPB = new PubliBikeWrapper();
 
     private List<Trip> trips = new ArrayList<>();
     private List<Stop> stops = new ArrayList<>();
+    private List<StopTime> stop_times = new ArrayList<>();
     private List<Route> routes = new ArrayList<>();
     private PlanPreference pp = new DefaultPlanPreference();
 
     private Date from_date;
+    private Time start_time;
+    private Coordinate source;
+    private Coordinate destination;
 
     DataGathering(){
 
@@ -39,6 +46,18 @@ public class DataGathering{
 
 	public void setFromDate(Date from_date) {
 		this.from_date = from_date;
+	}
+
+	public void setStartTime(Time start_time) {
+		this.start_time = start_time;
+	}
+
+	public void setDestination(Coordinate destination) {
+		this.destination = destination;
+	}
+
+	public void setSource(Coordinate source) {
+		this.source = source;
 	}
 
 	public void setPlanPreference(PlanPreference pp) {
@@ -79,10 +98,21 @@ public class DataGathering{
 		if(trips.size() != 0){
 			return trips;
 		}
+
+		int max_travel_minutes = 0;
+		max_travel_minutes += getPlanPreference().max_total_waiting_time();
+		max_travel_minutes += Math.round(Distance.distance(source, destination) / AVG_MOVING_SPEED);
+		Time end_time = Time.addMinutes(start_time, max_travel_minutes);
+
+
 		try{
 
+			TripSearch ts = new TripSearch();
+			ts.departure_after = start_time.toString();
+			ts.arrival_before = end_time.toString();
+
 			PaginatedList<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip>
-					gtfs_paginated_trips = getwGTFS().getTripsByBBox(boundingBox);
+					gtfs_paginated_trips = getwGTFS().getTripsByBBox(boundingBox, ts);
 			List<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip>
 					gtfs_trips = gtfs_paginated_trips.getResult();
 
@@ -376,5 +406,43 @@ public class DataGathering{
 			}
 		}
 		return e;
+	}
+
+	public void fetchData(){
+		BoundingBox boundingBox = new BoundingBox(source, destination);
+		boundingBox = boundingBox.expand(1500);
+
+		trips = getTrips(boundingBox);
+		stops = getStops(boundingBox);
+		stop_times = getStopTimes(boundingBox);
+	}
+
+	private List<StopTime> getStopTimes(BoundingBox boundingBox) {
+		if(stop_times.size() != 0){
+			return stop_times;
+		}
+
+		int max_travel_minutes = 0;
+		max_travel_minutes += getPlanPreference().max_total_waiting_time();
+		max_travel_minutes += Math.round(Distance.distance(source, destination) / AVG_MOVING_SPEED);
+		Time end_time = Time.addMinutes(start_time, max_travel_minutes);
+
+/*
+		try{
+
+			PaginatedList<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes>
+					gtfs_paginated_trips = getwGTFS().getStopTimesInBBoxBetween(boundingBox,
+					start_time, end_time);
+			List<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes>
+					gtfs_trips = gtfs_paginated_trips.getResult();
+
+			trips.addAll(gtfs_trips);
+			//trips.addAll(getwTL().getTripsByBBox(boundingBox));
+			// TODO: Add TL
+		} catch(GTFSrsError){
+			err.printStackTrace();
+		}*/
+
+		return stop_times;
 	}
 }
