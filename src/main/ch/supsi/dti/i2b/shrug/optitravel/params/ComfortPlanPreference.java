@@ -7,7 +7,7 @@ public class ComfortPlanPreference implements PlanPreference {
 
 	@Override
 	public double walkable_radius_meters() {
-		return 300;
+		return 800;
 	}
 
 	@Override
@@ -57,11 +57,11 @@ public class ComfortPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_total_waiting_time() {
-		return 10.0;
+		return max_waiting_time();
 	}
 
 	@Override
 	public int max_total_changes() {
-		return 3;
+		return 6;
 	}
 }
