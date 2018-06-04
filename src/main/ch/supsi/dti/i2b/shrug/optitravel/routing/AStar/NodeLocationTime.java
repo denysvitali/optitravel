@@ -7,7 +7,9 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
 
 import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 public class NodeLocationTime {
     private Stop element;
@@ -17,7 +19,9 @@ public class NodeLocationTime {
     private boolean visited;
     private NodeLocationTime from;
     private LocalTime arrivalTime;
+    private LocalTime departureTime;
     private String currentRsp;
+    private String currentTrip;
 
     public NodeLocationTime(Stop element){
         neighbours = new HashMap<>();
@@ -91,6 +95,14 @@ public class NodeLocationTime {
         this.arrivalTime = arrivalTime;
     }
 
+    public LocalTime getDepartureTime() {
+        return departureTime;
+    }
+
+    public void setDepartureTime(LocalTime departureTime) {
+        this.departureTime = departureTime;
+    }
+
     public String getCurrentRsp() {
         return currentRsp;
     }
@@ -99,11 +111,18 @@ public class NodeLocationTime {
         this.currentRsp = currentRsp;
     }
 
+    public String getCurrentTrip() {
+        return currentTrip;
+    }
 
-    public void findNeighbours(Structure timeToTest) {
+    public void setCurrentTrip(String currentTrip) {
+        this.currentTrip = currentTrip;
+    }
+
+    public void findNeighbours(Structure timeToTest, List<NodeLocationTime> calculatedNodes) {
 
         timeToTest.addNearStopsAsNeighbours(this);
-        timeToTest.addSameRSPStopAsNeighbour(this);
-        timeToTest.addDifferentRSPStopsAsNeighbours(this);
+        timeToTest.addSameRSPStopAsNeighbour(this, calculatedNodes);
+        timeToTest.addDifferentRSPStopsAsNeighbours(this, calculatedNodes);
     }
 }

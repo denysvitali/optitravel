@@ -1,5 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.BlaBlaCar.BlaBlaCarWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.BlaBlaCar.models.BlaBlaTrip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.ScheduleStopPair;
@@ -12,16 +14,20 @@ import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Structure;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class PuraTest {
 
     private List<Stop> stopsInBBox;
     private List<RouteStopPattern> routeStopPatternsInBBox;
-    private List<ScheduleStopPair> scheduleStopPairsInBBox;
+    private List<ScheduleStopPair> scheduleStopPairsInBBox = new ArrayList<>();
 
     int count = 0;
+    int richieste = -2;
     private static TransitLandAPIWrapper transitLandAPIWrapper = new TransitLandAPIWrapper();
     @Test
     public void testData(){
@@ -31,11 +37,31 @@ public class PuraTest {
         }
 
         Runnable r = ()->{
-            GPSCoordinates gps1 = new GPSCoordinates(51.523587, -0.140157);
-            GPSCoordinates gps2 = new GPSCoordinates(51.501660, -0.088609);
+
+
+            BlaBlaCarWrapper wrap = new BlaBlaCarWrapper();
+
+
+            List<BlaBlaTrip> list = wrap.getBlaBlaTrips(new Coordinate(45.465622,9.186730), new Coordinate(41.903376,12.493745));
+
+            LocalDateTime loc = LocalDateTime.parse(list.get(0).getDeparture_date(), DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+
+            GPSCoordinates gps1 = new GPSCoordinates(41.905981, 12.463507);
+            GPSCoordinates gps2 = new GPSCoordinates(41.869486, 12.497432);
+
+
+            //Roma
+            /*GPSCoordinates gps1 = new GPSCoordinates(41.905615, 12.484637);
+            GPSCoordinates gps2 = new GPSCoordinates(41.896346, 12.505849);*/
+
+
+            // San Francisco
+            /*
+            GPSCoordinates gps1 = new GPSCoordinates(37.764487, -122.507609);
+            GPSCoordinates gps2 = new GPSCoordinates(37.739887, -122.469078);*/
             transitLandAPIWrapper.AgetStopsByBBox(gps1, gps2, (stops)->{
 
-                System.out.println(stops);
+                System.out.println(stops.size());
                 stopsInBBox = stops;
                 synchronized (transitLandAPIWrapper){
                     count++;
@@ -45,17 +71,39 @@ public class PuraTest {
             });
             transitLandAPIWrapper.AgetRouteStopPatternsByBBox(gps1, gps2, (rsps)->{
 
-                System.out.println(rsps);
+                System.out.println(rsps.size());
                 routeStopPatternsInBBox = rsps;
+          /*      richieste = routeStopPatternsInBBox.size();
+                for(RouteStopPattern rsp : routeStopPatternsInBBox){
+
+                    transitLandAPIWrapper.AgetScheduleStopPairsByBBoxAndRSP(rsp.getId(), (ssps)->{
+
+
+                        if(ssps != null && ssps.size() != 0){
+
+                            synchronized (transitLandAPIWrapper) {
+                                System.out.println(ssps.size());
+                                scheduleStopPairsInBBox.addAll(ssps);
+                            }
+                        }
+
+                        synchronized (transitLandAPIWrapper){
+                            count++;
+                            transitLandAPIWrapper.notify();
+                        }
+
+                    });
+                }*/
                 synchronized (transitLandAPIWrapper){
                     count++;
                     transitLandAPIWrapper.notify();
                 }
 
             });
+
             transitLandAPIWrapper.AgetScheduleStopPairsByBBox(gps1, gps2, (ssps)->{
 
-                System.out.println(ssps);
+                System.out.println(ssps.size());
                 scheduleStopPairsInBBox = ssps;
                 synchronized (transitLandAPIWrapper){
                     count++;
@@ -85,6 +133,11 @@ public class PuraTest {
         List<Stop> sortedStops = transitLandAPIWrapper.sortStops(c, stopsInBBox);
         sortedStops.forEach(stop -> System.out.println(stop.getName() + " - " + Distance.distance(c.asCoordinate(), stop.getCoordinate())));
         System.out.println(sortedStops.get(0).getId());
+
+
+
+
+
 
 
         /**
@@ -144,8 +197,12 @@ public class PuraTest {
 
 
 
-        Stop stopP = mappaStops.get("s-gcpvj0wdme-embankmentundergroundstation");
-        Stop stopA = mappaStops.get("s-gcpvjdgx5r-farringdonundergroundstation"/*"s-gcpvjcxw36-bankdlrstation"*/);
+      //  Stop stopP = mappaStops.get("s-9q8ytnbje3-taravalst~19thave"/*"s-gcpvj0wdme-embankmentundergroundstation"*/);
+      //  Stop stopA = mappaStops.get("s-9q8yudjy7u-judahst~31stave"/*"s-gcpvjdgx5r-farringdonundergroundstation"/*"s-gcpvjcxw36-bankdlrstation"*/);
+
+        Stop stopP = mappaStops.get("s-sr2ykhm0pz-tritone~barberinima");
+        Stop stopA = mappaStops.get(/*"s-sr2yk7yf4k-terminima~mb~fs"*/"s-sr2yhnduhw-romaostiense");
+
 
         Structure timeToTest = new Structure(stopA.getCoordinate(), mappaStops, mappaRsps, rspsTraversingStop, tripOfRSP);
 
@@ -158,11 +215,11 @@ public class PuraTest {
 
         // TODO: @denvit verify performance of tree set removeIf
         TreeSet<NodeLocationTime> calculatedNodes = new TreeSet<>((a, b) -> a.getF() >= b.getF() ? 1 : -1);
+        List<NodeLocationTime> calculatedNodesAll = new ArrayList<>();
 
-        List<Location> visited = new ArrayList<>();
         NodeLocationTime currentNode = nodeP;
         nodeP.setG(0);
-        currentNode.findNeighbours(timeToTest);
+        currentNode.findNeighbours(timeToTest, calculatedNodesAll);
         for(;;) {
             if(currentNode == null){
                 break;
@@ -170,20 +227,29 @@ public class PuraTest {
 
             NodeLocationTime closestNode = null;
             for (NodeLocationTime n : currentNode.getNeighbours().keySet()) {
-                double newG = currentNode.getG() + currentNode.getNeighbours().get(n);
+                double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + currentNode.getNeighbours().get(n);
                 double newF = n.getH() + newG;
 
-                if(visited.contains(n.getElement())){
-                    calculatedNodes.removeIf(s -> s.getElement().equals(n.getElement()));
-                }
 
-                n.setG(newG);
-                n.setFrom(currentNode);
-                calculatedNodes.add(n);
+                if(n.getG() == -1){
+                    n.setG(newG);
+                    n.setFrom(currentNode);
+                    calculatedNodes.add(n);
+                    calculatedNodesAll.add(n);
+                }
+                else if((n.getF() > newF) && !n.getVisited()){
+                    calculatedNodes.removeIf(s -> s == n);
+                    n.setG(newG);
+                    n.setFrom(currentNode);
+                    calculatedNodes.add(n);
+                    calculatedNodesAll.add(n);
+                }
+                else{
+                    System.out.println("ignorato");
+                }
             }
 
             currentNode.setVisited();
-            visited.add(currentNode.getElement());
             currentNode = calculatedNodes.pollFirst();
 
             if(currentNode != null && currentNode.getElement().equals(nodeA.getElement())){
@@ -194,8 +260,9 @@ public class PuraTest {
                 }
                 path.add(currentNode);
                 Collections.reverse(path);
+                return;
             }
-            currentNode.findNeighbours(timeToTest);
+            currentNode.findNeighbours(timeToTest, calculatedNodesAll);
         }
     }
 }
