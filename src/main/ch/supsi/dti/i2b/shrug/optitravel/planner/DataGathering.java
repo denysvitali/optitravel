@@ -207,6 +207,8 @@ public class DataGathering{
 			}
 		}
 
+		System.out.println("Computed neighbours, adding walking stops");
+
     	/* Walkable Stops */
 
 		try {
@@ -281,10 +283,11 @@ public class DataGathering{
     		return null;
 		}
 
-		if(ce.getTrip() != null && ce.getTrip() != null){
+		if(ce.getTrip() != null && ne.getTrip() != null){
 			if(ce.getTrip().equals(ne.getTrip())){
 				System.out.println("Same trip :)");
 			} else {
+
 				weight += getPlanPreference().w_change();
 				weight += Distance.distance(c.getElement().getCoordinate(),
 						n.getElement().getCoordinate());
@@ -345,6 +348,7 @@ public class DataGathering{
 
 		if(!same_trip){
 			if(n.getChanges() + 1 > pp.max_total_changes()){
+				System.out.println("Changes count ecceeded!");
 				return null;
 			}
 			n.addChange();

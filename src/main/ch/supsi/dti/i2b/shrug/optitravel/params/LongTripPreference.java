@@ -11,7 +11,7 @@ public class LongTripPreference implements PlanPreference {
 	public LongTripPreference(double distance){
 		this.distance = distance;
 		average_moving_speed = average_moving_speed_kmh * 3.6;
-		PREF_WEIGHT = 1 * distance/average_moving_speed;
+		PREF_WEIGHT = 0.3 * distance/average_moving_speed;
 	}
 
 	@Override
@@ -36,12 +36,12 @@ public class LongTripPreference implements PlanPreference {
 
 	@Override
 	public double max_waiting_time() {
-		return 10.0;
+		return 8.0;
 	}
 
 	@Override
 	public double w_walk() {
-		return 0.5 * PREF_WEIGHT;
+		return 1.2 * PREF_WEIGHT;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class LongTripPreference implements PlanPreference {
 
 	@Override
 	public double w_change() {
-		return 0.3 * PREF_WEIGHT;
+		return 1 * PREF_WEIGHT;
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class LongTripPreference implements PlanPreference {
 
 	@Override
 	public double max_total_waiting_time() {
-		return 20.0;
+		return max_waiting_time() * 2;
 	}
 
 	@Override
