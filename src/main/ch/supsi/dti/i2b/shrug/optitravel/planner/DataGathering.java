@@ -109,6 +109,7 @@ public class DataGathering{
 		int max_travel_minutes = 0;
 		max_travel_minutes += getPlanPreference().max_total_waiting_time();
 		max_travel_minutes += Math.round(Distance.distance(source, destination) / AVG_MOVING_SPEED + 10);
+		max_travel_minutes += Math.round(pp.max_total_walkable_distance() / (pp.walk_speed_mps() * 60));
 		Time end_time = Time.addMinutes(start_time, max_travel_minutes);
 
 
@@ -139,9 +140,79 @@ public class DataGathering{
 
 		trips.forEach(t->{
 			for(StopTrip st : t.getStopTrip()){
+				StopTime st_st = new StopTime(st.getStop(), st.getArrival());
 				if(st.getStop().equals(currentNode.getElement().getLocation())){
-					System.out.println("OUR STOP!");
-					// TODO: Implement Node Addition
+
+					if(t.getStopTrip().indexOf(st) != (t.getStopTrip().size() - 1)){
+
+						int m_index = t.getStopTrip().indexOf(st);
+						StopTrip cst = t.getStopTrip().get(m_index);
+						StopTrip nst = t.getStopTrip().get(m_index+1);
+
+						Time cst_time = cst.getDeparture();
+						Time cn_time = currentNode.getElement().getTime();
+
+						if(st_st.equals(currentNode.getElement())){
+							// Our node is the current st_st (wait time is 0)
+
+							if(!Time.isAfter(cst_time, cn_time)){
+								// We can't reach this stop (wait time is negative!)
+								return;
+							}
+
+							double wait_time = Time.diffMinutes(cst_time, cn_time);
+							assert(wait_time >= 0); // Paranoic
+
+							if(currentNode.getChanges() + 1 > pp.max_total_changes()){
+								// Max changes exceeded!
+								return;
+							}
+							StopTime newStopSt = new StopTime(nst.getStop(), nst.getArrival());
+							newStopSt.setTrip(t);
+							Node<T,L> newStop = new Node<>((T) newStopSt);
+							newStop.setDg(this);
+							newStop.setChanges(currentNode.getChanges() + 1);
+							newStop.setH(Distance.distance(
+									nst.getStop().getCoordinate(),
+									destination
+							));
+							newStop.setWaitTotal(currentNode.getWaitTotal());
+							newStop.setFrom(currentNode);
+							newStop.setAlgorithm(algorithm);
+							addCalculatedNeighbour(currentNode, neighbours, newStop);
+						}
+						else {
+
+							if(!Time.isAfter(cst_time, cn_time)){
+								// We can't reach this stop (wait time is negative!)
+								return;
+							}
+
+							double wait_time = Time.diffMinutes(cst_time, cn_time);
+							assert(wait_time >= 0); // Paranoic
+
+							if(currentNode.getWaitTotal() + wait_time > pp.max_total_waiting_time()){
+								// Max waiting time exceeded!
+								return;
+							}
+
+							if(currentNode.getElement().getTrip() instanceof WaitingTrip){
+								// Won't wait twice (avoid graph node loops)
+								return;
+							}
+
+							StopTime newSameStopSt = new StopTime(cst.getStop(), cst.getArrival());
+							newSameStopSt.setTrip(new WaitingTrip(cst.getStop(), wait_time));
+							Node<T,L> newSameStopNode = new Node<>((T) newSameStopSt);
+							newSameStopNode.setDg(this);
+							newSameStopNode.setH(currentNode.getH());
+							newSameStopNode.setWaitTotal(currentNode.getWaitTotal() + wait_time);
+							newSameStopNode.setFrom(currentNode);
+							newSameStopNode.setChanges(currentNode.getChanges());
+							newSameStopNode.setAlgorithm(algorithm);
+							addCalculatedNeighbour(currentNode, neighbours, newSameStopNode);
+						}
+					}
 				}
 			}
 		});
@@ -217,6 +288,7 @@ public class DataGathering{
 							return d < pp.walkable_radius_meters();
 						}
 					)
+				.filter(e->!e.equals(currentNode.getElement().getLocation()))
 				.forEach(s -> {
 					double distance = Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate());
 					double walk_minutes = (pp.walk_speed_mps() * distance)/60.0;
@@ -435,7 +507,7 @@ public class DataGathering{
 
 		if(ce.getTrip() != null && ne.getTrip() != null){
 			if(ce.getTrip().equals(ne.getTrip())){
-				System.out.println("Same trip :)");
+				System.out.println("Same trip :)" + ce.getLocation() + ", " + ne.getLocation());
 			} else {
 
 				weight += getPlanPreference().w_change();
@@ -531,7 +603,7 @@ public class DataGathering{
 	public void fetchData(){
 		BoundingBox boundingBox = new BoundingBox(source, destination);
 		double distance = Distance.distance(source, destination);
-		boundingBox = boundingBox.expand(distance*5 + 1000);
+		boundingBox = boundingBox.expand(distance*1 + 100);
 
 		System.out.println("Bouding Box is: " + boundingBox.toPostGIS());
 

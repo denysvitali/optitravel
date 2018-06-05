@@ -16,4 +16,6 @@ public interface PlanPreference {
 
 	double max_total_waiting_time();
 	int max_total_changes();
+
+	double max_total_walkable_distance();
 }

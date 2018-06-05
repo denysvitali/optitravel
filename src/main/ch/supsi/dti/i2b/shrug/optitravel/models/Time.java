@@ -60,6 +60,7 @@ public class Time {
 		return t1.localTime.compareTo(t2.localTime);
 	}
 
+	// t1 is after t2?
 	public static boolean isAfter(Time t1, Time t2){
 		if(t1.getHour() < t2.getHour()){
 			return false;

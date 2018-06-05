@@ -54,13 +54,27 @@ public class PlannerTest {
 						16,
 						30,
 						0
-				));
+				), new LongTripPreference(Distance.distance(PREGASSONA_COORDINATE, LUGANO_COORDINATE)));
 	}
 
 	@Test
 	public void planPregassona_LuganoCentro2(){
 		testPlan(PREGASSONA_COORDINATE,
 				LUGANO_CENTRO_COORDINATE,
+				LocalDateTime.of(2018,
+						5,
+						17,
+						13,
+						26,
+						0
+				),
+				new ComfortPlanPreference());
+	}
+
+	@Test
+	public void planPregassona_Bozzoreda(){
+		testPlan(PREGASSONA_COORDINATE,
+				BOZZOREDA_COORDINATE,
 				LocalDateTime.of(2018,
 						5,
 						17,

@@ -73,4 +73,9 @@ public class FastPlanPreference implements PlanPreference {
 	public int max_total_changes() {
 		return 5;
 	}
+
+	@Override
+	public double max_total_walkable_distance() {
+		return 2000;
+	}
 }
