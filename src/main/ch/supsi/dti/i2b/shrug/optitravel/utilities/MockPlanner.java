@@ -43,6 +43,7 @@ public class MockPlanner extends Planner {
         trips.add(a.getResult().as(Trip.class));
 		List<ch.supsi.dti.i2b.shrug.optitravel.models.Trip> genericTrips = new ArrayList<>(trips);
         Plan p = new Plan(genericTrips, null, null, from, to);
+        plans.add(p);
         return plans;
     }
 }
