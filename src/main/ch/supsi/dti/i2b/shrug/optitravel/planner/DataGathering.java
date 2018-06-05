@@ -175,6 +175,9 @@ public class DataGathering{
 
 				for(String trip_id : rsp.getTrips()){
 
+				    if (rsp.getId().equals("r-gcut-largstoglasgowcentralsr-acc06b-978211") && trip_id.equals("216025")){
+				        System.out.println("a");
+                    }
 					List<ScheduleStopPair> schedulesInRspTrip = new ArrayList<>();
 					for(ScheduleStopPair sch : scheduleStopPairsInBBox){
 
@@ -202,6 +205,7 @@ public class DataGathering{
                                     ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setDeparture(sch.getDeparture());
 
                                     ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).add_stop_sequence(stopTrip);
+                                    break;
                                 }
                                 index++;
 
@@ -245,12 +249,11 @@ public class DataGathering{
 				StopTime trip_nx_st = new StopTime(nx_stoptrip.getStop(),
 						nx_stoptrip.getDeparture());
 
-				if(!Time.isAfter(trip_el_st.getTime(), currentNode.getElement().getTime()))
-				{
-					// The starting point isn't after our current node time,
-					// therefore we exclude this element
-					continue;
-				}
+                if (!Time.isAfter(trip_el_st.getTime(), currentNode.getElement().getTime())) {
+                    // The starting point isn't after our current node time,
+                    // therefore we exclude this element
+                    continue;
+                }
 
 				// Wait time, till the next bus / train
 				double wait_time = Time.diffMinutes(trip_el_st.getTime(), currentNode.getElement().getTime());
@@ -270,20 +273,22 @@ public class DataGathering{
 						continue;
 					}
 
-					Node<T,L> nextTimedStop = new Node<>((T) trip_el_st);
-					trip_el_st.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), wait_time));
-					nextTimedStop.setAlgorithm(algorithm);
-					nextTimedStop.setDg(this);
-					nextTimedStop.setH(currentNode.getH());
-					nextTimedStop.setChanges(currentNode.getChanges());
-					nextTimedStop.setWaitTotal(currentNode.getWaitTotal() + wait_time);
-					nextTimedStop.setWalkingTotal(currentNode.getWalkingTotal());
-					nextTimedStop.setFrom(currentNode);
+					if(!currentNode.getFrom().getElement().getLocation().equals(currentNode.getElement().getLocation())) {
+                        Node<T, L> nextTimedStop = new Node<>((T) trip_el_st);
+                        trip_el_st.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), wait_time));
+                        nextTimedStop.setAlgorithm(algorithm);
+                        nextTimedStop.setDg(this);
+                        nextTimedStop.setH(currentNode.getH());
+                        nextTimedStop.setChanges(currentNode.getChanges());
+                        nextTimedStop.setWaitTotal(currentNode.getWaitTotal() + wait_time);
+                        nextTimedStop.setWalkingTotal(currentNode.getWalkingTotal());
+                        nextTimedStop.setFrom(currentNode);
 
-					double weight = 0;
-					weight += getPlanPreference().w_waiting() * wait_time;
+                        double weight = 0;
+                        weight += getPlanPreference().w_waiting() * wait_time;
 
-					neighbours.putIfAbsent(nextTimedStop, weight);
+                        neighbours.putIfAbsent(nextTimedStop, weight);
+                    }
 					continue;
 				}
 
@@ -312,16 +317,49 @@ public class DataGathering{
 					weight += pp.w_change();
 					weight += pp.w_moving() * Time.diffMinutes(trip_nx_st.getTime(), trip_el_st.getTime());
 				}
+				else{
+				    System.out.println("");
+                }
 
 				neighbours.putIfAbsent(nextConnectedStop, weight);
 			}
 		}
 
 		// Walkable stops
+
+        for(Stop stop : stops){
+		    if(!stop.equals(currentNode.getElement().getLocation()) && Distance.distance(stop.getCoordinate(), currentNode.getElement().getCoordinate()) <= 1000/*pp.walkable_radius_meters()*/){
+                double distance = Distance.distance(stop.getCoordinate(), currentNode.getElement().getCoordinate());
+                int walk_minutes = (int) Math.ceil(distance / (pp.walk_speed_mps() * 60.0));
+                Time arrival_time = Time.addMinutes(currentNode.getElement().getTime(), walk_minutes);
+                StopTime stoptime = new StopTime(stop, arrival_time);
+
+                stoptime.setTrip(new WalkingTrip((StopTime) currentNode.getElement(), stoptime));
+
+                // Walking Total exceeded!
+                if(!(currentNode.getWalkingTotal() + distance > pp.max_total_walkable_distance())){
+
+                    Node<T,L> walkableStop = new Node<>((T) stoptime);
+                    walkableStop.setDg(this);
+                    walkableStop.setAlgorithm(algorithm);
+                    walkableStop.setChanges(currentNode.getChanges());
+                    walkableStop.setH(Distance.distance(stop.getCoordinate(), destination));
+                    walkableStop.setWalkingTotal(currentNode.getWalkingTotal() + distance);
+                    walkableStop.setFrom(currentNode);
+
+                    double weight = 1000.0;
+                    weight += walk_minutes * pp.w_walk();
+
+                    neighbours.put(walkableStop, weight);
+                }
+
+
+            }
+        }/*
 		stops
 			.stream()
-			.filter(s->Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate()) <= pp.walkable_radius_meters())
-				.filter(s->!s.equals(currentNode.getElement().getLocation()))
+			.filter(s->!s.equals(currentNode.getElement().getLocation()) && Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate()) <= pp.walkable_radius_meters())
+			//	.filter(s->!s.equals(currentNode.getElement().getLocation()))
 				.forEach(s->{
 					double distance = Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate());
 					int walk_minutes = (int) Math.ceil(distance / (pp.walk_speed_mps() * 60.0));
@@ -347,7 +385,7 @@ public class DataGathering{
 					weight += walk_minutes * pp.w_walk();
 
 					neighbours.put(walkableStop, weight);
-				});
+				});*/
 
 		return neighbours;
 	}

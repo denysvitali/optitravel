@@ -55,17 +55,17 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
             for (Node<T,L> n : neighbours.keySet()) {
                 double newG = (currentNode.getG() == -1 ? 0 : currentNode.getG()) + neighbours.get(n);
                 double newF = n.getH() + newG;
-                if (n.getF() > newF || n.getG() == -1) {
+                if (n.getG() == -1) {
                     n.setG(newG);
                     n.setFrom(currentNode);
-                    if(!treeset.contains(n) && !visited.contains(n)) {
-						treeset.add(n);
-					}
+               //     if(!treeset.contains(n) && !visited.contains(n)) {
+					treeset.add(n);
+			//		}
 				}
             }
 
 			currentNode = treeset.pollFirst();
-            visited.add(currentNode);
+          //  visited.add(currentNode);
 
 			if(currentNode != null &&
 					Distance.distance(

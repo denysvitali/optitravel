@@ -191,8 +191,8 @@ public class ScheduleStopPair extends ch.supsi.dti.i2b.shrug.optitravel.models.S
 	}
 
 	@Override
-	public int getStopSequence() throws ExecutionControl.NotImplementedException {
+	public int getStopSequence() {
     	// TODO: @Pura Implement
-		throw new ExecutionControl.NotImplementedException("Not yet implemented!");
+		return 0;
 	}
 }

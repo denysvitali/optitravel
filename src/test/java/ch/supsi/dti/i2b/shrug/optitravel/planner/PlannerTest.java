@@ -124,7 +124,7 @@ public class PlannerTest {
 				LocalDateTime.of(2018,
 						5,
 						17,
-						12,
+						10,
 						00,
 						0
 				),

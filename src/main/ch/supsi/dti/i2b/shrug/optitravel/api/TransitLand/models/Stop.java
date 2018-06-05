@@ -12,6 +12,7 @@ import jdk.jshell.spi.ExecutionControl;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @JsonObject(asExtraForUnknownProperties = false)
 public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
@@ -78,6 +79,21 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
         } catch (TransitLandAPIError transitLandAPIError) {
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("\"%s\" - %s (%s)",
+                getName(),
+                getUid(),
+                getCoordinate());
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Stop stop = (Stop) o;
+        return Objects.equals(this.onestop_id, stop.onestop_id);
     }
 
 }

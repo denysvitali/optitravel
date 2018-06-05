@@ -41,12 +41,12 @@ public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip 
 
     @Override
     public Time getDeparture() {
-        return null;
+        return departure;
     }
 
     @Override
     public Time getArrival() {
-        return null;
+        return arrival;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip 
     }
 
     @Override
-    public int getStopSequence() throws ExecutionControl.NotImplementedException {
+    public int getStopSequence() {
         return stopSequence;
     }
 }
