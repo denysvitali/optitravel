@@ -397,7 +397,21 @@ public class GTFSrsWrapper {
 		}
 	}
 
-	public PaginatedList<Trip> parsePaginatedTrips(String json){
+	public static PaginatedList<Trip> parsePaginatedTrips(byte[] json){
+		ResultArray a = JsonIterator.deserialize(
+				json,
+				ResultArray.class);
+		return new PaginatedList<>(
+				a.getResult()
+						.asList()
+						.stream()
+						.map((e) -> e.as(Trip.class))
+						.collect(Collectors.toList()),
+				a.getMeta()
+		);
+	}
+
+	public static PaginatedList<Trip> parsePaginatedTrips(String json){
 		ResultArray a = JsonIterator.deserialize(
 				json,
 				ResultArray.class);

@@ -10,6 +10,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.DataGathering;
 import org.mockito.Mockito;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -30,18 +31,12 @@ public class MockedDataGathering extends DataGathering {
 
 		TripSearch ts = Mockito.mock(TripSearch.class);
 		try {
-			String json_string;
-			String fpath = "test-me";
-			System.out.println(getClass().getResource("").getPath());
-			System.out.println(getClass().getResource(fpath));
-			File file = new File(getClass().getResource(fpath).getFile());
+			String fpath = "json/gtfs/bbox-pre-bo.json";
+			File file = new File(getClass().getClassLoader().getResource(fpath).getFile());
 			try {
-				FileInputStream fis = new FileInputStream(file);
-				byte[] b = fis.readAllBytes();
-				Scanner s = new Scanner(fis).useDelimiter("\\A");
-				json_string = s.hasNext() ? s.next() : "";
-				s.close();
-				PaginatedList<Trip> cached_res_1 = mockedGTFSWrapper.parsePaginatedTrips(json_string);
+				BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file), 1024 * 1024 * 2);
+				byte[] json = fis.readAllBytes();
+				PaginatedList<Trip> cached_res_1 = GTFSrsWrapper.parsePaginatedTrips(json);
 				when(mockedGTFSWrapper.getTripsByBBox(any(), any())).thenReturn(cached_res_1);
 			} catch (IOException e) {
 				e.printStackTrace();
