@@ -30,12 +30,12 @@ public class Planner<T extends TimedLocation, L extends Location> {
 	private Algorithm<T, L> algorithm;
 
 
-	Planner(Coordinate from, Coordinate to){
+	public Planner(Coordinate from, Coordinate to){
         this.from = from;
         this.to = to;
     }
 
-    List<Plan> getPlans(){
+    public List<Plan> getPlans(){
         if(!alreadyComputed){
             computePlans();
         }

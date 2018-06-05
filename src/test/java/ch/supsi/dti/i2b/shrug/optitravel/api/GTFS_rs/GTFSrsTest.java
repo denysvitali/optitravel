@@ -13,6 +13,8 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.sort.TripSort;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.models.DropOff;
+import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

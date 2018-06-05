@@ -1,18 +1,28 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Location;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
-import com.lynden.gmapsfx.javascript.object.GoogleMap;
-import com.lynden.gmapsfx.javascript.object.LatLong;
-import com.lynden.gmapsfx.javascript.object.MapOptions;
-import com.lynden.gmapsfx.javascript.object.MapTypeIdEnum;
+import com.lynden.gmapsfx.javascript.object.*;
+import com.lynden.gmapsfx.service.geocoding.GeocodingService;
+import javafx.application.Platform;
 
 public class MapController implements MapComponentInitializedListener {
 
     private final GoogleMapView mapView;
+    private GoogleMap map;
+    private GeocodingService geocodingService;
 
-    public MapController(GoogleMapView mapView) {
+    private Marker origin;
+    private Marker destination;
+
+    private final MainController mainController;
+
+    public enum NodeType {ORIGIN, DESTINATION, TRANSIT}
+
+    public MapController(GoogleMapView mapView, MainController mainController) {
         this.mapView = mapView;
+        this.mainController = mainController;
     }
 
     @Override
@@ -31,6 +41,36 @@ public class MapController implements MapComponentInitializedListener {
                 .minZoom(2);
         mapView.setKey("AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4");
 
-        GoogleMap map = mapView.createMap(options);
+        map = mapView.createMap(options);
+        geocodingService = new GeocodingService();
+    }
+
+    public void addMarker(Location location, NodeType type) {
+        Platform.runLater(() -> addMarker(new LatLong(location.getLatitude(), location.getLongitude()), type));
+    }
+
+    public void addMarker(LatLong where, NodeType type) {
+        MarkerOptions opt = new MarkerOptions();
+        opt.animation(Animation.DROP)
+                .visible(true)
+                .position(where);
+        switch (type) {
+            case ORIGIN:
+                if (origin != null) map.removeMarker(origin);
+                origin = new Marker(opt);
+                map.addMarker(origin);
+                map.panTo(where);
+                break;
+            case DESTINATION:
+                if (destination != null) map.removeMarker(destination);
+                destination = new Marker(opt);
+                map.addMarker(destination);
+                map.panTo(where);
+                break;
+        }
+    }
+
+    public void clearMarkers() {
+
     }
 }
