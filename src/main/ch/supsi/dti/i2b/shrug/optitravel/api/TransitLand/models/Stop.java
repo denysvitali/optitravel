@@ -75,9 +75,4 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
         }
     }
 
-    @Override
-    public void findNeighbours(int arrivalTime) {
-
-
-    }
 }

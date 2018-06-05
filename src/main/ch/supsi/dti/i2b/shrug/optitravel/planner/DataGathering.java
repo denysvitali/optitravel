@@ -9,17 +9,19 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.PubliBikeWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.ScheduleStopPair;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Date;
 import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
-import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class DataGathering{
@@ -117,6 +119,92 @@ public class DataGathering{
 					gtfs_trips = gtfs_paginated_trips.getResult();
 
 			trips.addAll(gtfs_trips);
+
+
+
+			/////////////////////////////
+
+
+			final List<RouteStopPattern> routeStopPatternsInBBox = new ArrayList<>();
+			final List<ScheduleStopPair> scheduleStopPairsInBBox = new ArrayList<>();
+
+			AtomicInteger count = new AtomicInteger();
+
+			getwTL().AgetRouteStopPatternsByBBox(boundingBox, (rsps)->{
+
+				System.out.println(rsps.size());
+				routeStopPatternsInBBox.addAll(rsps);
+
+				synchronized (getwTL()){
+					count.getAndIncrement();
+					getwTL().notify();
+				}
+
+			});
+
+			getwTL().AgetScheduleStopPairsByBBox(boundingBox, (ssps)->{
+
+				System.out.println(ssps.size());
+				scheduleStopPairsInBBox.addAll(ssps);
+				synchronized (getwTL()){
+					count.getAndIncrement();
+					getwTL().notify();
+				}
+
+			});
+
+
+			synchronized (getwTL()){
+				while(count.get()!=2){
+					try {
+						getwTL().wait();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+
+			for(RouteStopPattern rsp : routeStopPatternsInBBox){
+
+				for(String trip_id : rsp.getTrips()){
+
+					List<ScheduleStopPair> schedulesInRspTrip = new ArrayList<>();
+					for(ScheduleStopPair sch : scheduleStopPairsInBBox){
+
+						if(sch.getTrip().equals(trip_id) && sch.getRoute_stop_pattern_onestop_id().equals(rsp.getId()))
+							schedulesInRspTrip.add(sch);
+
+					}
+					Trip tlTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip();
+					((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setTrip_id(trip_id);
+					((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute_stop_pattern_id(rsp.getId());
+					((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute(rsp.getRoute());
+
+					for(ScheduleStopPair sch : schedulesInRspTrip){
+
+						int index = 0;
+						for(String stop_id : rsp.getStopPattern()){
+
+							if(stop_id.equals(sch.getOrigin_onestop_id())) {
+
+								StopTrip stopTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip();
+								((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStopSequence(index);
+								((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStop();
+							}
+							index++;
+
+						}
+
+					}
+
+				}
+
+			}
+
+
+
+
 			//trips.addAll(getwTL().getTripsByBBox(boundingBox));
 			// TODO: Add TL
 		} catch(GTFSrsError /*| TransitLandAPIError*/ err){

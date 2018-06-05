@@ -1,9 +1,12 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.BlaBlaCar.models;
 
+import ch.supsi.dti.i2b.shrug.optitravel.models.Route;
+import ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BlaBlaTrip extends Trip {
 
@@ -22,5 +25,15 @@ public class BlaBlaTrip extends Trip {
 
     public BlaBlaStop getArrival_place() {
         return arrival_place;
+    }
+
+    @Override
+    public List<StopTrip> getStopTrip() {
+        return null;
+    }
+
+    @Override
+    public Route getRoute() {
+        return null;
     }
 }

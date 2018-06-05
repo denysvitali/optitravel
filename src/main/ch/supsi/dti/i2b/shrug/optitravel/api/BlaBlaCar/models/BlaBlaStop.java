@@ -31,10 +31,6 @@ public class BlaBlaStop extends Stop {
         return city_name;
     }
 
-    @Override
-    public void findNeighbours(int arrivalTime) {
-
-    }
 
     @Override
     public Coordinate getCoordinate() {

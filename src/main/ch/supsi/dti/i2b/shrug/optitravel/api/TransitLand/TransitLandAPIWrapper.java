@@ -363,22 +363,28 @@ public class TransitLandAPIWrapper {
         throw new TransitLandAPIError("Unable to get any response for this request");
     }
 
-    public List<RouteStopPattern> getRouteStopPatternsByBBox(GPSCoordinates coord1, GPSCoordinates coord2) throws TransitLandAPIError {
+    public List<RouteStopPattern> getRouteStopPatternsByBBox(BoundingBox bbox) throws TransitLandAPIError {
 
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/route_stop_patterns")
-                .addQueryParameter("bbox", coord1.getLongitude()+","+coord1.getLatitude()+","+coord2.getLongitude()+","+coord2.getLatitude())
+                .addQueryParameter("bbox",
+                        String.format("%f,%f,%f,%f",
+                                bbox.getP1().getLng(),
+                                bbox.getP1().getLat(),
+                                bbox.getP2().getLng(),
+                                bbox.getP2().getLat()
+                        ))
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
         return parseRouteStopPatternResult(url);
     }
 
-    public void AgetRouteStopPatternsByBBox(GPSCoordinates coord1, GPSCoordinates coord2, Callback<List<RouteStopPattern>> cb){
+    public void AgetRouteStopPatternsByBBox(BoundingBox bbox, Callback<List<RouteStopPattern>> cb){
         Runnable r = ()->{
             try {
-                cb.exec(getRouteStopPatternsByBBox(coord1, coord2));
+                cb.exec(getRouteStopPatternsByBBox(bbox));
             } catch (TransitLandAPIError transitLandAPIError) {
                 transitLandAPIError.printStackTrace();
                 cb.exec(null);
