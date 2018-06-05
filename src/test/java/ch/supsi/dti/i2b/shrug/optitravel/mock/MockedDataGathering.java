@@ -9,6 +9,8 @@ import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.DataGathering;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -28,23 +30,30 @@ public class MockedDataGathering extends DataGathering {
 				new Coordinate(46.012963, 8.964333),
 				new Coordinate(46.028526,8.976853)
 		);
-
 		TripSearch ts = Mockito.mock(TripSearch.class);
 		try {
-			String fpath = "json/gtfs/bbox-pre-bo.json";
-			File file = new File(getClass().getClassLoader().getResource(fpath).getFile());
-			try {
-				BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file), 1024 * 1024 * 2);
-				byte[] json = fis.readAllBytes();
-				PaginatedList<Trip> cached_res_1 = GTFSrsWrapper.parsePaginatedTrips(json);
-				when(mockedGTFSWrapper.getTripsByBBox(any(), any())).thenReturn(cached_res_1);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} catch (GTFSrsError gtfSrsError) {
-			gtfSrsError.printStackTrace();
+			when(mockedGTFSWrapper.getTripsByBBox(any(), any())).thenAnswer(
+					(Answer<PaginatedList<Trip>>) invocation -> getTrips()
+			);
+		} catch(GTFSrsError err){
+			err.printStackTrace();
 		}
 	}
+
+	private PaginatedList<Trip> getTrips(){
+		String fpath = "json/gtfs/bbox-pre-bo.json";
+		File file = new File(getClass().getClassLoader().getResource(fpath).getFile());
+		try {
+			BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file));
+			byte[] json = fis.readAllBytes();
+			PaginatedList<Trip> cached_res_1 = GTFSrsWrapper.parsePaginatedTrips(json);
+			return cached_res_1;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 
 	@Override
 	public GTFSrsWrapper getwGTFS() {

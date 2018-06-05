@@ -7,10 +7,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.mock.MockedDataGathering;
 import ch.supsi.dti.i2b.shrug.optitravel.mock.MockedPlanner;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Plan;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
-import ch.supsi.dti.i2b.shrug.optitravel.params.ComfortPlanPreference;
-import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
-import ch.supsi.dti.i2b.shrug.optitravel.params.FastPlanPreference;
-import ch.supsi.dti.i2b.shrug.optitravel.params.LongTripPreference;
+import ch.supsi.dti.i2b.shrug.optitravel.params.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -66,11 +63,12 @@ public class PlannerTest {
 				LocalDateTime.of(2018,
 						5,
 						17,
-						13,
-						26,
+						10,
+						20,
 						0
 				),
-				new ComfortPlanPreference());
+				new DenvitPlanPreference(Distance.distance(PREGASSONA_COORDINATE,
+				LUGANO_CENTRO_COORDINATE)));
 	}
 
 	@Test
@@ -84,7 +82,8 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new ComfortPlanPreference());
+				new DenvitPlanPreference(Distance.distance(PREGASSONA_COORDINATE,
+						BOZZOREDA_COORDINATE)));
 	}
 
 	@Test
@@ -98,7 +97,7 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new ComfortPlanPreference());
+				new DefaultPlanPreference());
 	}
 
 	@Test

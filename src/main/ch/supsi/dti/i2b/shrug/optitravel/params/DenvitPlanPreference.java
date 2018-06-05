@@ -2,15 +2,25 @@ package ch.supsi.dti.i2b.shrug.optitravel.params;
 
 import ch.supsi.dti.i2b.shrug.optitravel.planner.PlanPreference;
 
-public class DefaultPlanPreference implements PlanPreference {
+public class DenvitPlanPreference implements PlanPreference {
+	private double PREF_WEIGHT;
+	private double distance;
+	private double average_moving_speed_kmh = 20;
+	private double average_moving_speed =  average_moving_speed_kmh * 3.6; // m/s
+
+	public DenvitPlanPreference(double distance){
+		this.distance = distance;
+		PREF_WEIGHT = 0.5 * distance;
+	}
+
 	@Override
 	public double walkable_radius_meters() {
-		return PlannerParams.WALKABLE_RADIUS_METERS;
+		return 100;
 	}
 
 	@Override
 	public double walk_speed_mps() {
-		return PlannerParams.WALK_SPEED_MPS;
+		return 1;
 	}
 
 	@Override
@@ -20,42 +30,42 @@ public class DefaultPlanPreference implements PlanPreference {
 
 	@Override
 	public double destination_radius() {
-		return PlannerParams.DESTINATION_RADIUS;
+		return 350;
 	}
 
 	@Override
 	public double max_waiting_time() {
-		return PlannerParams.MAX_WAITING_TIME;
+		return 15.0;
 	}
 
 	@Override
 	public double w_walk() {
-		return PlannerParams.W_WALK;
+		return 2 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_waiting() {
-		return PlannerParams.W_WAITING;
+		return 0.5 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_fast_change() {
-		return PlannerParams.W_FAST_CHANGE;
+		return 6 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_change() {
-		return PlannerParams.W_CHANGE;
+		return 1.4 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_moving() {
-		return PlannerParams.W_MOVING;
+		return 0.3 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double max_total_waiting_time() {
-		return 3 * max_waiting_time();
+		return 20.0;
 	}
 
 	@Override
