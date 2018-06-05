@@ -1,23 +1,22 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.GeocodingService;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Place;
-import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.TripTimeFrame;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTimePicker;
 import com.jfoenix.validation.RequiredFieldValidator;
-import com.jfoenix.validation.base.ValidatorBase;
 import com.lynden.gmapsfx.GoogleMapView;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DateCell;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Callback;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class MainController {
 
@@ -45,6 +44,7 @@ public class MainController {
     private MapController mapController;
 
     public MainController() {
+
     }
 
     @FXML
@@ -67,12 +67,30 @@ public class MainController {
         tfEndPoint.getValidators().add(new PlaceValidator("Please select a valid place."));
 
 
-        tfStartPoint.focusedProperty().addListener((o,oldVal,newVal) -> {if(!newVal) tfStartPoint.validate();});
-        tfEndPoint.focusedProperty().addListener((o,oldVal,newVal) -> {if(!newVal) tfEndPoint.validate();});
+        tfStartPoint.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) tfStartPoint.validate();
+        });
+        tfEndPoint.focusedProperty().addListener((o, oldVal, newVal) -> {
+            if (!newVal) tfEndPoint.validate();
+        });
 
         // Initialise map
         mapController = new MapController(mapView, this);
         mapView.addMapInializedListener(mapController);
+
+
+        // Set pickers to open when clicking on text field
+        dpDate.getEditor().setOnMouseClicked(e -> dpDate.show());
+        tpTime.getEditor().setOnMouseClicked(e -> tpTime.show());
+        tpTime.setIs24HourView(true);
+        // Validation for date and time pickers.
+        dpDate.setDayCellFactory((picker) -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+                setDisable(empty || item.compareTo(LocalDate.now()) < 0);
+            }
+        });
 
         // Setup trip period selection combobox
         cbTripPeriod.getSelectionModel().selectFirst();
@@ -96,11 +114,6 @@ public class MainController {
         });
         cbTripPeriod.getSelectionModel().selectFirst();
 
-        // Set pickers to open when clicking on text field
-        dpDate.getEditor().setOnMouseClicked(e -> dpDate.show());
-        tpTime.getEditor().setOnMouseClicked(e -> tpTime.show());
-        tpTime.setIs24HourView(true);
-
         // Prepare listview
         lvRouteStops.setPrefWidth(280);
         mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
@@ -110,6 +123,21 @@ public class MainController {
         fabSend.toFront();
         lvRouteStops.toBack();
 
+        fabSend.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                if (!tfStartPoint.validate() || !tfEndPoint.validate()) {
+                    return;
+                }
+                // validate time
+                if (cbTripPeriod.getValue() != TripTimeFrame.LEAVE_NOW) {
+                    if (LocalDateTime.of(dpDate.getValue(), tpTime.getValue()).compareTo(LocalDateTime.now()) < 0) {
+                        System.out.println("bad datetime");
+                        return;
+                    }
+                }
+            }
+        });
     }
 }
 
