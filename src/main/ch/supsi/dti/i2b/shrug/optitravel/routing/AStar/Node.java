@@ -18,6 +18,7 @@ public class Node<T extends TimedLocation, L extends Location> {
     private DataGathering dg;
     private Algorithm<T,L> algorithm;
     private double wait_total = 0.0;
+    private double walking_total = 0.0;
     private int changes = 0;
 
 	public void setDg(DataGathering dg) {
@@ -128,5 +129,13 @@ public class Node<T extends TimedLocation, L extends Location> {
 
 	public void addChange() {
 		changes++;
+	}
+
+	public double getWalkingTotal() {
+		return walking_total;
+	}
+
+	public void setWalkingTotal(double walking_total) {
+		this.walking_total= walking_total;
 	}
 }

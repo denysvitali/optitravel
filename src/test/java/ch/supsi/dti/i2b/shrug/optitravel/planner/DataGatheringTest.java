@@ -1,7 +1,9 @@
 package ch.supsi.dti.i2b.shrug.optitravel.planner;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.params.FastPlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 import org.junit.jupiter.api.Test;
@@ -10,8 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LAMONE_FFS_COORDINATE;
-import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.LUGANO_BBOX;
+import static ch.supsi.dti.i2b.shrug.optitravel.common.TestingElements.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DataGatheringTest {
@@ -38,15 +39,23 @@ public class DataGatheringTest {
 		try {
 			DataGathering dg = new DataGathering();
 			Stop stop;
-			stop = dg.getwGTFS().getStop("s-e9f3cd-mannolamonda");
-			Time time = new Time("16:30:00");
+			stop = dg.getwGTFS().getStop("s-89dd31-pregassonapaese");
+			Time time = new Time("17:03:00");
 
 			Node<StopTime, Stop> node = new Node<>(
 					new StopTime(stop, time)
 			);
 
 			Algorithm<StopTime, Stop> algorithm = new Algorithm<>(dg);
-			algorithm.setDestination(LAMONE_FFS_COORDINATE);
+			algorithm.setDestination(BOZZOREDA_COORDINATE);
+
+			dg.setSource(PREGASSONA_COORDINATE);
+			dg.setDestination(BOZZOREDA_COORDINATE);
+			dg.setStartTime(time);
+			dg.setFromDate(new Date("2018-06-01"));
+			dg.setPlanPreference(new FastPlanPreference(
+					Distance.distance(PREGASSONA_COORDINATE, BOZZOREDA_COORDINATE)));
+			dg.fetchData();
 
 			HashMap<Node<StopTime, Stop>,Double> neighbours =
 					dg.getNeighbours(node, algorithm);

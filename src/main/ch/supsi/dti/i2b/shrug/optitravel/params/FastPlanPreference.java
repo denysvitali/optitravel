@@ -6,17 +6,16 @@ public class FastPlanPreference implements PlanPreference {
 	private double PREF_WEIGHT;
 	private double distance;
 	private double average_moving_speed_kmh = 20;
-	private double average_moving_speed; // m/s
+	private double average_moving_speed =  average_moving_speed_kmh * 3.6; // m/s
 
 	public FastPlanPreference(double distance){
 		this.distance = distance;
-		average_moving_speed = average_moving_speed_kmh * 3.6;
 		PREF_WEIGHT = 0.5 * distance;
 	}
 
 	@Override
 	public double walkable_radius_meters() {
-		return 1500;
+		return 100;
 	}
 
 	@Override
@@ -36,7 +35,7 @@ public class FastPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_waiting_time() {
-		return 25.0;
+		return 15.0;
 	}
 
 	@Override
@@ -71,7 +70,7 @@ public class FastPlanPreference implements PlanPreference {
 
 	@Override
 	public int max_total_changes() {
-		return 5;
+		return 3;
 	}
 
 	@Override

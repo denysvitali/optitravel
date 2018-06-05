@@ -2,27 +2,22 @@ package ch.supsi.dti.i2b.shrug.optitravel.planner;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsWrapper;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.StopDistance;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.PaginatedList;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.TripTimeStop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.PubliBikeWrapper;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.LineString;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Date;
 import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
-import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class DataGathering{
 	private static final double AVG_MOVING_SPEED_KMH = 8;
@@ -138,349 +133,125 @@ public class DataGathering{
 		getNeighbours(Node<T,L> currentNode, Algorithm<T,L> algorithm) {
 		HashMap<Node<T,L>, Double> neighbours = new HashMap<>();
 
-		trips.forEach(t->{
-			for(StopTrip st : t.getStopTrip()){
-				StopTime st_st = new StopTime(st.getStop(), st.getArrival());
-				if(st.getStop().equals(currentNode.getElement().getLocation())){
+		// Connected stops (In a Trip)
+		for(Trip t : trips){
+			int stop_index = t.getStopIndex((Stop) currentNode.getElement().getLocation());
+			if(stop_index != -1 && stop_index < t.getStopTrip().size() - 1){
+				// This stop is in the trip, and isn't the last one!
+				System.out.println("We've got a stop");
+				StopTrip cr_stoptrip = t.getStopTrip().get(stop_index);
+				StopTrip nx_stoptrip = t.getStopTrip().get(stop_index + 1);
 
-					if(t.getStopTrip().indexOf(st) != (t.getStopTrip().size() - 1)){
+				StopTime trip_el_st = new StopTime(cr_stoptrip.getStop(),
+							cr_stoptrip.getDeparture());
+				StopTime trip_nx_st = new StopTime(nx_stoptrip.getStop(),
+						nx_stoptrip.getDeparture());
 
-						int m_index = t.getStopTrip().indexOf(st);
-						StopTrip cst = t.getStopTrip().get(m_index);
-						StopTrip nst = t.getStopTrip().get(m_index+1);
-
-						Time cst_time = cst.getDeparture();
-						Time cn_time = currentNode.getElement().getTime();
-
-						if(st_st.equals(currentNode.getElement())){
-							// Our node is the current st_st (wait time is 0)
-
-							if(!Time.isAfter(cst_time, cn_time)){
-								// We can't reach this stop (wait time is negative!)
-								return;
-							}
-
-							double wait_time = Time.diffMinutes(cst_time, cn_time);
-							assert(wait_time >= 0); // Paranoic
-
-							if(currentNode.getChanges() + 1 > pp.max_total_changes()){
-								// Max changes exceeded!
-								return;
-							}
-							StopTime newStopSt = new StopTime(nst.getStop(), nst.getArrival());
-							newStopSt.setTrip(t);
-							Node<T,L> newStop = new Node<>((T) newStopSt);
-							newStop.setDg(this);
-							newStop.setChanges(currentNode.getChanges() + 1);
-							newStop.setH(Distance.distance(
-									nst.getStop().getCoordinate(),
-									destination
-							));
-							newStop.setWaitTotal(currentNode.getWaitTotal());
-							newStop.setFrom(currentNode);
-							newStop.setAlgorithm(algorithm);
-							addCalculatedNeighbour(currentNode, neighbours, newStop);
-						}
-						else {
-
-							if(!Time.isAfter(cst_time, cn_time)){
-								// We can't reach this stop (wait time is negative!)
-								return;
-							}
-
-							double wait_time = Time.diffMinutes(cst_time, cn_time);
-							assert(wait_time >= 0); // Paranoic
-
-							if(currentNode.getWaitTotal() + wait_time > pp.max_total_waiting_time()){
-								// Max waiting time exceeded!
-								return;
-							}
-
-							if(currentNode.getElement().getTrip() instanceof WaitingTrip){
-								// Won't wait twice (avoid graph node loops)
-								return;
-							}
-
-							StopTime newSameStopSt = new StopTime(cst.getStop(), cst.getArrival());
-							newSameStopSt.setTrip(new WaitingTrip(cst.getStop(), wait_time));
-							Node<T,L> newSameStopNode = new Node<>((T) newSameStopSt);
-							newSameStopNode.setDg(this);
-							newSameStopNode.setH(currentNode.getH());
-							newSameStopNode.setWaitTotal(currentNode.getWaitTotal() + wait_time);
-							newSameStopNode.setFrom(currentNode);
-							newSameStopNode.setChanges(currentNode.getChanges());
-							newSameStopNode.setAlgorithm(algorithm);
-							addCalculatedNeighbour(currentNode, neighbours, newSameStopNode);
-						}
-					}
+				if(!Time.isAfter(trip_el_st.getTime(), currentNode.getElement().getTime()))
+				{
+					// The starting point isn't after our current node time,
+					// therefore we exclude this element
+					continue;
 				}
-			}
-		});
-//
-//		stop_times.stream()
-//				.filter(e->currentNode.getElement().getLocation().equals(stop_by_uid.get(e.getStop())))
-//				.forEach(e->{
-//			Stop s = stop_by_uid.get(e.getStop());
-//			if(s == null){
-//				return;
-//			}
-//			if(s.equals(currentNode.getElement().getLocation())){
-//				// The stop is the same, but the times are different
-//
-//				trips.forEach(t -> {
-//					ArrayList<StopTime> st = new ArrayList<>();
-//					for(StopTrip strip : t.getStopTrip()){
-//						if(strip.getStop().equals(s)){
-//							System.out.println("OUR STOP!");
-//						}
-//					}
-//
-//					/*
-//					StopTime st = new StopTime(s,tts.getTime());
-//					// Don't include myself
-//					if(currentNode.getElement().equals(st)){
-//						return;
-//					}
-//
-//					// Keep only trips that are different from the current one
-//					// (= we don't allow to get to the same trip / route to be an allowed change)
-//					Trip t = new ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip(tts.getTrip());
-//					if(	!currentNode.getElement().getTrip().equals(t)
-//							&& !currentNode.getElement().getTrip().getRoute().equals(t.getRoute())
-//					){
-//						System.out.println("Different trip / route!");
-//						double time_diff = Time.diffMinutes(tts.getTime(), currentNode.getElement().getTime());
-//						if(time_diff > pp.max_waiting_time()){
-//							return;
-//						}
-//						if(currentNode.getWaitTotal() + time_diff > pp.max_total_waiting_time()){
-//							return;
-//						}
-//
-//						Node<T,L> node = new Node<>((T) st);
-//						node.setH(Distance.distance(s.getCoordinate(), destination));
-//						node.setFrom(currentNode);
-//						node.setDg(this);
-//						node.setChanges(currentNode.getChanges() + 1); // We changed trip!
-//						node.setWaitTotal(currentNode.getWaitTotal() + time_diff);
-//						addCalculatedNeighbour(currentNode, neighbours, node);
-//					}
-//					else {
-//						System.out.println("We're on the same Trip (BCS!) :)");
-//						Node<T,L> node = new Node<>((T) st);
-//						node.setH(Distance.distance(s.getCoordinate(), destination));
-//						node.setFrom(currentNode);
-//						node.setDg(this);
-//						node.setChanges(currentNode.getChanges());
-//						node.setWaitTotal(currentNode.getWaitTotal());
-//						addCalculatedNeighbour(currentNode, neighbours, node);
-//					}
-//					*/
-//				});
-//			}
-//		});
 
-		// Walking Trips (add stops that can be reached by walking)
-		stops.stream()
-				.filter(e-> {
-							double d = Distance.distance(e.getCoordinate(), currentNode.getElement().getCoordinate());
-							//System.out.println(e + " - " + currentNode.getElement() + ": " + d);
-							return d < pp.walkable_radius_meters();
-						}
-					)
-				.filter(e->!e.equals(currentNode.getElement().getLocation()))
-				.forEach(s -> {
+				// Wait time, till the next bus / train
+				double wait_time = Time.diffMinutes(trip_el_st.getTime(), currentNode.getElement().getTime());
+				assert(wait_time>=0); // Assertion, we verified this condition before.
+
+				if(!trip_el_st.equals(currentNode.getElement())){
+					// We need to wait at this stop for X minutes,
+					// before we can hop on this trip.
+
+					if(currentNode.getWaitTotal() + wait_time > pp.max_total_waiting_time()){
+						// Waiting time exceeded
+						continue;
+					}
+
+					if(wait_time > pp.max_waiting_time()){
+						// Can't wait more than the max_waiting_time
+						continue;
+					}
+
+					Node<T,L> nextTimedStop = new Node<>((T) trip_el_st);
+					trip_el_st.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), wait_time));
+					nextTimedStop.setAlgorithm(algorithm);
+					nextTimedStop.setDg(this);
+					nextTimedStop.setH(currentNode.getH());
+					nextTimedStop.setChanges(currentNode.getChanges());
+					nextTimedStop.setWaitTotal(currentNode.getWaitTotal() + wait_time);
+					nextTimedStop.setWalkingTotal(currentNode.getWalkingTotal());
+					nextTimedStop.setFrom(currentNode);
+
+					double weight = 0;
+					weight += getPlanPreference().w_waiting() * wait_time;
+
+					neighbours.putIfAbsent(nextTimedStop, weight);
+					continue;
+				}
+
+				assert(wait_time == 0);
+
+				System.out.println("Found a directly connected stop! YAY!");
+				Node<T,L> nextConnectedStop = new Node<>((T) trip_nx_st);
+				trip_nx_st.setTrip(t);
+				nextConnectedStop.setAlgorithm(algorithm);
+				nextConnectedStop.setDg(this);
+				nextConnectedStop.setH(Distance.distance(trip_nx_st.getCoordinate(),
+						destination));
+
+				boolean same_trip = false;
+				if(currentNode.getElement().getTrip() != null &&
+						currentNode.getElement().getTrip().equals(t)){
+						same_trip = true;
+				}
+				nextConnectedStop.setChanges(currentNode.getChanges() + (same_trip?0:1));
+				nextConnectedStop.setWaitTotal(currentNode.getWaitTotal());
+				nextConnectedStop.setWalkingTotal(currentNode.getWalkingTotal());
+				nextConnectedStop.setFrom(currentNode);
+
+				double weight = 0.0;
+				if(!same_trip){
+					weight += pp.w_change();
+					weight += pp.w_moving() * Time.diffMinutes(trip_nx_st.getTime(), trip_el_st.getTime());
+				}
+
+				neighbours.putIfAbsent(nextConnectedStop, weight);
+			}
+		}
+
+		// Walkable stops
+		stops
+			.stream()
+			.filter(s->Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate()) <= pp.walkable_radius_meters())
+				.filter(s->!s.equals(currentNode.getElement()))
+				.forEach(s->{
 					double distance = Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate());
-					double walk_minutes = (pp.walk_speed_mps() * distance)/60.0;
-					Time t = Time.addMinutes(
-							currentNode.getElement().getTime(),
-							(int) walk_minutes
-					);
-					StopTime st = new StopTime(s, t);
-					st.setTrip(new WalkingTrip((StopTime) currentNode.getElement(), st));
-					Node<T,L> node = new Node<>((T) st);
-					node.setDg(this);
-					node.setH(distance);
-					node.setWaitTotal(currentNode.getWaitTotal());
-					if(currentNode.getChanges() + 1 > pp.max_total_changes()){
+					int walk_minutes = (int) Math.ceil(distance / (pp.walk_speed_mps() * 60.0));
+					Time arrival_time = Time.addMinutes(currentNode.getElement().getTime(), walk_minutes);
+					StopTime stoptime = new StopTime(s, arrival_time);
+
+					stoptime.setTrip(new WalkingTrip((StopTime) currentNode.getElement(), stoptime));
+
+					if(currentNode.getWalkingTotal() + distance > pp.max_total_walkable_distance()){
+						// Walking Total exceeded!
 						return;
 					}
-					node.setChanges(currentNode.getChanges() + 1);
-					node.setFrom(currentNode);
-					addCalculatedNeighbour(currentNode, neighbours, node);
+
+					Node<T,L> walkableStop = new Node<>((T) stoptime);
+					walkableStop.setDg(this);
+					walkableStop.setAlgorithm(algorithm);
+					walkableStop.setChanges(currentNode.getChanges());
+					walkableStop.setH(Distance.distance(s.getCoordinate(), destination));
+					walkableStop.setWalkingTotal(currentNode.getWalkingTotal() + distance);
+					walkableStop.setFrom(currentNode);
+
+					double weight = 0.0;
+					weight += walk_minutes * pp.w_walk();
+
+					neighbours.put(walkableStop, weight);
 				});
 
 		return neighbours;
-
-//
-//
-//    	HashMap<L, ArrayList<T>> timedlocation_by_location =
-//				algorithm.getTimedLocationByLocation();
-//
-//		double max_minutes = (
-//    			getPlanPreference().walkable_radius_meters()/
-//				getPlanPreference().walk_speed_mps()
-//		) / 60;
-//
-//		int total_time = (int) (Math.ceil(max_minutes) +
-//				getPlanPreference().max_waiting_time());
-//
-//		Time t = currentNode.getElement().getTime();
-//		Time t_max = Time.addMinutes(
-//    			currentNode.getElement().getTime(),
-//				total_time
-//		);
-//		Coordinate s = currentNode.getElement().getCoordinate();
-//
-//    	/*
-//    		Get Stops from GTFS
-//    	 */
-//
-//		HashMap<String, ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop>
-//				uid_stop_hm =
-//				(HashMap<String, ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop>)
-//						algorithm.getUidLocationHM();
-//
-//
-//
-//    	if(currentNode.getElement() instanceof StopTime){
-//    		StopTime st = (StopTime) currentNode.getElement();
-//			if(st.getStop() instanceof ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop){
-//				// Get connected stops for GTFS
-//				ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop gtfs_stop = (ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop)
-//						st.getStop();
-//				try {
-//					StopTimes stopTimes = wGTFS.getStopTimesBetween(t, t_max, from_date, gtfs_stop);
-//					if(stopTimes != null) {
-//						stopTimes
-//								.getTime()
-//								.stream()
-//								.map(tt -> {
-//									Stop next_stop = (Stop) algorithm.getUidLocationHM().get(tt.getNextStop());
-//									if (next_stop == null) {
-//										try {
-//											next_stop = getwGTFS().getStop(tt.getNextStop());
-//											algorithm.getUidLocationHM()
-//													.put(tt.getNextStop(), (L) next_stop);
-//										} catch (GTFSrsError gtfSrsError) {
-//											return null;
-//										}
-//									}
-//									ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip newTrip
-//											= new ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip(tt.getTrip());
-//
-//
-//									StopTime next_stoptime = new StopTime(
-//											next_stop,
-//											tt.getTime(),
-//											newTrip
-//									);
-//
-//									if (st.equals(next_stoptime) && newTrip.equals(
-//											st.getTrip())
-//									) {
-//										// https://arxiv.org/pdf/1607.01299.pdf
-//										// Page 3:
-//										// "We require that trips never overtake
-//										//  another trip of the same line;"
-//										return null;
-//									}
-//
-//									Node n = new Node<T, L>((T) next_stoptime);
-//									n.setFrom(currentNode);
-//
-//									n.setH(Distance.distance(
-//											algorithm.getDestination(),
-//											next_stop.getCoordinate())
-//									);
-//									n.setWaitTotal(currentNode.getWaitTotal());
-//									n.setChanges(currentNode.getChanges());
-//									n.setDg(this);
-//									n.setAlgorithm(algorithm);
-//									return n;
-//								})
-//								.filter(Objects::nonNull)
-//								.forEach(e -> {
-//									double weight = Time.diffMinutes(
-//											e.getElement().getTime(),
-//											t) * getPlanPreference().w_moving();
-//									if (!e.getElement().getTrip().equals(currentNode.getElement().getTrip())) {
-//										// Trip Changed!
-//										if(currentNode.getChanges() + 1 > pp.max_total_changes()){
-//											return;
-//										}
-//										e.setChanges(currentNode.getChanges() + 1);
-//										weight += getPlanPreference().w_change();
-//									}
-//									neighbours.put(e, weight);
-//								});
-//					}
-//				} catch (GTFSrsError gtfSrsError) {
-//					gtfSrsError.printStackTrace();
-//				}
-//			}
-//		}
-//
-//		System.out.println("Computed neighbours, adding walking stops");
-//
-//    	/* Walkable Stops */
-//
-//		try {
-//			List<StopDistance> st = wGTFS
-//					.getStopsNear(currentNode.getElement().getCoordinate(),
-//							getPlanPreference().walkable_radius_meters())
-//					.getResult();
-//			List<Node<T, L>> result = st.stream().map(e -> {
-//				ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop es = e.getStop();
-//				uid_stop_hm.putIfAbsent(es.getUid(), es);
-//
-//				timedlocation_by_location.computeIfAbsent(
-//						(L) es,
-//						k -> new ArrayList<>()
-//				);
-//
-//				double distance =
-//						Distance.distance(es.getCoordinate(),
-//								currentNode.getElement().getCoordinate());
-//
-//				double walk_seconds = distance * getPlanPreference().walk_speed_mps();
-//				Time start = t;
-//				Time.addMinutes(start, (int) Math.ceil(walk_seconds / 60.0));
-//
-//						StopTime tl = new StopTime(es, start);
-//						tl.setTrip(new WalkingTrip((StopTime)
-//								currentNode.getElement(),
-//								tl));
-//						Node<T, L> nst = new Node<>((T) tl);
-//						nst.setWaitTotal(currentNode.getWaitTotal());
-//						nst.setChanges(currentNode.getChanges());
-//						nst.setDg(this);
-//						nst.setAlgorithm(algorithm);
-//						nst.setH(distance);
-//						return nst;
-//					}
-//			).collect(Collectors.toList());
-//
-//			result
-//						.stream()
-//						.filter(n-> !(n.equals(currentNode)))
-//						.filter(n-> !algorithm.getVisited().contains(n))
-//						.peek((n) -> n.setFrom(currentNode))
-//						.map((Node<T,L> n) -> calculateWeight(currentNode, n, algorithm.getDestination()))
-//						.filter(Objects::nonNull)
-//						.filter(e -> !currentNode.equals(e.getKey()))
-//						.forEach(e->{
-//							neighbours.putIfAbsent(e.getKey(),
-//									e.getValue());
-//						});
-//			currentNode.setComputedNeighbours(true);
-//			return neighbours;
-//		} catch (GTFSrsError gtfSrsError) {
-//			gtfSrsError.printStackTrace();
-//		}
-//
-//		currentNode.setComputedNeighbours(true);
-//		return neighbours;
 	}
 
 	private <T extends TimedLocation, L extends Location> void addCalculatedNeighbour(Node<T, L> currentNode, HashMap<Node<T, L>, Double> neighbours, Node<T, L> node) {
@@ -493,10 +264,8 @@ public class DataGathering{
 
 	private <T extends TimedLocation, L extends Location> Map.Entry<Node<T,L>, Double>
 	 calculateWeight(Node<T,L> c, Node<T,L> n, Coordinate d) {
-    	double weight = 0.0;
+     	double weight = 0.0;
     	boolean same_trip = true;
-    	/*weight += Distance.distance(c.getElement().getCoordinate(),
-    	n.getElement().getCoordinate());*/
 
     	T ce = c.getElement();
     	T ne = n.getElement();

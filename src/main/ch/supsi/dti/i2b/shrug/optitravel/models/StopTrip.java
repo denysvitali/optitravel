@@ -15,4 +15,13 @@ public abstract class StopTrip {
 
 	// TODO: @Pura, implement for TL!
 	public abstract int getStopSequence() throws ExecutionControl.NotImplementedException;
+
+	@Override
+	public String toString() {
+		return String.format("ST %s, A %s D %s",
+				getStop(),
+				getArrival(),
+				getDeparture()
+		);
+	}
 }
