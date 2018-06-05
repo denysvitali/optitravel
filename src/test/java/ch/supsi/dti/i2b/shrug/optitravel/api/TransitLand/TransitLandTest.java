@@ -253,7 +253,11 @@ class TransitLandTest{
 
              */
 
-            List<RouteStopPattern> listRouteStopPatterns = apiWrapper.getRouteStopPatternsByBBox(new GPSCoordinates(37.668,-122.000), new GPSCoordinates(37.719,-122.500));
+            List<RouteStopPattern> listRouteStopPatterns = apiWrapper.getRouteStopPatternsByBBox(new BoundingBox(
+                    new Coordinate(37.668,-122.000),
+                    new Coordinate(37.719,-122.500)
+                    )
+            );
             assertEquals("r-9q8yy-8bx-6b7992-8e20fa", listRouteStopPatterns.get(0).getId());
 
         } catch (TransitLandAPIError transitLandAPIError) {

@@ -2,11 +2,12 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 
-    private List<StopTrip> stop_sequence;
+    private List<StopTrip> stop_sequence = new ArrayList<>();
     private Route route;
     private String route_stop_pattern_id;
     private String trip_id;
@@ -28,7 +29,7 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
         this.trip_id = trip_id;
     }
 
-    public void add_stop_sequence(ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip stopTrip) {
+    public void add_stop_sequence(StopTrip stopTrip) {
         stop_sequence.add(stopTrip);
     }
 

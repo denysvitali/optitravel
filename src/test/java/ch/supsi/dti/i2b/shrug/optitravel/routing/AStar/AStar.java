@@ -127,6 +127,7 @@ public class AStar {
 
 */
     }
+    /*
     @Test
     void initializationDemo(){
 
@@ -224,5 +225,5 @@ public class AStar {
 
 
 
-    }
+    }*/
 }

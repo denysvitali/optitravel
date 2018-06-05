@@ -37,4 +37,9 @@ public class BlaBlaStop extends Stop {
 
         return coordinates;
     }
+
+    @Override
+    public String getUid() {
+        return null;
+    }
 }

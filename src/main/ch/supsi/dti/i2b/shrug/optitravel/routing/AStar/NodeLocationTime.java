@@ -118,11 +118,11 @@ public class NodeLocationTime {
     public void setCurrentTrip(String currentTrip) {
         this.currentTrip = currentTrip;
     }
-
+/*
     public void findNeighbours(Structure timeToTest, List<NodeLocationTime> calculatedNodes) {
 
         timeToTest.addNearStopsAsNeighbours(this);
         timeToTest.addSameRSPStopAsNeighbour(this, calculatedNodes);
         timeToTest.addDifferentRSPStopsAsNeighbours(this, calculatedNodes);
-    }
+    }*/
 }

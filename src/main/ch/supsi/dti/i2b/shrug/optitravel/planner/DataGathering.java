@@ -93,9 +93,9 @@ public class DataGathering{
     		return stops;
 		}
     	try{
-			stops.addAll(getwGTFS().getStopsByBBox(boundingBox));
+//			stops.addAll(getwGTFS().getStopsByBBox(boundingBox));
 			stops.addAll(getwTL().getStopsByBBox(boundingBox));
-		} catch(GTFSrsError | TransitLandAPIError err){
+		} catch(/*GTFSrsError |*/ TransitLandAPIError err){
 			err.printStackTrace();
 		}
 
@@ -113,7 +113,7 @@ public class DataGathering{
 		Time end_time = Time.addMinutes(start_time, max_travel_minutes);
 
 
-		try{
+/*		try{
 
 			TripSearch ts = new TripSearch();
 			ts.departure_after = start_time.toString();
@@ -127,7 +127,7 @@ public class DataGathering{
 			trips.addAll(gtfs_trips);
 
 
-
+*/
 			/////////////////////////////
 
 
@@ -182,27 +182,34 @@ public class DataGathering{
 							schedulesInRspTrip.add(sch);
 
 					}
-					Trip tlTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip();
-					((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setTrip_id(trip_id);
-					((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute_stop_pattern_id(rsp.getId());
-					((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute(rsp.getRoute());
+					if(schedulesInRspTrip.size() != 0) {
+                        Trip tlTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip();
+                        ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setTrip_id(trip_id);
+                        ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute_stop_pattern_id(rsp.getId());
+                        ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute(rsp.getRoute());
 
-					for(ScheduleStopPair sch : schedulesInRspTrip){
+                        for (ScheduleStopPair sch : schedulesInRspTrip) {
 
-						int index = 0;
-						for(String stop_id : rsp.getStopPattern()){
+                            int index = 0;
+                            for (String stop_id : rsp.getStopPattern()) {
 
-							if(stop_id.equals(sch.getOrigin_onestop_id())) {
+                                if (stop_id.equals(sch.getOrigin_onestop_id())) {
 
-								StopTrip stopTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip();
-								((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStopSequence(index);
-								((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStop();
-							}
-							index++;
+                                    StopTrip stopTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip();
+                                    ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStopSequence(index);
+                                    ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStop(stop_by_uid.get(stop_id));
+                                    ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setArrival(sch.getArrival());
+                                    ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setDeparture(sch.getDeparture());
 
-						}
+                                    ((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).add_stop_sequence(stopTrip);
+                                }
+                                index++;
 
-					}
+                            }
+
+                        }
+                        trips.add(tlTrip);
+                    }
 
 				}
 
@@ -213,9 +220,9 @@ public class DataGathering{
 
 			//trips.addAll(getwTL().getTripsByBBox(boundingBox));
 			// TODO: Add TL
-		} catch(GTFSrsError /*| TransitLandAPIError*/ err){
-			err.printStackTrace();
-		}
+//		} catch(GTFSrsError /*| TransitLandAPIError*/ err){
+//			err.printStackTrace();
+//		}
 
 		return trips;
 	}
@@ -226,7 +233,8 @@ public class DataGathering{
 
 		trips.forEach(t->{
 			for(StopTrip st : t.getStopTrip()){
-				if(st.getStop().equals(currentNode.getElement().getLocation())){
+
+				if(st.getStop() != null && st.getStop().equals(currentNode.getElement().getLocation())){
 					System.out.println("OUR STOP!");
 					// TODO: Implement Node Addition
 				}
@@ -618,17 +626,19 @@ public class DataGathering{
 	public void fetchData(){
 		BoundingBox boundingBox = new BoundingBox(source, destination);
 		double distance = Distance.distance(source, destination);
-		boundingBox = boundingBox.expand(distance*5 + 1000);
+		boundingBox = boundingBox.expand(Math.max(distance*0.4, 1500));
 
 		System.out.println("Bouding Box is: " + boundingBox.toPostGIS());
 
+        stops = getStops(boundingBox);
+        stops.forEach(e->{
+            stop_by_uid.putIfAbsent(e.getUid(), e);
+        });
 		trips = getTrips(boundingBox);
-		stops = getStops(boundingBox);
+
 		stop_times = getStopTimes(boundingBox);
 
-		stops.forEach(e->{
-			stop_by_uid.putIfAbsent(e.getUid(), e);
-		});
+
 
 		stop_times.forEach(e->{
 			trip_time_stop_by_stop.put(

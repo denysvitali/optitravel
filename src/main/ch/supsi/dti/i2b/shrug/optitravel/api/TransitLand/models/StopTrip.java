@@ -61,11 +61,11 @@ public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip 
 
     @Override
     public Stop getStop() {
-        return null;
+        return stop;
     }
 
     @Override
     public int getStopSequence() throws ExecutionControl.NotImplementedException {
-        return 0;
+        return stopSequence;
     }
 }
