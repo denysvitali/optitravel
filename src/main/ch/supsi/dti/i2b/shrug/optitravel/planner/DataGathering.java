@@ -7,6 +7,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.TripTimeStop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.PubliBikeWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.LineString;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
