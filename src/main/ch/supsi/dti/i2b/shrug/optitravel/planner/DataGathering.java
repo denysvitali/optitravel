@@ -321,7 +321,7 @@ public class DataGathering{
 		stops
 			.stream()
 			.filter(s->Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate()) <= pp.walkable_radius_meters())
-				.filter(s->!s.equals(currentNode.getElement()))
+				.filter(s->!s.equals(currentNode.getElement().getLocation()))
 				.forEach(s->{
 					double distance = Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate());
 					int walk_minutes = (int) Math.ceil(distance / (pp.walk_speed_mps() * 60.0));
