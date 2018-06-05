@@ -24,6 +24,9 @@ public class TestingElements {
 	public static Coordinate PREGASSONA_COORDINATE =
 			new Coordinate(46.020805, 8.975589);
 
+	public static Coordinate BOZZOREDA_COORDINATE =
+			new Coordinate(46.020684, 8.965597);
+
 	public static Coordinate LAMONE_FFS_COORDINATE =
 			new Coordinate(46.0396684,8.932392);
 

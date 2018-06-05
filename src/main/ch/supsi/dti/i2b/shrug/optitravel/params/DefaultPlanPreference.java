@@ -62,4 +62,9 @@ public class DefaultPlanPreference implements PlanPreference {
 	public int max_total_changes() {
 		return 3;
 	}
+
+	@Override
+	public double max_total_walkable_distance() {
+		return 2000;
+	}
 }

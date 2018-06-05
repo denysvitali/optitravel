@@ -7,7 +7,7 @@ public class ComfortPlanPreference implements PlanPreference {
 
 	@Override
 	public double walkable_radius_meters() {
-		return 800;
+		return 200;
 	}
 
 	@Override
@@ -27,7 +27,7 @@ public class ComfortPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_waiting_time() {
-		return 25.0;
+		return 30.0;
 	}
 
 	@Override
@@ -47,12 +47,12 @@ public class ComfortPlanPreference implements PlanPreference {
 
 	@Override
 	public double w_change() {
-		return 8 * PREF_WEIGHT;
+		return 0.2 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_moving() {
-		return 0.1 * PREF_WEIGHT;
+		return 0 * PREF_WEIGHT;
 	}
 
 	@Override
@@ -63,5 +63,10 @@ public class ComfortPlanPreference implements PlanPreference {
 	@Override
 	public int max_total_changes() {
 		return 6;
+	}
+
+	@Override
+	public double max_total_walkable_distance() {
+		return 1000;
 	}
 }
