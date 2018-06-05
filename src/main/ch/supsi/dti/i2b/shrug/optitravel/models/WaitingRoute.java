@@ -10,4 +10,9 @@ public class WaitingRoute extends Route {
 	public Operator getOperator() {
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

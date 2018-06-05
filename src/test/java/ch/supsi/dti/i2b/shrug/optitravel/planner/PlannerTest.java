@@ -39,7 +39,7 @@ public class PlannerTest {
 						16,
 						30,
 						0),
-				new LongTripPreference(Distance.distance(SUPSI_COORDINATE,
+				new DenvitPlanPreference(Distance.distance(SUPSI_COORDINATE,
 						LAMONE_FFS_COORDINATE)));
 	}
 
@@ -111,7 +111,7 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new LongTripPreference(
+				new DenvitPlanPreference(
 						Distance.distance(
 							OXFORD_CIRCUS_UNDERGROUND_STATION_COORDINATE,
 							TEMPLE_LONDON_COORDINATE
@@ -130,7 +130,7 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new LongTripPreference(Distance.distance(LUGANO_COORDINATE, ZURICH_COORDINATE)));
+				new DenvitPlanPreference(Distance.distance(LUGANO_COORDINATE, ZURICH_COORDINATE)));
 	}
 	@Test
 	public void planLondonC4_LondonTOL(){
@@ -160,7 +160,7 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new LongTripPreference(Distance.distance(LUGANO_COORDINATE, BELLINZONA_COORDINATE)));
+				new DenvitPlanPreference(Distance.distance(LUGANO_COORDINATE, BELLINZONA_COORDINATE)));
 	}
 
 	private void testPlan(Coordinate from, Coordinate to, LocalDateTime ldt, PlanPreference pp){

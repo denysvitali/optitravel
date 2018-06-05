@@ -7,11 +7,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.TripTimeStop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.PubliBikeWrapper;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.LineString;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
-import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.ScheduleStopPair;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
@@ -22,12 +18,10 @@ import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class DataGathering{
-	private static final double AVG_MOVING_SPEED_KMH = 8;
-	private static final double AVG_MOVING_SPEED = AVG_MOVING_SPEED_KMH / 60 * 1000; // in m/minute
+	private static final double AVG_MOVING_SPEED_KMH = 50;
+	private static final double AVG_MOVING_SPEED = AVG_MOVING_SPEED_KMH / (60 * 1000); // in m/minute
 	private TransitLandAPIWrapper wTL = new TransitLandAPIWrapper();
 	private GTFSrsWrapper wGTFS = new GTFSrsWrapper();
 	private PubliBikeWrapper wPB = new PubliBikeWrapper();
@@ -36,6 +30,8 @@ public class DataGathering{
 	private List<Stop> stops = new ArrayList<>();
 	private List<StopTimes> stop_times = new ArrayList<>();
 	private List<Route> routes = new ArrayList<>();
+
+	private Time estimatedEndTime;
 
 	private HashMap<Stop, List<TripTimeStop>> trip_time_stop_by_stop = new HashMap<>();
 	private HashMap<String, Stop> stop_by_uid = new HashMap<>();
@@ -106,11 +102,7 @@ public class DataGathering{
 			return trips;
 		}
 
-		int max_travel_minutes = 0;
-		max_travel_minutes += getPlanPreference().max_total_waiting_time();
-		max_travel_minutes += Math.round(Distance.distance(source, destination) / AVG_MOVING_SPEED + 10);
-		max_travel_minutes += Math.round(pp.max_total_walkable_distance() / (pp.walk_speed_mps() * 60));
-		Time end_time = Time.addMinutes(start_time, max_travel_minutes);
+		Time end_time = getEstimatedEndTime();
 
 
 		TripSearch ts = new TripSearch();
@@ -233,6 +225,21 @@ public class DataGathering{
 		return trips;
 	}
 
+	private Time getEstimatedEndTime() {
+		if(estimatedEndTime != null){
+			return estimatedEndTime;
+		}
+
+		int max_travel_minutes = 0;
+		max_travel_minutes += getPlanPreference().max_total_waiting_time();
+		max_travel_minutes += Math.round(Distance.distance(source, destination) * (AVG_MOVING_SPEED) + 10);
+		max_travel_minutes += Math.round(pp.max_total_walkable_distance() / (pp.walk_speed_mps() * 60));
+		Time end_time = Time.addMinutes(start_time, max_travel_minutes);
+
+		estimatedEndTime = end_time;
+		return estimatedEndTime;
+	}
+
 	public <T extends TimedLocation, L extends Location> HashMap<Node<T,L>, Double>
 	getNeighbours(Node<T,L> currentNode, Algorithm<T,L> algorithm) {
 		HashMap<Node<T,L>, Double> neighbours = new HashMap<>();
@@ -242,7 +249,6 @@ public class DataGathering{
 			int stop_index = t.getStopIndex((Stop) currentNode.getElement().getLocation());
 			if(stop_index != -1 && stop_index < t.getStopTrip().size() - 1){
 				// This stop is in the trip, and isn't the last one!
-				System.out.println("We've got a stop");
 				StopTrip cr_stoptrip = t.getStopTrip().get(stop_index);
 				StopTrip nx_stoptrip = t.getStopTrip().get(stop_index + 1);
 
@@ -296,7 +302,7 @@ public class DataGathering{
 
 				assert(wait_time == 0);
 
-				System.out.println("Found a directly connected stop! YAY!");
+				//System.out.println("Found a directly connected stop! YAY!");
 				Node<T,L> nextConnectedStop = new Node<>((T) trip_nx_st);
 				trip_nx_st.setTrip(t);
 				nextConnectedStop.setAlgorithm(algorithm);
@@ -357,142 +363,8 @@ public class DataGathering{
 
 
 			}
-		}/*
-		stops
-			.stream()
-			.filter(s->!s.equals(currentNode.getElement().getLocation()) && Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate()) <= pp.walkable_radius_meters())
-			//	.filter(s->!s.equals(currentNode.getElement().getLocation()))
-				.forEach(s->{
-					double distance = Distance.distance(s.getCoordinate(), currentNode.getElement().getCoordinate());
-					int walk_minutes = (int) Math.ceil(distance / (pp.walk_speed_mps() * 60.0));
-					Time arrival_time = Time.addMinutes(currentNode.getElement().getTime(), walk_minutes);
-					StopTime stoptime = new StopTime(s, arrival_time);
-
-					stoptime.setTrip(new WalkingTrip((StopTime) currentNode.getElement(), stoptime));
-
-					if(currentNode.getWalkingTotal() + distance > pp.max_total_walkable_distance()){
-						// Walking Total exceeded!
-						return;
-					}
-
-					Node<T,L> walkableStop = new Node<>((T) stoptime);
-					walkableStop.setDg(this);
-					walkableStop.setAlgorithm(algorithm);
-					walkableStop.setChanges(currentNode.getChanges());
-					walkableStop.setH(Distance.distance(s.getCoordinate(), destination));
-					walkableStop.setWalkingTotal(currentNode.getWalkingTotal() + distance);
-					walkableStop.setFrom(currentNode);
-
-					double weight = 0.0;
-					weight += walk_minutes * pp.w_walk();
-
-					neighbours.put(walkableStop, weight);
-				});*/
-
+		}
 		return neighbours;
-	}
-
-	private <T extends TimedLocation, L extends Location> void addCalculatedNeighbour(Node<T, L> currentNode, HashMap<Node<T, L>, Double> neighbours, Node<T, L> node) {
-		Map.Entry<Node<T, L>, Double> cw =
-				calculateWeight(currentNode, node, destination);
-		if (cw != null) {
-			neighbours.putIfAbsent(cw.getKey(), cw.getValue());
-		}
-	}
-
-	private <T extends TimedLocation, L extends Location> Map.Entry<Node<T,L>, Double>
-	calculateWeight(Node<T,L> c, Node<T,L> n, Coordinate d) {
-		double weight = 0.0;
-		boolean same_trip = true;
-
-		T ce = c.getElement();
-		T ne = n.getElement();
-
-		if(ce == null || ne == null){
-			return null;
-		}
-
-		if(ce.getTrip() != null && ne.getTrip() != null){
-			if(ce.getTrip().equals(ne.getTrip())){
-				System.out.println("Same trip :)" + ce.getLocation() + ", " + ne.getLocation());
-			} else {
-
-				weight += getPlanPreference().w_change();
-				weight += Distance.distance(c.getElement().getCoordinate(),
-						n.getElement().getCoordinate());
-				same_trip = false;
-				//System.out.println(ce.getTrip() + ", " + ne.getTrip());
-			}
-		} else {
-			weight += getPlanPreference().w_change();
-			weight += Distance.distance(c.getElement().getCoordinate(),
-					n.getElement().getCoordinate());
-			same_trip = false;
-			//System.out.println(ce.getTrip() + ", " + ne.getTrip());
-		}
-
-		Location cl = c.getElement().getLocation();
-		Location nl = n.getElement().getLocation();
-
-		if(cl instanceof Stop && nl instanceof Stop &&
-				cl.getClass().equals(nl.getClass()))
-		{
-			Stop c_s = (Stop) c.getElement().getLocation();
-			Stop n_s = (Stop) n.getElement().getLocation();
-
-			/*
-				Watch out!
-				----------
-				Weight calculation between two stops can only be performed
-				if they're the same Stop (but w/ a different
-				time and a different trip) or are directly connected by a trip.
-				This means that we have the Same Stop, but different StopTimes.
-				To connect two stops together, we use a WalkTrip.
-				Therefore the following assertion should always be valid.
-				E.g:	Lugano - Locarno via Giubiasco
-						Lugano (12:56 PM) 	- Giubiasco (1:22 PM)
-						Giubiasco (1:34 PM)	- Locarno
-				-------------------------------------------------------------
-			*/
-
-			if(!(c_s.equals(n_s) || same_trip)){
-				return null;
-			}
-		}
-
-		/*
-			Time Weight
-			------------
-			This weight will define how bad for the user to wait
-			at a stop for the difference in time.
-		 */
-		double minute_wait = Time.diffMinutes(n.getElement().getTime(),
-				c.getElement().getTime());
-		assert(minute_wait>=0);
-
-		if(c.getWaitTotal() + minute_wait > pp.max_total_waiting_time()){
-			// Waiting time limit exceeded
-			return null;
-		}
-
-		if(!same_trip){
-			if(n.getChanges() + 1 > pp.max_total_changes()){
-				System.out.println("Changes count ecceeded!");
-				return null;
-			}
-			n.addChange();
-		}
-
-		n.setWaitTotal(c.getWaitTotal());
-		n.addToWaitTotal(minute_wait);
-		weight += getPlanPreference().w_waiting() * minute_wait;
-
-		n.setH(
-				Distance.distance(nl.getCoordinate(), d));
-
-		// Return the weighted arc.
-
-		return new AbstractMap.SimpleEntry<>(n, weight);
 	}
 
 	public Trip fetchTrip(Trip e) {
@@ -512,7 +384,7 @@ public class DataGathering{
 		double distance = Distance.distance(source, destination);
 		boundingBox = boundingBox.expand(Math.max(distance*0.4, 1500));
 
-		System.out.println("Bouding Box is: " + boundingBox.toPostGIS());
+		System.out.println("Bounding Box is: " + boundingBox.toPostGIS());
 
 		stops = getStops(boundingBox);
 		stops.forEach(e->{
@@ -539,10 +411,7 @@ public class DataGathering{
 			return stop_times;
 		}
 
-		int max_travel_minutes = 0;
-		max_travel_minutes += getPlanPreference().max_total_waiting_time();
-		max_travel_minutes += Math.round(Distance.distance(source, destination) / AVG_MOVING_SPEED);
-		Time end_time = Time.addMinutes(start_time, max_travel_minutes);
+		Time end_time = getEstimatedEndTime();
 
 		try{
 

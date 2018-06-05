@@ -199,7 +199,7 @@ public class GTFSrsWrapper {
 		addTripSearch(builder, tripSearch);
 
 		HttpUrl url = builder.build();
-		Response response = client.get(url, 50 * 1000);
+		Response response = client.get(url, 120 * 1000);
 		return getPaginatedTrips(response);
 	}
 
