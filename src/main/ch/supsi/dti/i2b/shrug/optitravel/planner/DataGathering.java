@@ -41,7 +41,7 @@ public class DataGathering{
     private Coordinate source;
     private Coordinate destination;
 
-	DataGathering(){
+	public DataGathering(){
 
     }
 

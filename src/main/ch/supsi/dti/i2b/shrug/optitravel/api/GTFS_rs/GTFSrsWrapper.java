@@ -397,20 +397,24 @@ public class GTFSrsWrapper {
 		}
 	}
 
+	public PaginatedList<Trip> parsePaginatedTrips(String json){
+		ResultArray a = JsonIterator.deserialize(
+				json,
+				ResultArray.class);
+		return new PaginatedList<>(
+				a.getResult()
+						.asList()
+						.stream()
+						.map((e) -> e.as(Trip.class))
+						.collect(Collectors.toList()),
+				a.getMeta()
+		);
+	}
+
 	private PaginatedList<Trip> getPaginatedTrips(Response response) throws GTFSrsError {
 		if(response != null && response.isSuccessful() && response.body() != null){
 			try {
-				ResultArray a = JsonIterator.deserialize(
-						response.body().string(),
-						ResultArray.class);
-				return new PaginatedList<>(
-						a.getResult()
-								.asList()
-								.stream()
-								.map((e) -> e.as(Trip.class))
-								.collect(Collectors.toList()),
-						a.getMeta()
-				);
+				return parsePaginatedTrips(response.body().string());
 			} catch(IOException ex){
 				return null;
 			}

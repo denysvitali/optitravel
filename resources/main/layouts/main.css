@@ -1,0 +1,50 @@
+.combo-box.trip-filters .list-cell {
+    -fx-padding: 2px 2px;
+}
+
+.combo-box.trip-filters .list-cell,
+.text-field.trip-filters,
+.combo-box.trip-filters,
+.jfx-date-picker > .text-field,
+.jfx-time-picker > .text-field {
+    -fx-prompt-text-fill: rgba(255,255,255,0.4);
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Roboto Medium";
+    -fx-font-size: 13;
+}
+
+.combo-box.trip-filters .list-view .list-cell {
+    -fx-text-fill: #222;
+}
+
+.combo-box.trip-filters .list-view .list-cell:selected {
+    -fx-background-color: none;
+}
+
+.combo-box.trip-filters .list-view .list-cell:hover {
+    -fx-background-color: #757de8;
+}
+
+/* JFoenix controls styling */
+.jfx-text-field.trip-filters,
+.jfx-combo-box.trip-filters,
+.jfx-date-picker > .jfx-text-field,
+.jfx-time-picker > .jfx-text-field {
+    -jfx-focus-color: #ffffff;
+    -jfx-unfocus-color: #ffffff;
+}
+
+.toggle-button.trip-filters {
+    -fx-background-color: rgba(0,0,0,0);
+    -fx-background-radius: 24px 24px 24px 24px;
+    -fx-text-fill: WHITE;
+}
+
+.toggle-button:selected.trip-filters {
+    -fx-background-color: #002984;
+}
+
+.jfx-date-picker > .arrow-button > .jfx-svg-glyph,
+.jfx-time-picker > .arrow-button > .jfx-svg-glyph {
+    -fx-background-color: #ffffff;
+}
