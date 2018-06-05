@@ -37,12 +37,12 @@ public class MockPlanner extends Planner {
         String json = builder.toString();
 
         List<Plan> plans = new ArrayList<>();
-        List<Trip> trips = null;
+        List<Trip> trips = new ArrayList<>();
 
         Result a = JsonIterator.deserialize(json, Result.class);
         trips.add(a.getResult().as(Trip.class));
-        List<ch.supsi.dti.i2b.shrug.optitravel.models.Trip> tripss = new ArrayList<>(trips);
-        Plan p = new Plan(tripss, null, null, from, to);
+		List<ch.supsi.dti.i2b.shrug.optitravel.models.Trip> genericTrips = new ArrayList<>(trips);
+        Plan p = new Plan(genericTrips, null, null, from, to);
         return plans;
     }
 }
