@@ -6,6 +6,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.DataGathering;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.PlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.Planner;
+import ch.supsi.dti.i2b.shrug.optitravel.utilities.MockPlanner;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.TripTimeFrame;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXListView;
@@ -135,15 +136,15 @@ public class MainController {
     }
 
     private void validateAndRequest() {
-        if (!tfStartPoint.validate() || !tfEndPoint.validate()) {
-            return;
-        }
-        // validate time
-        if (cbTripPeriod.getValue() != TripTimeFrame.LEAVE_NOW) {
-            if (LocalDateTime.of(dpDate.getValue(), tpTime.getValue()).compareTo(LocalDateTime.now()) < 0) {
-                return;
-            }
-        }
+//        if (!tfStartPoint.validate() || !tfEndPoint.validate()) {
+//            return;
+//        }
+//        // validate time
+//        if (cbTripPeriod.getValue() != TripTimeFrame.LEAVE_NOW) {
+//            if (LocalDateTime.of(dpDate.getValue(), tpTime.getValue()).compareTo(LocalDateTime.now()) < 0) {
+//                return;
+//            }
+//        }
 //        Planner p = new Planner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
 //        p.setStartTime(
 //                cbTripPeriod.getValue() == TripTimeFrame.LEAVE_NOW ?
@@ -153,14 +154,12 @@ public class MainController {
 //        PlanPreference pp = new DefaultPlanPreference();
 //        p.setPlanPreference(pp);
 //        new Thread(() -> onPlannerComputeFinish(p.getPlans()));
-
+        MockPlanner mp = new MockPlanner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
+        onPlannerComputeFinish(mp.getPlans());
     }
 
     private void onPlannerComputeFinish(List<Plan> plans) {
         Plan plan = plans.get(0);
-        for(Trip t : plan.getTrips()) {
-
-        }
     }
 }
 
