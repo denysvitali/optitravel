@@ -73,7 +73,7 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
 									.getElement()
 									.getLocation()
 									.getCoordinate()
-							, to) < PlannerParams.DESTINATION_RADIUS
+							, to) < dg.getPlanPreference().destination_radius()
 			){
 				List<Node<T,L>> path = new ArrayList<>();
 				while(currentNode.getFrom() != null){
@@ -86,10 +86,10 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
 			}
 
 			if(currentNode != null){
-				System.out.println(String.format("%d, %s (%f + %f = %f), (C: %d, WT: %f) (last element F: %f)",
+				/*System.out.println(String.format("%d, %s (%f + %f = %f), (C: %d, WT: %f) (last element F: %f)",
 						treeset.size(), currentNode.getElement(), currentNode.getG(),
 						currentNode.getH(), currentNode.getF(), currentNode.getChanges(),
-						currentNode.getWaitTotal(), (treeset.size() != 0 ? treeset.last().getF(): -1)));
+						currentNode.getWaitTotal(), (treeset.size() != 0 ? treeset.last().getF(): -1)));*/
 
 				//System.out.println(currentNode.getElement());
 				/*System.out.println("Distance: " + Distance.distance(

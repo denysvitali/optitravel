@@ -5,7 +5,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.planner.PlanPreference;
 public class DenvitPlanPreference implements PlanPreference {
 	private double PREF_WEIGHT;
 	private double distance;
-	private double average_moving_speed_kmh = 50;
+	private double average_moving_speed_kmh = 40;
 	private double average_moving_speed =  average_moving_speed_kmh * 3.6; // m/s
 
 	public DenvitPlanPreference(double distance){
@@ -15,7 +15,7 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double walkable_radius_meters() {
-		return 500;
+		return 300;
 	}
 
 	@Override
@@ -30,17 +30,17 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double destination_radius() {
-		return 350;
+		return 100;
 	}
 
 	@Override
 	public double max_waiting_time() {
-		return 15.0;
+		return 20.0;
 	}
 
 	@Override
 	public double w_walk() {
-		return 2.8 * PREF_WEIGHT;
+		return 4 * PREF_WEIGHT;
 	}
 
 	@Override
@@ -65,16 +65,16 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_total_waiting_time() {
-		return 35.0;
+		return max_waiting_time()*2;
 	}
 
 	@Override
 	public int max_total_changes() {
-		return 3;
+		return 4;
 	}
 
 	@Override
 	public double max_total_walkable_distance() {
-		return 1400;
+		return 800;
 	}
 }

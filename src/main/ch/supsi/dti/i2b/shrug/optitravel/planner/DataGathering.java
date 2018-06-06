@@ -269,6 +269,11 @@ public class DataGathering{
 					continue;
 				}
 
+				if (!Time.isAfter(trip_nx_st.getTime(), trip_el_st.getTime())) {
+					// The next stop doesn't come AFTER the current one!
+					continue;
+				}
+
 				// Wait time, till the next bus / train
 				double wait_time = Time.diffMinutes(trip_el_st.getTime(), currentNode.getElement().getTime());
 				assert(wait_time>=0); // Assertion, we verified this condition before.
@@ -320,7 +325,12 @@ public class DataGathering{
 				if(currentNode.getElement().getTrip() != null &&
 						currentNode.getElement().getTrip().equals(t)){
 					same_trip = true;
+				} else {
+					if(currentNode.getChanges() + 1 > pp.max_total_changes()){
+						continue;
+					}
 				}
+
 				nextConnectedStop.setChanges(currentNode.getChanges() + (same_trip?0:1));
 				nextConnectedStop.setWaitTotal(currentNode.getWaitTotal());
 				nextConnectedStop.setWalkingTotal(currentNode.getWalkingTotal());

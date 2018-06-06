@@ -79,7 +79,7 @@ public class PlannerTest {
 						5,
 						17,
 						13,
-						26,
+						40,
 						0
 				),
 				new DenvitPlanPreference(Distance.distance(PREGASSONA_COORDINATE,
