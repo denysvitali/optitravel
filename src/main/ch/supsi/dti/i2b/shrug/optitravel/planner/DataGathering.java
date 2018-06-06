@@ -214,6 +214,7 @@ public class DataGathering{
 						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setTrip_id(trip_id);
 						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute_stop_pattern_id(rsp.getId());
 						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute(rsp.getRoute());
+						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setTrip_headsign(schedulesInRspTrip.get(0).getTrip_headsign());
 
 						for (ScheduleStopPair sch : schedulesInRspTrip) {
 

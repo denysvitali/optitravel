@@ -12,6 +12,7 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     private Route route;
     private String route_stop_pattern_id;
     private String trip_id;
+    private String trip_headsign;
 
 
     public String getRoute_stop_pattern_id() {
@@ -34,6 +35,11 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
         stop_sequence.add(stopTrip);
     }
 
+
+    public void setTrip_headsign(String trip_headsign) {
+        this.trip_headsign = trip_headsign;
+    }
+
     @Override
     public List<StopTrip> getStopTrip() {
         return stop_sequence;
@@ -51,8 +57,8 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 
     @Override
     public String getHeadSign() {
-        // TODO: @Pura, implement
-        return null;
+
+        return trip_headsign;
     }
 
     @Override
