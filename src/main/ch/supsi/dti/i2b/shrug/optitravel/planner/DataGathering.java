@@ -409,9 +409,9 @@ public class DataGathering{
 
 						// Clone the object:
 						StopTime nst = new StopTime(st.getStop(), st.getTime());
+						nst.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), time_diff));
 
 						Node<T, L> nextTimedStop = new Node<>((T) nst);
-						nst.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), time_diff));
 						nextTimedStop.setAlgorithm(algorithm);
 						nextTimedStop.setDg(this);
 						nextTimedStop.setH(currentNode.getH());
