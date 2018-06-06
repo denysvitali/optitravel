@@ -2,16 +2,10 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
-import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
-import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import com.jsoniter.annotation.JsonCreator;
 import com.jsoniter.annotation.JsonObject;
-import com.jsoniter.annotation.JsonProperty;
-import jdk.jshell.spi.ExecutionControl;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @JsonObject(asExtraForUnknownProperties = false)
@@ -59,10 +53,6 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
     @Override
     public String getUid() {
         return getId();
-    }
-
-    public List<StopTime> findNeighbors(Time time) throws ExecutionControl.NotImplementedException {
-        throw new ExecutionControl.NotImplementedException("Not implemented yet.");
     }
 
     public ArrayList<Operator> getOperators() {

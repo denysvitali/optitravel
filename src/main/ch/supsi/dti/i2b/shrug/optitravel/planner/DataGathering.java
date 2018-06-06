@@ -329,7 +329,7 @@ public class DataGathering{
 									if(prevPrevNode.getElement().getTrip() != null){
 										if(prevPrevNode.getElement().getTrip().getRoute().equals(t.getRoute())){
 											// Don't take the same route twice
-											System.out.println("Ignoring this choice...");
+//											System.out.println("Ignoring this choice...");
 											continue;
 										}
 									}

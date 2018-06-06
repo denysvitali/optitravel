@@ -1,7 +1,5 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
-import jdk.jshell.spi.ExecutionControl;
-
 public abstract class StopTrip {
 	public abstract Time getDeparture();
 

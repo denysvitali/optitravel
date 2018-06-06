@@ -23,36 +23,36 @@ import static org.mockito.Mockito.when;
 
 public class MockedDataGathering extends DataGathering {
 	private GTFSrsWrapper mockedGTFSWrapper;
-	public MockedDataGathering() {
-		super();
-		mockedGTFSWrapper = Mockito.mock(GTFSrsWrapper.class);
-		BoundingBox bbox = new BoundingBox(
-				new Coordinate(46.012963, 8.964333),
-				new Coordinate(46.028526,8.976853)
-		);
-		TripSearch ts = Mockito.mock(TripSearch.class);
-		try {
-			when(mockedGTFSWrapper.getTripsByBBox(any(), any())).thenAnswer(
-					(Answer<PaginatedList<Trip>>) invocation -> getTrips()
-			);
-		} catch(GTFSrsError err){
-			err.printStackTrace();
-		}
-	}
+//	public MockedDataGathering() {
+//		super();
+//		mockedGTFSWrapper = Mockito.mock(GTFSrsWrapper.class);
+//		BoundingBox bbox = new BoundingBox(
+//				new Coordinate(46.012963, 8.964333),
+//				new Coordinate(46.028526,8.976853)
+//		);
+//		TripSearch ts = Mockito.mock(TripSearch.class);
+//		try {
+//			when(mockedGTFSWrapper.getTripsByBBox(any(), any())).thenAnswer(
+//					(Answer<PaginatedList<Trip>>) invocation -> getTrips()
+//			);
+//		} catch(GTFSrsError err){
+//			err.printStackTrace();
+//		}
+//	}
 
-	private PaginatedList<Trip> getTrips(){
-		String fpath = "json/gtfs/bbox-pre-bo.json";
-		File file = new File(getClass().getClassLoader().getResource(fpath).getFile());
-		try {
-			BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file));
-			byte[] json = fis.readAllBytes();
-			PaginatedList<Trip> cached_res_1 = GTFSrsWrapper.parsePaginatedTrips(json);
-			return cached_res_1;
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+//	private PaginatedList<Trip> getTrips(){
+//		String fpath = "json/gtfs/bbox-pre-bo.json";
+//		File file = new File(getClass().getClassLoader().getResource(fpath).getFile());
+//		try {
+//			BufferedInputStream fis = new BufferedInputStream(new FileInputStream(file));
+//			byte[] json = fis.readAllBytes();
+//			PaginatedList<Trip> cached_res_1 = GTFSrsWrapper.parsePaginatedTrips(json);
+//			return cached_res_1;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		return null;
+//	}
 
 
 	@Override

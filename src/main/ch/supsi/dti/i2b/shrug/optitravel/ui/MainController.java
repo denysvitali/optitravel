@@ -160,22 +160,12 @@ public class MainController {
 //        PlanPreference pp = new DenvitPlanPreference(Distance.distance(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates()));
 //        p.setPlanPreference(pp);
 //        new Thread(() -> onPlannerComputeFinish(p.getPlans())).start();
-//        DirectionsRequest request = new DirectionsRequest(tfStartPoint.getPlace().getCoordinates().toLatLong(),
-//                tfEndPoint.getPlace().getCoordinates().toLatLong(), TravelModes.TRANSIT);
-//        DirectionsRenderer renderer = new DirectionsRenderer(true, mapController.getMap(), );
-//        renderer.setMap(mapController.getMap());
-//        DirectionsService service = new DirectionsService();
-//        DirectionsServiceCallback callback = new DirectionsServiceCallback() {
-//            @Override
-//            public void directionsReceived(DirectionsResult results, DirectionStatus status) {
-//                System.out.println("Diopo rco");
-//            }
-//        };
-//        service.getRoute(request, callback, renderer);
 
+        mapController.addDirections(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
     }
 
     private void onPlannerComputeFinish(List<Plan> plans) {
+        System.out.println("Got routes");
     }
 }
 

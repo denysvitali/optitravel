@@ -5,9 +5,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
-import com.lynden.gmapsfx.service.directions.DirectionsRenderer;
-import com.lynden.gmapsfx.service.directions.DirectionsRequest;
-import com.lynden.gmapsfx.service.directions.DirectionsService;
+import com.lynden.gmapsfx.service.directions.*;
 import com.lynden.gmapsfx.service.geocoding.GeocodingService;
 import javafx.application.Platform;
 
@@ -15,18 +13,17 @@ public class MapController implements MapComponentInitializedListener {
 
     private final GoogleMapView mapView;
     private GoogleMap map;
-    private GeocodingService geocodingService;
+    private DirectionsService directionsService;
+    private DirectionsRenderer directionsRenderer;
+
 
     private Marker origin;
     private Marker destination;
-
-    private final MainController mainController;
 
     public enum NodeType {ORIGIN, DESTINATION, TRANSIT}
 
     public MapController(GoogleMapView mapView, MainController mainController) {
         this.mapView = mapView;
-        this.mainController = mainController;
     }
 
     @Override
@@ -45,8 +42,8 @@ public class MapController implements MapComponentInitializedListener {
                 .minZoom(2);
         mapView.setKey("AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4");
 
-        map = mapView.createMap(options);
-        geocodingService = new GeocodingService();
+
+        map = mapView.createMap(options, false);
     }
 
     public void addMarker(Location location, NodeType type) {
@@ -78,6 +75,14 @@ public class MapController implements MapComponentInitializedListener {
         LatLong sw = new LatLong(Math.max(origin.getLat(), dest.getLat()), Math.min(origin.getLng(), dest.getLng()));
         LatLong ne = new LatLong(Math.min(origin.getLat(), dest.getLat()), Math.max(origin.getLng(), dest.getLng()));
         map.fitBounds(new LatLongBounds(sw, ne));
+    }
+
+    public void addDirections(Coordinate from, Coordinate to) {
+        if (directionsRenderer == null) directionsRenderer = new DirectionsRenderer(true, map, mapView.getDirec());
+        if (directionsService == null) directionsService = new DirectionsService();
+        directionsRenderer.clearDirections();
+        DirectionsRequest request = new DirectionsRequest(from.toLatLong(), to.toLatLong(), TravelModes.TRANSIT);
+        directionsService.getRoute(request, (results, status) -> System.out.println("Directions received"), directionsRenderer);
     }
 
     public GoogleMap getMap() { return map; }

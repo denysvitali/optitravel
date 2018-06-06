@@ -60,7 +60,7 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double w_moving() {
-		return 0.3 * PREF_WEIGHT;
+		return 0.02 * PREF_WEIGHT;
 	}
 
 	@Override
