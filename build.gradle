@@ -77,3 +77,13 @@ jar {
 run{
 
 }
+
+/*task jsoniterStaticCodgen(type:JavaExec) {
+    classpath configurations.getByName(sourceSets.main.compileConfigurationName)
+    classpath = sourceSets.main.runtimeClasspath + sourceSets.main.compileClasspath
+    workingDir = new File(project.rootDir, '/src/main')
+    main = 'com.jsoniter.static_codegen.StaticCodegen'
+    args 'ch.supsi.dti.i2b.shrug.optitravel.staticgen.StaticCodeGen'
+    standardOutput = System.out
+    errorOutput = System.err
+}*/
