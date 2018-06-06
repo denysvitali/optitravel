@@ -16,6 +16,10 @@ public class Operator extends ch.supsi.dti.i2b.shrug.optitravel.models.Operator 
     private String updated_at;
     private ArrayList<String> represented_in_feed_onestop_ids;
 
+    public Operator(String name){
+        this.name = name;
+    }
+
     public Operator(){
 
     }

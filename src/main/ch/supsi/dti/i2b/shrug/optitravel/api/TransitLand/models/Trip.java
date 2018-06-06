@@ -4,6 +4,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 
@@ -11,6 +12,7 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     private Route route;
     private String route_stop_pattern_id;
     private String trip_id;
+    private String trip_headsign;
 
 
     public String getRoute_stop_pattern_id() {
@@ -33,6 +35,11 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
         stop_sequence.add(stopTrip);
     }
 
+
+    public void setTrip_headsign(String trip_headsign) {
+        this.trip_headsign = trip_headsign;
+    }
+
     @Override
     public List<StopTrip> getStopTrip() {
         return stop_sequence;
@@ -50,13 +57,22 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 
     @Override
     public String getHeadSign() {
-        // TODO: @Pura, implement
-        return null;
+
+        return trip_headsign;
     }
 
     @Override
     public String toString() {
         return getRoute_stop_pattern_id() + " Trip_id: " + getTrip_id();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Trip trip = (Trip) o;
+        return Objects.equals(this.route_stop_pattern_id, trip.route_stop_pattern_id) &&
+                Objects.equals(this.trip_id, trip.trip_id);
     }
 
     public void setRoute(Route route) {

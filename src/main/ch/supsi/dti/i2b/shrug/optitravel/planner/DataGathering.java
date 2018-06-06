@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class DataGathering{
 	private static final double AVG_MOVING_SPEED_KMH = 50;
 	private static final double AVG_MOVING_SPEED = AVG_MOVING_SPEED_KMH / (60 * 1000); // in m/minute
-	private static final boolean USE_GTFS = true;
+	private static final boolean USE_GTFS = false;
 	private TransitLandAPIWrapper wTL = new TransitLandAPIWrapper();
 	private GTFSrsWrapper wGTFS = new GTFSrsWrapper();
 	private PubliBikeWrapper wPB = new PubliBikeWrapper();
@@ -176,7 +176,7 @@ public class DataGathering{
 
 			});
 
-			getwTL().AgetScheduleStopPairsByBBox(boundingBox, (ssps) -> {
+		    getwTL().AgetScheduleStopPairsByBBox(boundingBox, from_date, start_time, end_time, (ssps)->{
 
 				System.out.println(ssps.size());
 				scheduleStopPairsInBBox.addAll(ssps);
@@ -203,9 +203,6 @@ public class DataGathering{
 
 				for (String trip_id : rsp.getTrips()) {
 
-					if (rsp.getId().equals("r-gcut-largstoglasgowcentralsr-acc06b-978211") && trip_id.equals("216025")) {
-						System.out.println("a");
-					}
 					List<ScheduleStopPair> schedulesInRspTrip = new ArrayList<>();
 					for (ScheduleStopPair sch : scheduleStopPairsInBBox) {
 
@@ -218,6 +215,7 @@ public class DataGathering{
 						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setTrip_id(trip_id);
 						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute_stop_pattern_id(rsp.getId());
 						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute(rsp.getRoute());
+						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setTrip_headsign(schedulesInRspTrip.get(0).getTrip_headsign());
 
 						for (ScheduleStopPair sch : schedulesInRspTrip) {
 
@@ -248,9 +246,12 @@ public class DataGathering{
 			}
 		}
 
+/*
+		String nameroute = trips.get(0).getRoute().getName();
+		String opname = trips.get(0).getRoute().getOperator().getName();
 
-
-
+		nameroute = trips.get(1).getRoute().getName();
+		opname = trips.get(1).getRoute().getOperator().getName();*/
 		//trips.addAll(getwTL().getTripsByBBox(boundingBox));
 		// TODO: Add TL
 //		} catch(GTFSrsError /*| TransitLandAPIError*/ err){
@@ -303,9 +304,13 @@ public class DataGathering{
 				for (Trip t : tripByStopTime.get(currentNodeStopTime)) {
 
 					t.setStopTrip(t.getStopTrip().stream().sorted(Comparator.comparingInt(StopTrip::getStopSequence)).collect(Collectors.toList()));
-					int prev = 0;
+					int prev = -1;
 					for(StopTrip current_stop_trip : t.getStopTrip()){
-						assert (current_stop_trip.getStopSequence() > prev);
+						try {
+							assert (current_stop_trip.getStopSequence() > prev);
+						}catch(AssertionError e){
+							e.printStackTrace();
+						}
 						prev = current_stop_trip.getStopSequence();
 					}
 					int stop_index = t.getStopIndex((Stop) currentNode.getElement().getLocation());
@@ -609,7 +614,7 @@ public class DataGathering{
 		});
 		trips = getTrips(boundingBox);
 
-		stop_times = getStopTimes(boundingBox);
+//		stop_times = getStopTimes(boundingBox);
 
 		stop_times.forEach(e->{
 			trip_time_stop_by_stop.put(
