@@ -39,8 +39,7 @@ public class Algorithm<T extends TimedLocation, L extends Location> {
 		return visited;
 	}
 
-	public List<Node<T,L>> route(Node<T,L> from, Coordinate to){
-		destination = to;
+	public List<Node<T,L>> route(Node<T,L> from, Coordinate to){destination = to;
 		Node<T,L> currentNode = from;
 		from.setG(0);
 		TreeSet<Node<T,L>> treeset = new TreeSet<>(Comparator.comparingDouble(Node::getF));
