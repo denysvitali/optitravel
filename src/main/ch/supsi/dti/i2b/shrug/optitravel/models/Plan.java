@@ -35,23 +35,33 @@ public class Plan {
     	for(TimedLocation tl : timedLocationList){
 			if(st_start == null){
 				st_start = tl;
+				st_end = tl;
 				continue;
 			}
 
 			if(ps == null){
-				ps = new PlanSegment(tl.getTrip(), tl);
+				ps = new PlanSegment(tl.getTrip(), st_start);
+				ps.setEnd(tl);
+				st_end = tl;
 				continue;
 			}
 
-			ps.addElement(tl);
-			if(!ps.getTrip().equals(tl.getTrip())){
-				ps.setEnd(tl);
-				planSegments.add(ps);
-				ps = new PlanSegment(tl.getTrip(), tl);
-			}
 
-			ps.setEnd(tl);
+
+			if((ps.getTrip() == null && tl.getTrip() != null ) || !ps.getTrip().equals(tl.getTrip())){
+				ps.addElement(st_end);
+				ps.setEnd(st_end);
+				planSegments.add(ps);
+				ps = new PlanSegment(tl.getTrip(), st_end);
+			} else {
+				ps.addElement(st_end);
+				ps.setEnd(st_end);
+			}
 			st_end = tl;
+		}
+		if(ps != null) {
+			ps.addElement(st_end);
+			ps.setEnd(st_end);
 		}
 		planSegments.add(ps);
 		start_location = st_start;
