@@ -47,6 +47,11 @@ public class WalkingTrip extends Trip {
 	}
 
 	@Override
+	public String getHeadSign() {
+		return null;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof WalkingTrip)){
 			return false;

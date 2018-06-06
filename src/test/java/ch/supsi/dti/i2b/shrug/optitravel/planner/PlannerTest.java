@@ -190,7 +190,7 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new DenvitPlanPreference(Distance.distance(LUGANO_COORDINATE, BELLINZONA_COORDINATE)));
+				new LongTripPreference(Distance.distance(LUGANO_COORDINATE, BELLINZONA_COORDINATE)));
 	}
 
 	private void testPlan(Coordinate from, Coordinate to, LocalDateTime ldt, PlanPreference pp){

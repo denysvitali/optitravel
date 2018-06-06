@@ -23,4 +23,6 @@ public abstract class Trip implements Serializable {
 	}
 
 	public abstract void setStopTrip(List<StopTrip> stopTrip);
+
+	public abstract String getHeadSign();
 }

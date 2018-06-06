@@ -1,23 +1,21 @@
 package ch.supsi.dti.i2b.shrug.optitravel.params;
 
-import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.PlanPreference;
 
 public class LongTripPreference implements PlanPreference {
 	private double PREF_WEIGHT;
 	private double distance;
-	private double average_moving_speed_kmh = 6.0;
-	private double average_moving_speed; // m/s
+	private double average_moving_speed_kmh = 30;
+	private double average_moving_speed =  average_moving_speed_kmh * 3.6; // m/s
 
 	public LongTripPreference(double distance){
 		this.distance = distance;
-		average_moving_speed = average_moving_speed_kmh * 3.6;
-		PREF_WEIGHT = 1 * distance/average_moving_speed;
+		PREF_WEIGHT = 0.5 * distance;
 	}
 
 	@Override
 	public double walkable_radius_meters() {
-		return 1200;
+		return 800.0;
 	}
 
 	@Override
@@ -32,42 +30,42 @@ public class LongTripPreference implements PlanPreference {
 
 	@Override
 	public double destination_radius() {
-		return 800;
+		return Math.max(500, 0.01 * distance);
 	}
 
 	@Override
 	public double max_waiting_time() {
-		return 20.0;
+		return 50.0;
 	}
 
 	@Override
 	public double w_walk() {
-		return 1.2 * PREF_WEIGHT;
+		return 4 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_waiting() {
-		return 0.7 * PREF_WEIGHT;
+		return 0.8 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_fast_change() {
-		return 5 * PREF_WEIGHT;
+		return 6 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_change() {
-		return 0.5 * PREF_WEIGHT;
+		return 1 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_moving() {
-		return 0.03 * PREF_WEIGHT;
+		return 0.02 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double max_total_waiting_time() {
-		return max_waiting_time() * 3;
+		return max_waiting_time()*3;
 	}
 
 	@Override
@@ -77,6 +75,6 @@ public class LongTripPreference implements PlanPreference {
 
 	@Override
 	public double max_total_walkable_distance() {
-		return Math.max(distance * 0.01, 1500);
+		return Math.min(distance * 0.1, 3000);
 	}
 }

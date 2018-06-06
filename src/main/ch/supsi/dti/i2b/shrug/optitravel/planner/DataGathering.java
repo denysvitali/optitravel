@@ -487,9 +487,8 @@ public class DataGathering{
 			}
 
 
-			// Walking Total exceeded!
-			if(!(currentNode.getWalkingTotal() + distance > pp.max_total_walkable_distance())){
-
+			if(currentNode.getWalkingTotal() + distance < pp.max_total_walkable_distance()){
+				// Walkable Distance not exceeded, adding this node as a neighbour
 				Node<T,L> walkableStop = new Node<>((T) stoptime);
 				walkableStop.setDg(this);
 				walkableStop.setAlgorithm(algorithm);
