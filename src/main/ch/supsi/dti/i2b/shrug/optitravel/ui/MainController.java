@@ -3,32 +3,25 @@ package ch.supsi.dti.i2b.shrug.optitravel.ui;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
-import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.params.DenvitPlanPreference;
-import ch.supsi.dti.i2b.shrug.optitravel.planner.DataGathering;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.PlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.Planner;
-import ch.supsi.dti.i2b.shrug.optitravel.utilities.MockPlanner;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.TripTimeFrame;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTimePicker;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.lynden.gmapsfx.GoogleMapView;
-import com.lynden.gmapsfx.service.directions.*;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DateCell;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +42,7 @@ public class MainController {
     @FXML
     private GoogleMapView mapView;
     @FXML
-    private JFXListView<Stop> lvRouteStops;
+    private JFXListView<Trip> lvRouteStops;
     @FXML
     private AnchorPane mainContainer;
     @FXML
@@ -132,7 +125,7 @@ public class MainController {
         lvRouteStops.setPrefWidth(280);
         mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
         filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
-        lvRouteStops.setCellFactory(param -> new StopCellItem());
+        lvRouteStops.setCellFactory(param -> new TripCellItem());
 
         fabSend.toFront();
         lvRouteStops.toBack();
@@ -151,21 +144,28 @@ public class MainController {
                 return;
             }
         }
-//        Planner p = new Planner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
-//        p.setStartTime(
-//                cbTripPeriod.getValue() == TripTimeFrame.LEAVE_NOW ?
-//                        LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) :
-//                        LocalDateTime.of(dpDate.getValue(), tpTime.getValue())
-//        );
-//        PlanPreference pp = new DenvitPlanPreference(Distance.distance(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates()));
-//        p.setPlanPreference(pp);
-//        new Thread(() -> onPlannerComputeFinish(p.getPlans())).start();
+        Planner p = new Planner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
+        p.setStartTime(
+                cbTripPeriod.getValue() == TripTimeFrame.LEAVE_NOW ?
+                        LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) :
+                        LocalDateTime.of(dpDate.getValue(), tpTime.getValue())
+        );
+        PlanPreference pp = new DenvitPlanPreference(Distance.distance(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates()));
+        p.setPlanPreference(pp);
+        new Thread(() -> onPlannerComputeFinish(p.getPlans())).start();
 
-        mapController.addDirections(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
+//        mapController.addDirections(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
     }
 
     private void onPlannerComputeFinish(List<Plan> plans) {
-        System.out.println("Got routes");
+        Plan p = plans.get(0);
+        List<Coordinate> stops = new ArrayList<>();
+        for(Trip t : p.getTrips()) {
+            if(t instanceof WaitingTrip) continue;
+            stops.add(t.getStopTrip().get(0).getStop().getCoordinate());
+            lvRouteStops.getItems().add(t);
+        }
+        Platform.runLater(() -> mapController.addDirections(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates(), stops));
     }
 }
 

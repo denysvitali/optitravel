@@ -1,20 +1,20 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
-import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
 import com.jfoenix.controls.JFXListCell;
 import javafx.scene.Node;
 
-public class StopCellItem extends JFXListCell<Stop> {
+public class TripCellItem extends JFXListCell<Trip> {
 
-    private final StopCellController controller = new StopCellController();
+    private final TripCellController controller = new TripCellController();
     private final Node view = controller.getView();
 
     @Override
-    protected void updateItem(Stop item, boolean empty) {
+    protected void updateItem(Trip item, boolean empty) {
 //        super.updateItem(item, empty);
         if(empty) setGraphic(null);
         else {
-            controller.setStop(item);
+            controller.setTrip(item);
             setGraphic(view);
         }
     }

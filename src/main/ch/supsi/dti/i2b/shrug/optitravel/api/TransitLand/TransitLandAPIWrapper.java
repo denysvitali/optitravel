@@ -5,6 +5,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.results.*;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
+import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
@@ -504,8 +505,40 @@ public class TransitLandAPIWrapper {
                                 bbox.getP2().getLng(),
                                 bbox.getP2().getLat()
                         ))
-                .addQueryParameter("date", "2018-05-24")
-                .addQueryParameter("origin_departure_between", "11:00:00,12:00:00")
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
+                .build();
+
+        return parseRouteStopPairResult(url);
+    }
+
+    public void AgetScheduleStopPairsByBBox(BoundingBox bbox,Callback<List<ScheduleStopPair>> cb){
+        Runnable r = ()->{
+            try {
+                cb.exec(getScheduleStopPairsByBBox(bbox));
+            } catch (TransitLandAPIError transitLandAPIError) {
+                transitLandAPIError.printStackTrace();
+                cb.exec(null);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+    }
+
+    public List<ScheduleStopPair> getScheduleStopPairsByBBox(BoundingBox bbox, ch.supsi.dti.i2b.shrug.optitravel.models.Date startingDate, Time begin, Time end) throws TransitLandAPIError {
+
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/schedule_stop_pairs")
+                .addQueryParameter("bbox",
+                        String.format("%f,%f,%f,%f",
+                                bbox.getP1().getLng(),
+                                bbox.getP1().getLat(),
+                                bbox.getP2().getLng(),
+                                bbox.getP2().getLat()
+                        ))
+                .addQueryParameter("date", startingDate.toString())
+                .addQueryParameter("origin_departure_between", String.format("%s,%s", begin, end))
 
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
@@ -513,10 +546,10 @@ public class TransitLandAPIWrapper {
         return parseRouteStopPairResult(url);
     }
 
-    public void AgetScheduleStopPairsByBBox(BoundingBox bbox, Callback<List<ScheduleStopPair>> cb){
+    public void AgetScheduleStopPairsByBBox(BoundingBox bbox, ch.supsi.dti.i2b.shrug.optitravel.models.Date startingDate, Time begin, Time end, Callback<List<ScheduleStopPair>> cb){
         Runnable r = ()->{
             try {
-                cb.exec(getScheduleStopPairsByBBox(bbox));
+                cb.exec(getScheduleStopPairsByBBox(bbox, startingDate, begin, end));
             } catch (TransitLandAPIError transitLandAPIError) {
                 transitLandAPIError.printStackTrace();
                 cb.exec(null);

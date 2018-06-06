@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class DataGathering{
 	private static final double AVG_MOVING_SPEED_KMH = 50;
 	private static final double AVG_MOVING_SPEED = AVG_MOVING_SPEED_KMH / (60 * 1000); // in m/minute
-	private static final boolean USE_GTFS = true;
 	private TransitLandAPIWrapper wTL = new TransitLandAPIWrapper();
 	private GTFSrsWrapper wGTFS = new GTFSrsWrapper();
 	private PubliBikeWrapper wPB = new PubliBikeWrapper();
@@ -95,39 +94,13 @@ public class DataGathering{
 			return stops;
 		}
 		try{
-			if(USE_GTFS) {
-				stops.addAll(getwGTFS().getStopsByBBox(boundingBox));
-			} else {
-				stops.addAll(getwTL().getStopsByBBox(boundingBox));
-			}
-		} catch(GTFSrsError | TransitLandAPIError err){
+		//	stops.addAll(getwGTFS().getStopsByBBox(boundingBox));
+			stops.addAll(getwTL().getStopsByBBox(boundingBox));
+		} catch(/*GTFSrsError | */TransitLandAPIError err){
 			err.printStackTrace();
 		}
 
 		return stops;
-	}
-
-	private List<StopTimes> getStopTimes(BoundingBox boundingBox) {
-		if(stop_times.size() != 0){
-			return stop_times;
-		}
-
-		Time end_time = getEstimatedEndTime();
-		try{
-
-			PaginatedList<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes>
-					gtfs_paginated_stop_times = getwGTFS().getStopTimesInBBoxBetween(boundingBox,
-					start_time, end_time);
-			List<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes>
-					gtfs_stop_times = gtfs_paginated_stop_times.getResult();
-
-			stop_times.addAll(gtfs_stop_times);
-			// TODO: Add TL
-		} catch(GTFSrsError err){
-			err.printStackTrace();
-		}
-
-		return stop_times;
 	}
 
 	public List<Trip> getTrips(BoundingBox boundingBox) {
@@ -137,113 +110,113 @@ public class DataGathering{
 
 		Time end_time = getEstimatedEndTime();
 
-		if(USE_GTFS) {
-			TripSearch ts = new TripSearch();
-			ts.departure_after = start_time;
-			ts.arrival_before = end_time;
+/*
+		TripSearch ts = new TripSearch();
+		ts.departure_after = start_time.toString();
+		ts.arrival_before = end_time.toString();
 
-			PaginatedList<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip>
-					gtfs_paginated_trips = null;
-			try {
-				gtfs_paginated_trips = getwGTFS().getTripsByBBox(boundingBox, ts);
-			} catch (GTFSrsError gtfSrsError) {
-				gtfSrsError.printStackTrace();
-			}
-			List<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip>
-					gtfs_trips = gtfs_paginated_trips.getResult();
+		PaginatedList<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip>
+				gtfs_paginated_trips = null;
+		try {
+			gtfs_paginated_trips = getwGTFS().getTripsByBBox(boundingBox, ts);
+		} catch (GTFSrsError gtfSrsError) {
+			gtfSrsError.printStackTrace();
+		}
+		List<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip>
+				gtfs_trips = gtfs_paginated_trips.getResult();
 
-			trips.addAll(gtfs_trips);
-		} else {
-
-			/////////////////////////////
-
-			final List<RouteStopPattern> routeStopPatternsInBBox = new ArrayList<>();
-			final List<ScheduleStopPair> scheduleStopPairsInBBox = new ArrayList<>();
-
-			AtomicInteger count = new AtomicInteger();
-
-			getwTL().AgetRouteStopPatternsByBBox(boundingBox, (rsps) -> {
-
-				System.out.println(rsps.size());
-				routeStopPatternsInBBox.addAll(rsps);
-
-				synchronized (getwTL()) {
-					count.getAndIncrement();
-					getwTL().notify();
-				}
-
-			});
-
-			getwTL().AgetScheduleStopPairsByBBox(boundingBox, (ssps) -> {
-
-				System.out.println(ssps.size());
-				scheduleStopPairsInBBox.addAll(ssps);
-				synchronized (getwTL()) {
-					count.getAndIncrement();
-					getwTL().notify();
-				}
-
-			});
+		trips.addAll(gtfs_trips);
 
 
-			synchronized (getwTL()) {
-				while (count.get() != 2) {
-					try {
-						getwTL().wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+		/////////////////////////////
+
+*/
+		final List<RouteStopPattern> routeStopPatternsInBBox = new ArrayList<>();
+		final List<ScheduleStopPair> scheduleStopPairsInBBox = new ArrayList<>();
+
+		AtomicInteger count = new AtomicInteger();
+
+		getwTL().AgetRouteStopPatternsByBBox(boundingBox, (rsps)->{
+
+			System.out.println(rsps.size());
+			routeStopPatternsInBBox.addAll(rsps);
+
+			synchronized (getwTL()){
+				count.getAndIncrement();
+				getwTL().notify();
 			}
 
+		});
 
-			for (RouteStopPattern rsp : routeStopPatternsInBBox) {
+		getwTL().AgetScheduleStopPairsByBBox(boundingBox, from_date, start_time, end_time, (ssps)->{
 
-				for (String trip_id : rsp.getTrips()) {
+			System.out.println(ssps.size());
+			scheduleStopPairsInBBox.addAll(ssps);
+			synchronized (getwTL()){
+				count.getAndIncrement();
+				getwTL().notify();
+			}
 
-					if (rsp.getId().equals("r-gcut-largstoglasgowcentralsr-acc06b-978211") && trip_id.equals("216025")) {
-						System.out.println("a");
-					}
-					List<ScheduleStopPair> schedulesInRspTrip = new ArrayList<>();
-					for (ScheduleStopPair sch : scheduleStopPairsInBBox) {
+		});
 
-						if (sch.getTrip().equals(trip_id) && sch.getRoute_stop_pattern_onestop_id().equals(rsp.getId()))
-							schedulesInRspTrip.add(sch);
 
-					}
-					if (schedulesInRspTrip.size() != 0) {
-						Trip tlTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip();
-						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setTrip_id(trip_id);
-						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute_stop_pattern_id(rsp.getId());
-						((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute(rsp.getRoute());
+		synchronized (getwTL()){
+			while(count.get()!=2){
+				try {
+					getwTL().wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 
-						for (ScheduleStopPair sch : schedulesInRspTrip) {
 
-							int index = 0;
-							for (String stop_id : rsp.getStopPattern()) {
+		for(RouteStopPattern rsp : routeStopPatternsInBBox){
 
-								if (stop_id.equals(sch.getOrigin_onestop_id())) {
+			for(String trip_id : rsp.getTrips()){
 
-									StopTrip stopTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip();
-									((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStopSequence(index);
-									((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStop(stop_by_uid.get(stop_id));
-									((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setArrival(sch.getArrival());
-									((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setDeparture(sch.getDeparture());
+				if (rsp.getId().equals("r-gcut-largstoglasgowcentralsr-acc06b-978211") && trip_id.equals("216025")){
+					System.out.println("a");
+				}
+				List<ScheduleStopPair> schedulesInRspTrip = new ArrayList<>();
+				for(ScheduleStopPair sch : scheduleStopPairsInBBox){
 
-									((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).add_stop_sequence(stopTrip);
-									break;
-								}
-								index++;
+					if(sch.getTrip().equals(trip_id) && sch.getRoute_stop_pattern_onestop_id().equals(rsp.getId()))
+						schedulesInRspTrip.add(sch);
 
+				}
+				if(schedulesInRspTrip.size() != 0) {
+					Trip tlTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip();
+					((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setTrip_id(trip_id);
+					((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute_stop_pattern_id(rsp.getId());
+					((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).setRoute(rsp.getRoute());
+
+					for (ScheduleStopPair sch : schedulesInRspTrip) {
+
+						int index = 0;
+						for (String stop_id : rsp.getStopPattern()) {
+
+							if (stop_id.equals(sch.getOrigin_onestop_id())) {
+
+								StopTrip stopTrip = new ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip();
+								((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStopSequence(index);
+								((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setStop(stop_by_uid.get(stop_id));
+								((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setArrival(sch.getArrival());
+								((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.StopTrip) stopTrip).setDeparture(sch.getDeparture());
+
+								((ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.Trip) tlTrip).add_stop_sequence(stopTrip);
+								break;
 							}
+							index++;
 
 						}
-						trips.add(tlTrip);
-					}
 
+					}
+					trips.add(tlTrip);
 				}
 
 			}
+
 		}
 
 
@@ -320,23 +293,6 @@ public class DataGathering{
 					}
 
 					if(!currentNode.getFrom().getElement().getLocation().equals(currentNode.getElement().getLocation())) {
-
-						if(currentNode.getFrom() != null){
-							Node<T,L> prevNode = currentNode.getFrom();
-							if(prevNode.getElement().getTrip() instanceof  WaitingTrip){
-								Node<T,L> prevPrevNode = prevNode.getFrom();
-								if(prevPrevNode != null){
-									if(prevPrevNode.getElement().getTrip() != null){
-										if(prevPrevNode.getElement().getTrip().getRoute().equals(t.getRoute())){
-											// Don't take the same route twice
-//											System.out.println("Ignoring this choice...");
-											continue;
-										}
-									}
-								}
-							}
-						}
-
 						Node<T, L> nextTimedStop = new Node<>((T) trip_el_st);
 						trip_el_st.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), wait_time));
 						nextTimedStop.setAlgorithm(algorithm);
@@ -357,6 +313,7 @@ public class DataGathering{
 
 				assert(wait_time == 0);
 
+				//System.out.println("Found a directly connected stop! YAY!");
 				Node<T,L> nextConnectedStop = new Node<>((T) trip_nx_st);
 				trip_nx_st.setTrip(t);
 				nextConnectedStop.setAlgorithm(algorithm);
@@ -438,7 +395,7 @@ public class DataGathering{
 	public void fetchData(){
 		BoundingBox boundingBox = new BoundingBox(source, destination);
 		double distance = Distance.distance(source, destination);
-		boundingBox = boundingBox.expand(Math.max(distance*0.4, 1500));
+		boundingBox = boundingBox.expand(Math.max(distance*0.4, 300));
 
 		System.out.println("Bounding Box is: " + boundingBox.toPostGIS());
 
@@ -448,7 +405,9 @@ public class DataGathering{
 		});
 		trips = getTrips(boundingBox);
 
-		stop_times = getStopTimes(boundingBox);
+//		stop_times = getStopTimes(boundingBox);
+
+
 
 		stop_times.forEach(e->{
 			trip_time_stop_by_stop.put(
@@ -458,5 +417,29 @@ public class DataGathering{
 			);
 		});
 
+	}
+
+	private List<StopTimes> getStopTimes(BoundingBox boundingBox) {
+		if(stop_times.size() != 0){
+			return stop_times;
+		}
+
+		Time end_time = getEstimatedEndTime();
+
+		try{
+
+			PaginatedList<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes>
+					gtfs_paginated_stop_times = getwGTFS().getStopTimesInBBoxBetween(boundingBox,
+					start_time, end_time);
+			List<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes>
+					gtfs_stop_times = gtfs_paginated_stop_times.getResult();
+
+			stop_times.addAll(gtfs_stop_times);
+			// TODO: Add TL
+		} catch(GTFSrsError err){
+			err.printStackTrace();
+		}
+
+		return stop_times;
 	}
 }
