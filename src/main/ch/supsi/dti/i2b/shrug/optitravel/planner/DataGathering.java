@@ -42,6 +42,7 @@ public class DataGathering{
 
 	private HashMap<Stop, List<TripTimeStop>> trip_time_stop_by_stop = new HashMap<>();
 	private HashMap<String, Stop> stop_by_uid = new HashMap<>();
+	private HashMap<StopTime, List<Trip>> tripByStopTime = new HashMap<>();
 
 	private PlanPreference pp = new DefaultPlanPreference();
 
@@ -277,115 +278,136 @@ public class DataGathering{
 	getNeighbours(Node<T,L> currentNode, Algorithm<T,L> algorithm) {
 		HashMap<Node<T,L>, Double> neighbours = new HashMap<>();
 
-		// Connected stops (In a Trip)
-		for(Trip t : trips){
-			int stop_index = t.getStopIndex((Stop) currentNode.getElement().getLocation());
-			if(stop_index != -1 && stop_index < t.getStopTrip().size() - 1){
-				// This stop is in the trip, and isn't the last one!
-				StopTrip cr_stoptrip = t.getStopTrip().get(stop_index);
-				StopTrip nx_stoptrip = t.getStopTrip().get(stop_index + 1);
-
-				StopTime trip_el_st = new StopTime(cr_stoptrip.getStop(),
-						cr_stoptrip.getDeparture());
-				StopTime trip_nx_st = new StopTime(nx_stoptrip.getStop(),
-						nx_stoptrip.getDeparture());
-
-				if (!Time.isAfter(trip_el_st.getTime(), currentNode.getElement().getTime())) {
-					// The starting point isn't after our current node time,
-					// therefore we exclude this element
-					continue;
-				}
-
-				if (!Time.isAfter(trip_nx_st.getTime(), trip_el_st.getTime())) {
-					// The next stop doesn't come AFTER the current one!
-					continue;
-				}
-
-				// Wait time, till the next bus / train
-				double wait_time = Time.diffMinutes(trip_el_st.getTime(), currentNode.getElement().getTime());
-				assert(wait_time>=0); // Assertion, we verified this condition before.
-
-				if(!trip_el_st.equals(currentNode.getElement())){
-					// We need to wait at this stop for X minutes,
-					// before we can hop on this trip.
-
-					if(currentNode.getWaitTotal() + wait_time > pp.max_total_waiting_time()){
-						// Waiting time exceeded
-						continue;
+		if(tripByStopTime.size()==0){
+			trips.stream().forEach(t->{
+				t.getStopTrip().forEach(s->{
+					StopTime st = new StopTime(s.getStop(), s.getDeparture());
+					assert(st.equals(st));
+					tripByStopTime.putIfAbsent(st, new ArrayList<Trip>());
+					if(!tripByStopTime.get(st).contains(t)) {
+						tripByStopTime.get(st).add(t);
 					}
+				});
+			});
+		}
 
-					if(wait_time > pp.max_waiting_time()){
-						// Can't wait more than the max_waiting_time
-						continue;
-					}
+		if(currentNode.getElement() != null && currentNode.getElement() instanceof StopTime) {
+			StopTime currentNodeStopTime = (StopTime) currentNode.getElement();
+			// Connected stops (In a Trip)
+			if(tripByStopTime.get(currentNodeStopTime) != null) {
+				for (Trip t : tripByStopTime.get(currentNodeStopTime)) {
 
-					if(!currentNode.getFrom().getElement().getLocation().equals(currentNode.getElement().getLocation())) {
+					int stop_index = t.getStopIndex((Stop) currentNode.getElement().getLocation());
+					if (stop_index != -1 && stop_index < t.getStopTrip().size() - 1) {
+						// This stop is in the trip, and isn't the last one!
+						StopTrip cr_stoptrip = t.getStopTrip().get(stop_index);
+						StopTrip nx_stoptrip = t.getStopTrip().get(stop_index + 1);
 
-						if(currentNode.getFrom() != null){
-							Node<T,L> prevNode = currentNode.getFrom();
-							if(prevNode.getElement().getTrip() instanceof  WaitingTrip){
-								Node<T,L> prevPrevNode = prevNode.getFrom();
-								if(prevPrevNode != null){
-									if(prevPrevNode.getElement().getTrip() != null){
-										if(prevPrevNode.getElement().getTrip().getRoute().equals(t.getRoute())){
-											// Don't take the same route twice
-											System.out.println("Ignoring this choice...");
-											continue;
+						StopTime trip_el_st = new StopTime(cr_stoptrip.getStop(),
+								cr_stoptrip.getDeparture());
+						StopTime trip_nx_st = new StopTime(nx_stoptrip.getStop(),
+								nx_stoptrip.getDeparture());
+
+						if (!Time.isAfter(trip_el_st.getTime(), currentNode.getElement().getTime())) {
+							// The starting point isn't after our current node time,
+							// therefore we exclude this element
+							continue;
+						}
+
+						if (!Time.isAfter(trip_nx_st.getTime(), trip_el_st.getTime())) {
+							// The next stop doesn't come AFTER the current one!
+							continue;
+						}
+
+						// Wait time, till the next bus / train
+						double wait_time = Time.diffMinutes(trip_el_st.getTime(), currentNode.getElement().getTime());
+						assert (wait_time >= 0); // Assertion, we verified this condition before.
+
+						if (!trip_el_st.equals(currentNode.getElement())) {
+							// We need to wait at this stop for X minutes,
+							// before we can hop on this trip.
+
+							if (currentNode.getWaitTotal() + wait_time > pp.max_total_waiting_time()) {
+								// Waiting time exceeded
+								continue;
+							}
+
+							if (wait_time > pp.max_waiting_time()) {
+								// Can't wait more than the max_waiting_time
+								continue;
+							}
+
+							if (!currentNode.getFrom().getElement().getLocation().equals(currentNode.getElement().getLocation())) {
+
+								if (currentNode.getFrom() != null) {
+									Node<T, L> prevNode = currentNode.getFrom();
+									if (prevNode.getElement().getTrip() instanceof WaitingTrip) {
+										Node<T, L> prevPrevNode = prevNode.getFrom();
+										if (prevPrevNode != null) {
+											if (prevPrevNode.getElement().getTrip() != null) {
+												if (prevPrevNode.getElement().getTrip().getRoute().equals(t.getRoute())) {
+													// Don't take the same route twice
+													System.out.println("Ignoring this choice...");
+													continue;
+												}
+											}
 										}
 									}
 								}
+
+								Node<T, L> nextTimedStop = new Node<>((T) trip_el_st);
+								trip_el_st.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), wait_time));
+								nextTimedStop.setAlgorithm(algorithm);
+								nextTimedStop.setDg(this);
+								nextTimedStop.setH(currentNode.getH());
+								nextTimedStop.setChanges(currentNode.getChanges());
+								nextTimedStop.setWaitTotal(currentNode.getWaitTotal() + wait_time);
+								nextTimedStop.setWalkingTotal(currentNode.getWalkingTotal());
+								nextTimedStop.setFrom(currentNode);
+
+								double weight = 0;
+								weight += getPlanPreference().w_waiting() * wait_time;
+
+								neighbours.putIfAbsent(nextTimedStop, weight);
+							}
+							continue;
+						}
+
+						assert (wait_time == 0);
+
+						Node<T, L> nextConnectedStop = new Node<>((T) trip_nx_st);
+						trip_nx_st.setTrip(t);
+						nextConnectedStop.setAlgorithm(algorithm);
+						nextConnectedStop.setDg(this);
+						nextConnectedStop.setH(Distance.distance(trip_nx_st.getCoordinate(),
+								destination));
+
+						boolean same_trip = false;
+						if (currentNode.getElement().getTrip() != null &&
+								currentNode.getElement().getTrip().equals(t)) {
+							same_trip = true;
+						} else {
+							if (currentNode.getChanges() + 1 > pp.max_total_changes()) {
+								continue;
 							}
 						}
 
-						Node<T, L> nextTimedStop = new Node<>((T) trip_el_st);
-						trip_el_st.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), wait_time));
-						nextTimedStop.setAlgorithm(algorithm);
-						nextTimedStop.setDg(this);
-						nextTimedStop.setH(currentNode.getH());
-						nextTimedStop.setChanges(currentNode.getChanges());
-						nextTimedStop.setWaitTotal(currentNode.getWaitTotal() + wait_time);
-						nextTimedStop.setWalkingTotal(currentNode.getWalkingTotal());
-						nextTimedStop.setFrom(currentNode);
+						nextConnectedStop.setChanges(currentNode.getChanges() + (same_trip ? 0 : 1));
+						nextConnectedStop.setWaitTotal(currentNode.getWaitTotal());
+						nextConnectedStop.setWalkingTotal(currentNode.getWalkingTotal());
+						nextConnectedStop.setFrom(currentNode);
 
-						double weight = 0;
-						weight += getPlanPreference().w_waiting() * wait_time;
+						double weight = 0.0;
+						if (!same_trip) {
+							weight += pp.w_change();
+							weight += pp.w_moving() * Time.diffMinutes(trip_nx_st.getTime(), trip_el_st.getTime());
+						}
 
-						neighbours.putIfAbsent(nextTimedStop, weight);
-					}
-					continue;
-				}
-
-				assert(wait_time == 0);
-
-				Node<T,L> nextConnectedStop = new Node<>((T) trip_nx_st);
-				trip_nx_st.setTrip(t);
-				nextConnectedStop.setAlgorithm(algorithm);
-				nextConnectedStop.setDg(this);
-				nextConnectedStop.setH(Distance.distance(trip_nx_st.getCoordinate(),
-						destination));
-
-				boolean same_trip = false;
-				if(currentNode.getElement().getTrip() != null &&
-						currentNode.getElement().getTrip().equals(t)){
-					same_trip = true;
-				} else {
-					if(currentNode.getChanges() + 1 > pp.max_total_changes()){
-						continue;
+						neighbours.putIfAbsent(nextConnectedStop, weight);
 					}
 				}
-
-				nextConnectedStop.setChanges(currentNode.getChanges() + (same_trip?0:1));
-				nextConnectedStop.setWaitTotal(currentNode.getWaitTotal());
-				nextConnectedStop.setWalkingTotal(currentNode.getWalkingTotal());
-				nextConnectedStop.setFrom(currentNode);
-
-				double weight = 0.0;
-				if(!same_trip){
-					weight += pp.w_change();
-					weight += pp.w_moving() * Time.diffMinutes(trip_nx_st.getTime(), trip_el_st.getTime());
-				}
-
-				neighbours.putIfAbsent(nextConnectedStop, weight);
+			} else {
+				//System.out.println("No trips associated w/" + currentNodeStopTime);
 			}
 		}
 
