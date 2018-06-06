@@ -53,6 +53,7 @@ public class Plan {
 			ps.setEnd(tl);
 			st_end = tl;
 		}
+		planSegments.add(ps);
 		start_location = st_start;
 		end_location = st_end;
 	}
