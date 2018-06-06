@@ -83,8 +83,9 @@ public class MapController implements MapComponentInitializedListener {
 
     public void addDirections(Coordinate from, Coordinate to) {
         if (directionsService == null) directionsService = new DirectionsService();
+//        if(directionsService.renderer != null) directionsService.renderer.clearDirections();
 
-
+        fitToBounds(from, to);
         DirectionsRequest request = new DirectionsRequest(from.toString(), to.toString(), TravelModes.TRANSIT);
         directionsService.getRoute(request, (results, status) -> System.out.println("Directions received"),
                 new DirectionsRenderer(true, map, mapView.getDirec()));

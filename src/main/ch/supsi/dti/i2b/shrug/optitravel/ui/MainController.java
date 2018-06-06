@@ -182,10 +182,11 @@ onPlannerComputeFinish(null);
         Plan p = new Plan(timedLocationList);
         List<Coordinate> stops = new ArrayList<>();
         for(PlanSegment ps : p.getPlanSegments()) {
-            if(!(ps.getTrip() instanceof WaitingTrip) && !(ps.getTrip() instanceof ConnectionTrip)) stops.add(ps.getStart().getCoordinate());
+            if(!(ps.getTrip() instanceof WaitingTrip) && !(ps.getTrip() instanceof ConnectionTrip))
+                Platform.runLater(() -> mapController.addDirections(ps.getStart().getCoordinate(), ps.getEnd().getCoordinate()));
             lvPlanSegments.getItems().add(ps);
         }
-        Platform.runLater(() -> mapController.addDirections(p.getStartLocation().getCoordinate(), p.getEndLocation().getCoordinate(), stops));
+//        Platform.runLater(() -> mapController.addDirections(p.getStartLocation().getCoordinate(), p.getEndLocation().getCoordinate(), stops));
     }
 }
 
