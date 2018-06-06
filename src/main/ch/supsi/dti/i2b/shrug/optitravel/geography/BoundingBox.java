@@ -74,10 +74,12 @@ public class BoundingBox {
 		double c1f_x,c1f_y,c2f_x,c2f_y;
 
 		if(c1_x < c2_x){
+			// C1 is on the left of C2
 			if(c1_y < c2_y){
+				// C1 is under C2
 				/*
-						c2
-					c1
+						C2
+					C1
 				 */
 				c1f_x = c1_x - meters;
 				c1f_y = c1_y - meters;
@@ -86,36 +88,37 @@ public class BoundingBox {
 				c2f_y = c2_y + meters;
 			} else {
 				/*
-					c2
-						c1
+					C1
+						C2
 				 */
-				c1f_x = c1_x + meters;
+				c1f_x = c1_x - meters;
 				c1f_y = c1_y + meters;
 
-				c2f_x = c2_x - meters;
+				c2f_x = c2_x + meters;
 				c2f_y = c2_y - meters;
 			}
 		} else {
+			// C1 is on the right of C2
 			if(c1_y < c2_y){
+				// C1 is under C2
 				/*
-					c2
-						c1
+					C2
+						C1
+				 */
+				c1f_x = c1_x + meters;
+				c1f_y = c1_y - meters;
+
+				c2f_x = c2_x - meters;
+				c2f_y = c2_y + meters;
+			} else {
+				/*
+						C1
+					C2
 				 */
 				c1f_x = c1_x + meters;
 				c1f_y = c1_y + meters;
-
 				c2f_x = c2_x - meters;
 				c2f_y = c2_y - meters;
-			} else {
-				/*
-						c1
-					c2
-				 */
-				c1f_x = c1_x - meters;
-				c1f_y = c1_y - meters;
-
-				c2f_x = c2_x + meters;
-				c2f_y = c2_y + meters;
 			}
 		}
 

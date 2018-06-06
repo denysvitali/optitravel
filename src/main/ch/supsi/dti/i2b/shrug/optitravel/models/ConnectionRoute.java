@@ -1,9 +1,9 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
-public class WaitingRoute extends Route {
+public class ConnectionRoute extends Route {
 	@Override
 	public String getName() {
-		return "Waiting";
+		return "Connection";
 	}
 
 	@Override
@@ -13,11 +13,6 @@ public class WaitingRoute extends Route {
 
 	@Override
 	public String getUID() {
-		return "WaitingRoute";
-	}
-
-	@Override
-	public String toString() {
-		return getName();
+		return null;
 	}
 }

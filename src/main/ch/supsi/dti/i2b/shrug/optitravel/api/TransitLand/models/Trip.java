@@ -45,6 +45,11 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     }
 
     @Override
+    public void setStopTrip(List<StopTrip> stopTrip) {
+        this.stop_sequence = stopTrip;
+    }
+
+    @Override
     public String toString() {
         return getRoute_stop_pattern_id() + " Trip_id: " + getTrip_id();
     }

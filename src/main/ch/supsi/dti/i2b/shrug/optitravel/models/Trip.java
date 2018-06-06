@@ -1,8 +1,9 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
+import java.io.Serializable;
 import java.util.List;
 
-public abstract class Trip {
+public abstract class Trip implements Serializable {
 	public abstract List<StopTrip> getStopTrip();
 	public abstract Route getRoute();
 
@@ -20,4 +21,6 @@ public abstract class Trip {
 
 		return -1;
 	}
+
+	public abstract void setStopTrip(List<StopTrip> stopTrip);
 }

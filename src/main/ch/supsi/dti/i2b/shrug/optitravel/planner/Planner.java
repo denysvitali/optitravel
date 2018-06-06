@@ -8,6 +8,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.params.PlannerParams;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -114,6 +115,22 @@ public class Planner<T extends TimedLocation, L extends Location> {
 		assert(path!=null);
 		alreadyComputed = true;
 
+		List<TimedLocation> tl = path.stream()
+				.map(Node::getElement)
+				.collect(Collectors.toList());
+
+		try {
+			FileOutputStream fos = new FileOutputStream("path.classdata");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(tl);
+			oos.close();
+			System.out.println("File saved!");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		List<Trip> plan_trips = path.stream()
 						.map((e)->e.getElement().getTrip())
 						.filter(Objects::nonNull)
@@ -121,12 +138,14 @@ public class Planner<T extends TimedLocation, L extends Location> {
 						.distinct()
 						.collect(Collectors.toList());
 
-		Plan p = new Plan(plan_trips,
+		/*Plan p = new Plan(plan_trips,
 				path.get(0).getElement().getTime(),
 				path.get(path.size()-1).getElement().getTime(),
 				path.get(0).getElement().getCoordinate(),
 				path.get(path.size()-1).getElement().getCoordinate()
-				);
+				);*/
+
+		Plan p = null;
 
 		plans.add(p);
     }

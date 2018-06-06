@@ -2,7 +2,9 @@ package ch.supsi.dti.i2b.shrug.optitravel.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 
-public abstract class Location {
+import java.io.Serializable;
+
+public abstract class Location implements Serializable {
 	private Coordinate coordinate;
 
 	public Location(){

@@ -61,7 +61,7 @@ public class StopTime extends TimedLocation {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(stop, time, trip);
+		return Objects.hash(stop, time);
 	}
 
 	@Override

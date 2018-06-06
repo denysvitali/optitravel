@@ -2,7 +2,9 @@ package ch.supsi.dti.i2b.shrug.optitravel.models;
 
 import jdk.jshell.spi.ExecutionControl;
 
-public abstract class StopTrip {
+import java.io.Serializable;
+
+public abstract class StopTrip implements Serializable {
 	public abstract Time getDeparture();
 
 	public abstract Time getArrival();
