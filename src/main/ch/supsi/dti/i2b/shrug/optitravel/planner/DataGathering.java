@@ -304,9 +304,13 @@ public class DataGathering{
 				for (Trip t : tripByStopTime.get(currentNodeStopTime)) {
 
 					t.setStopTrip(t.getStopTrip().stream().sorted(Comparator.comparingInt(StopTrip::getStopSequence)).collect(Collectors.toList()));
-					int prev = 0;
+					int prev = -1;
 					for(StopTrip current_stop_trip : t.getStopTrip()){
-						assert (current_stop_trip.getStopSequence() > prev);
+						try {
+							assert (current_stop_trip.getStopSequence() > prev);
+						}catch(AssertionError e){
+							e.printStackTrace();
+						}
 						prev = current_stop_trip.getStopSequence();
 					}
 					int stop_index = t.getStopIndex((Stop) currentNode.getElement().getLocation());
