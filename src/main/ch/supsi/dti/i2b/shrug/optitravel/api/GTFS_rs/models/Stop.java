@@ -57,7 +57,14 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
         return uid;
     }
 
-    public int getType() {
+	public ch.supsi.dti.i2b.shrug.optitravel.models.Stop getParentStop() {
+    	if(parent_station != null) {
+			return new Stop(parent_station);
+		}
+		return null;
+	}
+
+	public int getType() {
         return location_type;
     }
 

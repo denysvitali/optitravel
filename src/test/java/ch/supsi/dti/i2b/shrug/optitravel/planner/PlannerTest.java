@@ -115,6 +115,21 @@ public class PlannerTest {
 	}
 
 	@Test
+	public void planLuganoCentro_Pregassona(){
+		testPlan(LUGANO_CENTRO_COORDINATE,
+				PREGASSONA_COORDINATE,
+				LocalDateTime.of(2018,
+						5,
+						17,
+						13,
+						26,
+						0
+				),
+				new DenvitPlanPreference(Distance.distance(LUGANO_CENTRO_COORDINATE,
+						PREGASSONA_COORDINATE)));
+	}
+
+	@Test
 	public void planOxfordStreet_Temple(){
 		testPlan(OXFORD_CIRCUS_UNDERGROUND_STATION_COORDINATE,
 				TEMPLE_LONDON_COORDINATE,

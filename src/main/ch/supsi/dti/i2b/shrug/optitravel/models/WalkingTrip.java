@@ -43,6 +43,10 @@ public class WalkingTrip extends Trip {
 	}
 
 	@Override
+	public void setStopTrip(List<StopTrip> stopTrip) {
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(!(obj instanceof WalkingTrip)){
 			return false;
