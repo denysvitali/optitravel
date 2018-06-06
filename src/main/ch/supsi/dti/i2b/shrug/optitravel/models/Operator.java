@@ -1,6 +1,8 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
-public abstract class Operator {
+import java.io.Serializable;
+
+public abstract class Operator implements Serializable {
     public abstract String getName();
     public abstract String getURL();
 }

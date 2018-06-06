@@ -608,21 +608,31 @@ public class DataGathering{
 
 		System.out.println("Bounding Box is: " + boundingBox.toPostGIS());
 
+		System.out.println("Fetching Stops...");
+
 		stops = getStops(boundingBox);
+
+		System.out.println("Matching Stops w/ UIDs...");
 		stops.forEach(e->{
 			stop_by_uid.putIfAbsent(e.getUid(), e);
 		});
+
+		System.out.println("Fetching Trips...");
 		trips = getTrips(boundingBox);
 
-//		stop_times = getStopTimes(boundingBox);
 
-		stop_times.forEach(e->{
-			trip_time_stop_by_stop.put(
-					stop_by_uid.get(
-							e.getStop()),
-					e.getTime()
-			);
-		});
+		if(USE_GTFS) {
+			System.out.println("[GTFS] Fetching Stop Times...");
+			stop_times = getStopTimes(boundingBox);
+			stop_times.forEach(e -> {
+				trip_time_stop_by_stop.put(
+						stop_by_uid.get(
+								e.getStop()),
+						e.getTime()
+				);
+			});
+		}
 
+		System.out.println("Fetching complete!");
 	}
 }

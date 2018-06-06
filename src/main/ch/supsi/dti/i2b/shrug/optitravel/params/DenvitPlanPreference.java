@@ -30,12 +30,12 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double destination_radius() {
-		return 100;
+		return 300;
 	}
 
 	@Override
 	public double max_waiting_time() {
-		return 8.0;
+		return 10.0;
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double w_waiting() {
-		return 1 * PREF_WEIGHT;
+		return 2 * PREF_WEIGHT;
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double w_change() {
-		return 3 * PREF_WEIGHT;
+		return 2 * PREF_WEIGHT;
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_total_waiting_time() {
-		return max_waiting_time()*4;
+		return max_waiting_time()*3;
 	}
 
 	@Override
@@ -75,6 +75,6 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_total_walkable_distance() {
-		return 800;
+		return 1600;
 	}
 }
