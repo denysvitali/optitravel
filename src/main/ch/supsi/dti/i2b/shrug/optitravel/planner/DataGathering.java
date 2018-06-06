@@ -335,9 +335,6 @@ public class DataGathering{
 					weight += pp.w_change();
 					weight += pp.w_moving() * Time.diffMinutes(trip_nx_st.getTime(), trip_el_st.getTime());
 				}
-				else{
-					System.out.println("");
-				}
 
 				neighbours.putIfAbsent(nextConnectedStop, weight);
 			}
