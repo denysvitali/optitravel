@@ -61,6 +61,11 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
         return getId();
     }
 
+    @Override
+    public ch.supsi.dti.i2b.shrug.optitravel.models.Stop getParentStop() {
+        return null;
+    }
+
     public List<StopTime> findNeighbors(Time time) throws ExecutionControl.NotImplementedException {
         throw new ExecutionControl.NotImplementedException("Not implemented yet.");
     }

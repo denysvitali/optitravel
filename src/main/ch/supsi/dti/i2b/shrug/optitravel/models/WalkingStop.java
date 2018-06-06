@@ -29,6 +29,11 @@ public class WalkingStop extends Stop {
 	}
 
 	@Override
+	public Stop getParentStop() {
+		return null;
+	}
+
+	@Override
 	public String toString() {
 		return getUid();
 	}

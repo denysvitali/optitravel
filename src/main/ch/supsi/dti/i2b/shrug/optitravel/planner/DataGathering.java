@@ -283,7 +283,7 @@ public class DataGathering{
 				t.getStopTrip().forEach(s->{
 					StopTime st = new StopTime(s.getStop(), s.getDeparture());
 					assert(st.equals(st));
-					tripByStopTime.putIfAbsent(st, new ArrayList<Trip>());
+					tripByStopTime.putIfAbsent(st, new ArrayList<>());
 					if(!tripByStopTime.get(st).contains(t)) {
 						tripByStopTime.get(st).add(t);
 					}
@@ -291,12 +291,18 @@ public class DataGathering{
 			});
 		}
 
-		if(currentNode.getElement() != null && currentNode.getElement() instanceof StopTime) {
+		if(currentNode.getElement() != null) {
 			StopTime currentNodeStopTime = (StopTime) currentNode.getElement();
 			// Connected stops (In a Trip)
 			if(tripByStopTime.get(currentNodeStopTime) != null) {
 				for (Trip t : tripByStopTime.get(currentNodeStopTime)) {
 
+					t.setStopTrip(t.getStopTrip().stream().sorted(Comparator.comparingInt(StopTrip::getStopSequence)).collect(Collectors.toList()));
+					int prev = 0;
+					for(StopTrip current_stop_trip : t.getStopTrip()){
+						assert (current_stop_trip.getStopSequence() > prev);
+						prev = current_stop_trip.getStopSequence();
+					}
 					int stop_index = t.getStopIndex((Stop) currentNode.getElement().getLocation());
 					if (stop_index != -1 && stop_index < t.getStopTrip().size() - 1) {
 						// This stop is in the trip, and isn't the last one!
@@ -414,32 +420,76 @@ public class DataGathering{
 		// Walkable stops
 
 		for(Stop stop : stops){
-			if(!stop.equals(currentNode.getElement().getLocation()) && Distance.distance(stop.getCoordinate(), currentNode.getElement().getCoordinate()) <= 1000/*pp.walkable_radius_meters()*/){
-				double distance = Distance.distance(stop.getCoordinate(), currentNode.getElement().getCoordinate());
-				int walk_minutes = (int) Math.ceil(distance / (pp.walk_speed_mps() * 60.0));
-				Time arrival_time = Time.addMinutes(currentNode.getElement().getTime(), walk_minutes);
-				StopTime stoptime = new StopTime(stop, arrival_time);
+			boolean connecting_stop = false;
+			if(currentNode.getElement() == null){
+				// It should never happen, but if it happens,
+				// let's discard this element.
+				continue;
+			}
+			if(stop.equals(currentNode.getElement().getLocation())){
+				// We can't walk to the same stop!
+				continue;
+			}
 
-				stoptime.setTrip(new WalkingTrip((StopTime) currentNode.getElement(), stoptime));
-
-				// Walking Total exceeded!
-				if(!(currentNode.getWalkingTotal() + distance > pp.max_total_walkable_distance())){
-
-					Node<T,L> walkableStop = new Node<>((T) stoptime);
-					walkableStop.setDg(this);
-					walkableStop.setAlgorithm(algorithm);
-					walkableStop.setChanges(currentNode.getChanges());
-					walkableStop.setH(Distance.distance(stop.getCoordinate(), destination));
-					walkableStop.setWalkingTotal(currentNode.getWalkingTotal() + distance);
-					walkableStop.setFrom(currentNode);
-
-					double weight = 1000.0;
-					weight += walk_minutes * pp.w_walk();
-
-					neighbours.put(walkableStop, weight);
+			if(currentNode.getElement().getLocation() instanceof Stop){
+				Stop s = (Stop) currentNode.getElement().getLocation();
+				if(s.getParentStop() != null){
+					if(s.getParentStop().equals(stop)){
+						// Our Stop has the current iterated stop as a parent
+						connecting_stop = true;
+					}
+					if(s.getParentStop().equals(stop.getParentStop())){
+						// Our stop has the same parent stop as the one
+						// that is currently being iterated
+						connecting_stop = true;
+					}
+					if(stop.getParentStop().equals(s.getParentStop())){
+						// The stop being iterated has our stop as a
+						// parent stop
+						connecting_stop = true;
+					}
+				} else {
+					if(stop.getParentStop() != null){
+						if(stop.getParentStop().equals(s)){
+							// The iterated stop has our stop as a parent
+							connecting_stop = true;
+						}
+					}
 				}
+			}
+
+			if(Distance.distance(stop.getCoordinate(), currentNode.getElement().getCoordinate()) > pp.walkable_radius_meters()){
+				// Unreachable Stop
+				continue;
+			}
+
+			double distance = Distance.distance(stop.getCoordinate(), currentNode.getElement().getCoordinate());
+			int walk_minutes = (int) Math.ceil(distance / (pp.walk_speed_mps() * 60.0));
+			Time arrival_time = Time.addMinutes(currentNode.getElement().getTime(), walk_minutes);
+			StopTime stoptime = new StopTime(stop, arrival_time);
+
+			if(connecting_stop){
+				stoptime.setTrip(new ConnectionTrip((StopTime) currentNode.getElement(), stoptime));
+			} else {
+				stoptime.setTrip(new WalkingTrip((StopTime) currentNode.getElement(), stoptime));
+			}
 
 
+			// Walking Total exceeded!
+			if(!(currentNode.getWalkingTotal() + distance > pp.max_total_walkable_distance())){
+
+				Node<T,L> walkableStop = new Node<>((T) stoptime);
+				walkableStop.setDg(this);
+				walkableStop.setAlgorithm(algorithm);
+				walkableStop.setChanges(currentNode.getChanges());
+				walkableStop.setH(Distance.distance(stop.getCoordinate(), destination));
+				walkableStop.setWalkingTotal(currentNode.getWalkingTotal() + distance);
+				walkableStop.setFrom(currentNode);
+
+				double weight = 1000.0;
+				weight += walk_minutes * pp.w_walk();
+
+				neighbours.put(walkableStop, weight);
 			}
 		}
 		return neighbours;

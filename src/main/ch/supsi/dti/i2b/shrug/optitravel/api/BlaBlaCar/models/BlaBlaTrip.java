@@ -36,4 +36,8 @@ public class BlaBlaTrip extends Trip {
     public Route getRoute() {
         return null;
     }
+
+    @Override
+    public void setStopTrip(List<StopTrip> stopTrip) {
+    }
 }

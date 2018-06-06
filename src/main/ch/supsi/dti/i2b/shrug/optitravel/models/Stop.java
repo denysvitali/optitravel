@@ -16,4 +16,6 @@ public abstract class Stop extends Location {
     public abstract Coordinate getCoordinate();
 
 	public abstract String getUid();
+
+	public abstract Stop getParentStop();
 }

@@ -30,4 +30,9 @@ public class WaitingTrip extends Trip {
 	public Route getRoute() {
 		return new WaitingRoute();
 	}
+
+	@Override
+	public void setStopTrip(List<StopTrip> stopTrip) {
+
+	}
 }

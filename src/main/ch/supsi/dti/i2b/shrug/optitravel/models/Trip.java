@@ -20,4 +20,6 @@ public abstract class Trip {
 
 		return -1;
 	}
+
+	public abstract void setStopTrip(List<StopTrip> stopTrip);
 }

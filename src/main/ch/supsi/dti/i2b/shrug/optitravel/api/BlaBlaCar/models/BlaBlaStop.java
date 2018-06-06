@@ -42,4 +42,9 @@ public class BlaBlaStop extends Stop {
     public String getUid() {
         return null;
     }
+
+    @Override
+    public Stop getParentStop() {
+        return null;
+    }
 }
