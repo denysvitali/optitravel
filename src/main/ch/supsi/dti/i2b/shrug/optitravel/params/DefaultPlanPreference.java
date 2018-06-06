@@ -55,7 +55,7 @@ public class DefaultPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_total_waiting_time() {
-		return 20.0;
+		return 3 * max_waiting_time();
 	}
 
 	@Override

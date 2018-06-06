@@ -51,6 +51,9 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
 
     @Override
     public String toString() {
+        if(getShortName() != null){
+            return String.format("%s (%s)", getShortName(), getUID());
+        }
         return String.format("%s", getUID());
     }
 }

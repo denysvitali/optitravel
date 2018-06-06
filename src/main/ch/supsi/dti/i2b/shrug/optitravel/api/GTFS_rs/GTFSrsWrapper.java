@@ -199,7 +199,7 @@ public class GTFSrsWrapper {
 		addTripSearch(builder, tripSearch);
 
 		HttpUrl url = builder.build();
-		Response response = client.get(url, 50 * 1000);
+		Response response = client.get(url, 120 * 1000);
 		return getPaginatedTrips(response);
 	}
 
@@ -397,20 +397,38 @@ public class GTFSrsWrapper {
 		}
 	}
 
+	public static PaginatedList<Trip> parsePaginatedTrips(byte[] json){
+		ResultArray a = JsonIterator.deserialize(
+				json,
+				ResultArray.class);
+		return new PaginatedList<>(
+				a.getResult()
+						.asList()
+						.stream()
+						.map((e) -> e.as(Trip.class))
+						.collect(Collectors.toList()),
+				a.getMeta()
+		);
+	}
+
+	public static PaginatedList<Trip> parsePaginatedTrips(String json){
+		ResultArray a = JsonIterator.deserialize(
+				json,
+				ResultArray.class);
+		return new PaginatedList<>(
+				a.getResult()
+						.asList()
+						.stream()
+						.map((e) -> e.as(Trip.class))
+						.collect(Collectors.toList()),
+				a.getMeta()
+		);
+	}
+
 	private PaginatedList<Trip> getPaginatedTrips(Response response) throws GTFSrsError {
 		if(response != null && response.isSuccessful() && response.body() != null){
 			try {
-				ResultArray a = JsonIterator.deserialize(
-						response.body().string(),
-						ResultArray.class);
-				return new PaginatedList<>(
-						a.getResult()
-								.asList()
-								.stream()
-								.map((e) -> e.as(Trip.class))
-								.collect(Collectors.toList()),
-						a.getMeta()
-				);
+				return parsePaginatedTrips(response.body().string());
 			} catch(IOException ex){
 				return null;
 			}

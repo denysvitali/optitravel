@@ -43,6 +43,11 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
         return route;
     }
 
+    @Override
+    public String toString() {
+        return getRoute_stop_pattern_id() + " Trip_id: " + getTrip_id();
+    }
+
     public void setRoute(Route route) {
         this.route = route;
     }

@@ -71,8 +71,7 @@ public class StopTime extends TimedLocation {
 		if (!super.equals(o)) return false;
 		StopTime stopTime = (StopTime) o;
 		return Objects.equals(stop, stopTime.stop) &&
-				Objects.equals(time, stopTime.time) /*&&
-				Objects.equals(trip, stopTime.trip)*/;
+				Objects.equals(time, stopTime.time);
 	}
 
 	@Override

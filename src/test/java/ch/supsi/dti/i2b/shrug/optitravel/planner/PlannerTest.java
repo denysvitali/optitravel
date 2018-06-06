@@ -3,12 +3,11 @@ package ch.supsi.dti.i2b.shrug.optitravel.planner;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
+import ch.supsi.dti.i2b.shrug.optitravel.mock.MockedDataGathering;
+import ch.supsi.dti.i2b.shrug.optitravel.mock.MockedPlanner;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Plan;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
-import ch.supsi.dti.i2b.shrug.optitravel.params.ComfortPlanPreference;
-import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
-import ch.supsi.dti.i2b.shrug.optitravel.params.FastPlanPreference;
-import ch.supsi.dti.i2b.shrug.optitravel.params.LongTripPreference;
+import ch.supsi.dti.i2b.shrug.optitravel.params.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -40,7 +39,7 @@ public class PlannerTest {
 						16,
 						30,
 						0),
-				new LongTripPreference(Distance.distance(SUPSI_COORDINATE,
+				new DenvitPlanPreference(Distance.distance(SUPSI_COORDINATE,
 						LAMONE_FFS_COORDINATE)));
 	}
 
@@ -64,15 +63,45 @@ public class PlannerTest {
 				LocalDateTime.of(2018,
 						5,
 						17,
-						13,
-						26,
+						10,
+						20,
 						0
 				),
-				new ComfortPlanPreference());
+				new DenvitPlanPreference(Distance.distance(PREGASSONA_COORDINATE,
+				LUGANO_CENTRO_COORDINATE)));
 	}
 
 	@Test
 	public void planPregassona_Bozzoreda(){
+		testPlan(PREGASSONA_COORDINATE,
+				BOZZOREDA_COORDINATE,
+				LocalDateTime.of(2018,
+						5,
+						17,
+						13,
+						26,
+						0
+				),
+				new DenvitPlanPreference(Distance.distance(PREGASSONA_COORDINATE,
+						BOZZOREDA_COORDINATE)));
+	}
+
+	@Test
+	public void mockedPlanPregassona_Bozzoreda(){
+		mockedTestPlan(PREGASSONA_COORDINATE,
+				BOZZOREDA_COORDINATE,
+				LocalDateTime.of(2018,
+						5,
+						17,
+						13,
+						26,
+						0
+				),
+				new DefaultPlanPreference());
+	}
+
+	@Test
+	public void planPregassona_Bozzoreda2(){
 		testPlan(PREGASSONA_COORDINATE,
 				BOZZOREDA_COORDINATE,
 				LocalDateTime.of(2018,
@@ -96,7 +125,7 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new LongTripPreference(
+				new DenvitPlanPreference(
 						Distance.distance(
 							OXFORD_CIRCUS_UNDERGROUND_STATION_COORDINATE,
 							TEMPLE_LONDON_COORDINATE
@@ -115,7 +144,7 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new LongTripPreference(Distance.distance(LUGANO_COORDINATE, ZURICH_COORDINATE)));
+				new DenvitPlanPreference(Distance.distance(LUGANO_COORDINATE, ZURICH_COORDINATE)));
 	}
 	@Test
 	public void planLondonC4_LondonTOL(){
@@ -128,7 +157,7 @@ public class PlannerTest {
 						00,
 						0
 				),
-				new FastPlanPreference(Distance.distance(
+				new DenvitPlanPreference(Distance.distance(
 						CHANNEL_4_LONDON_COORDINATE,
 						TOWER_OF_LONDON_COORDINATE
 				)));
@@ -145,7 +174,7 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new LongTripPreference(Distance.distance(LUGANO_COORDINATE, BELLINZONA_COORDINATE)));
+				new DenvitPlanPreference(Distance.distance(LUGANO_COORDINATE, BELLINZONA_COORDINATE)));
 	}
 
 	private void testPlan(Coordinate from, Coordinate to, LocalDateTime ldt, PlanPreference pp){
@@ -153,6 +182,34 @@ public class PlannerTest {
 				from,
 				to
 		);
+
+		p.setStartTime(ldt);
+		p.setPlanPreference(pp);
+
+		p.computePlans();
+		List<Plan> plans = p.getPlans();
+		assertNotEquals(null, plans);
+		assertNotEquals(0, plans.size());
+
+		Plan plan = plans.get(0);
+
+		assertNotEquals(null, plan);
+		assertNotEquals(null, plan.getTrips());
+
+		plan.getTrips()
+				.stream()
+				.map(Trip::getRoute)
+				.forEach(System.out::println);
+	}
+
+	private void mockedTestPlan(Coordinate from, Coordinate to, LocalDateTime ldt, PlanPreference pp){
+		MockedPlanner p = new MockedPlanner(
+				from,
+				to
+		);
+
+		MockedDataGathering mockedDG = new MockedDataGathering();
+		p.setMockedDG(mockedDG);
 
 		p.setStartTime(ldt);
 		p.setPlanPreference(pp);

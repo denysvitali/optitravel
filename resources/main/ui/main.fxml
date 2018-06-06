@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<?import com.lynden.gmapsfx.GoogleMapView?>
+<?import com.jfoenix.controls.JFXButton?>
+<VBox prefHeight="475.0" prefWidth="767.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+  <children>
+    <MenuBar VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" text="File">
+          <items>
+            <MenuItem mnemonicParsing="false" text="New" />
+            <MenuItem mnemonicParsing="false" text="Open…" />
+            <Menu mnemonicParsing="false" text="Open Recent" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Close" />
+            <MenuItem mnemonicParsing="false" text="Save" />
+            <MenuItem mnemonicParsing="false" text="Save As…" />
+            <MenuItem mnemonicParsing="false" text="Revert" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Preferences…" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Quit" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Edit">
+          <items>
+            <MenuItem mnemonicParsing="false" text="Undo" />
+            <MenuItem mnemonicParsing="false" text="Redo" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Cut" />
+            <MenuItem mnemonicParsing="false" text="Copy" />
+            <MenuItem mnemonicParsing="false" text="Paste" />
+            <MenuItem mnemonicParsing="false" text="Delete" />
+            <SeparatorMenuItem mnemonicParsing="false" />
+            <MenuItem mnemonicParsing="false" text="Select All" />
+            <MenuItem mnemonicParsing="false" text="Unselect All" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+          <items>
+            <MenuItem mnemonicParsing="false" text="About MyHelloApp" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+      <VBox prefHeight="200.0" prefWidth="100.0">
+         <children>
+            <HBox>
+               <children>
+                  <HBox prefHeight="146.0" prefWidth="502.0">
+                     <children>
+                        <VBox prefHeight="132.0" prefWidth="355.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Partenza">
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </Text>
+                              <TextField prefHeight="40.0" prefWidth="411.0" id="tf_partenza">
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </TextField>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Destinazione">
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </Text>
+                              <TextField id="tf_arrivo">
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                     </children>
+                     <HBox.margin>
+                        <Insets left="10.0" top="20.0" />
+                     </HBox.margin>
+                  </HBox>
+                  <VBox prefHeight="100.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Traspoto mediante:">
+                           <VBox.margin>
+                              <Insets bottom="5.0" />
+                           </VBox.margin>
+                        </Text>
+                        <CheckBox mnemonicParsing="false" text="Car-Sharing" />
+                        <CheckBox mnemonicParsing="false" text="Mezzi pubblici" />
+                        <CheckBox mnemonicParsing="false" text="Servizi di Taxi (Uber / Lyft)" />
+                        <CheckBox mnemonicParsing="false" text="Taxi" />
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <JFXButton
+                                      buttonType="RAISED"
+                                      style="-fx-background-color: #2980b9; -fx-text-fill: #FFF;"
+                                      alignment="CENTER"
+                                      layoutX="8.0"
+                                      layoutY="12.0"
+                                      mnemonicParsing="false"
+                                      prefWidth="200.0"
+                                      text="Cerca"
+                                      textAlignment="CENTER" />
+                           </children>
+                        </AnchorPane>
+                     </children>
+                     <HBox.margin>
+                        <Insets left="20.0" right="20.0" top="5.0" />
+                     </HBox.margin>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <VBox prefHeight="326.0" prefWidth="238.0" style="-fx-background-color: #efefef;" HBox.hgrow="ALWAYS">
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                     <children>
+                        <VBox prefHeight="326.0" prefWidth="238.0" style="-fx-background-color: #efefef;">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="2:26 PM - 5:51 PM">
+                                 <font>
+                                    <Font size="19.0" />
+                                 </font>
+                              </Text>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Car Sharing, Bus">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
+                        <VBox prefHeight="326.0" prefWidth="238.0" style="-fx-background-color: #efefef;">
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="2:36 PM - 5:22 PM">
+                                 <font>
+                                    <Font size="19.0" />
+                                 </font>
+                              </Text>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Uber, Treno">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Text>
+                           </children>
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </VBox>
+                   <AnchorPane id="ap-mapview" minWidth="200" minHeight="200"></AnchorPane>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+  </children>
+</VBox>
