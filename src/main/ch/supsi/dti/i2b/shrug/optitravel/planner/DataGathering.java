@@ -50,6 +50,7 @@ public class DataGathering{
 	private Time start_time;
 	private Coordinate source;
 	private Coordinate destination;
+	private HashMap<Stop, List<StopTime>> stopTimesByStop = new HashMap<>();
 
 	public DataGathering(){
 
@@ -283,6 +284,10 @@ public class DataGathering{
 				t.getStopTrip().forEach(s->{
 					StopTime st = new StopTime(s.getStop(), s.getDeparture());
 					assert(st.equals(st));
+
+					stopTimesByStop.putIfAbsent(st.getStop(), new ArrayList<>());
+					stopTimesByStop.get(st.getStop()).add(st);
+
 					tripByStopTime.putIfAbsent(st, new ArrayList<>());
 					if(!tripByStopTime.get(st).contains(t)) {
 						tripByStopTime.get(st).add(t);
@@ -329,56 +334,6 @@ public class DataGathering{
 						double wait_time = Time.diffMinutes(trip_el_st.getTime(), currentNode.getElement().getTime());
 						assert (wait_time >= 0); // Assertion, we verified this condition before.
 
-						if (!trip_el_st.equals(currentNode.getElement())) {
-							// We need to wait at this stop for X minutes,
-							// before we can hop on this trip.
-
-							if (currentNode.getWaitTotal() + wait_time > pp.max_total_waiting_time()) {
-								// Waiting time exceeded
-								continue;
-							}
-
-							if (wait_time > pp.max_waiting_time()) {
-								// Can't wait more than the max_waiting_time
-								continue;
-							}
-
-							if (!currentNode.getFrom().getElement().getLocation().equals(currentNode.getElement().getLocation())) {
-
-								if (currentNode.getFrom() != null) {
-									Node<T, L> prevNode = currentNode.getFrom();
-									if (prevNode.getElement().getTrip() instanceof WaitingTrip) {
-										Node<T, L> prevPrevNode = prevNode.getFrom();
-										if (prevPrevNode != null) {
-											if (prevPrevNode.getElement().getTrip() != null) {
-												if (prevPrevNode.getElement().getTrip().getRoute().equals(t.getRoute())) {
-													// Don't take the same route twice
-													System.out.println("Ignoring this choice...");
-													continue;
-												}
-											}
-										}
-									}
-								}
-
-								Node<T, L> nextTimedStop = new Node<>((T) trip_el_st);
-								trip_el_st.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), wait_time));
-								nextTimedStop.setAlgorithm(algorithm);
-								nextTimedStop.setDg(this);
-								nextTimedStop.setH(currentNode.getH());
-								nextTimedStop.setChanges(currentNode.getChanges());
-								nextTimedStop.setWaitTotal(currentNode.getWaitTotal() + wait_time);
-								nextTimedStop.setWalkingTotal(currentNode.getWalkingTotal());
-								nextTimedStop.setFrom(currentNode);
-
-								double weight = 0;
-								weight += getPlanPreference().w_waiting() * wait_time;
-
-								neighbours.putIfAbsent(nextTimedStop, weight);
-							}
-							continue;
-						}
-
 						assert (wait_time == 0);
 
 						Node<T, L> nextConnectedStop = new Node<>((T) trip_nx_st);
@@ -413,7 +368,119 @@ public class DataGathering{
 					}
 				}
 			} else {
+
+				/* 	We've arrived to a StopTime w/ no Trips.
+					We now check for another StopTime after the current Time,
+					with the same Stop (we ask stopTimesByStop for
+					such a StopTime) and connect it w/ a WaitingTrip.
+				 */
+
+
+				List<StopTime> stbs = stopTimesByStop.get(currentNode.getElement().getLocation());
+				if(stbs != null){
+					for(StopTime st : stbs){
+						if(!st.getTime().isAfter(currentNode.getElement().getTime())){
+							// This Stop Time is in the past!
+							continue;
+						}
+
+						double time_diff = Time.diffMinutes(st.getTime(),
+								currentNode.getElement().getTime());
+
+						if(time_diff > pp.max_waiting_time()){
+							// Waiting Time exceeds the maximum waiting time
+							continue;
+						}
+
+						if(currentNode.getWaitTotal() + time_diff > pp.max_total_waiting_time()){
+							// Total Waiting Time exceeded, won't parse this ST.
+							continue;
+						}
+
+						if (currentNode.getFrom() != null) {
+							Node<T, L> prevNode = currentNode.getFrom();
+							if (prevNode.getElement().getTrip() instanceof WaitingTrip) {
+								// Do not allow consecutive WaitingTrips
+								continue;
+							}
+						}
+
+						// All conditions met, create a node and add it as a neighbour!
+
+						// Clone the object:
+						StopTime nst = new StopTime(st.getStop(), st.getTime());
+
+						Node<T, L> nextTimedStop = new Node<>((T) nst);
+						nst.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), time_diff));
+						nextTimedStop.setAlgorithm(algorithm);
+						nextTimedStop.setDg(this);
+						nextTimedStop.setH(currentNode.getH());
+						nextTimedStop.setChanges(currentNode.getChanges());
+						nextTimedStop.setWaitTotal(currentNode.getWaitTotal() + time_diff);
+						nextTimedStop.setWalkingTotal(currentNode.getWalkingTotal());
+						nextTimedStop.setFrom(currentNode);
+
+						double weight = 0;
+						weight += getPlanPreference().w_waiting() * time_diff;
+
+						neighbours.putIfAbsent(nextTimedStop, weight);
+
+					}
+
+				}
+
+
+
 				//System.out.println("No trips associated w/" + currentNodeStopTime);
+					// We need to wait at this stop for X minutes,
+					// before we can hop on this trip.
+
+				/*
+				if (currentNode.getWaitTotal() + wait_time > pp.max_total_waiting_time()) {
+					// Waiting time exceeded
+					continue;
+				}
+
+				if (wait_time > pp.max_waiting_time()) {
+					// Can't wait more than the max_waiting_time
+					continue;
+				}
+
+				if (!currentNode.getFrom().getElement().getLocation().equals(currentNode.getElement().getLocation())) {
+
+					if (currentNode.getFrom() != null) {
+						Node<T, L> prevNode = currentNode.getFrom();
+						if (prevNode.getElement().getTrip() instanceof WaitingTrip) {
+							Node<T, L> prevPrevNode = prevNode.getFrom();
+							if (prevPrevNode != null) {
+								if (prevPrevNode.getElement().getTrip() != null) {
+									if (prevPrevNode.getElement().getTrip().getRoute().equals(t.getRoute())) {
+										// Don't take the same route twice
+										System.out.println("Ignoring this choice...");
+										continue;
+									}
+								}
+							}
+						}
+					}
+
+					Node<T, L> nextTimedStop = new Node<>((T) trip_el_st);
+					trip_el_st.setTrip(new WaitingTrip(currentNode.getElement().getLocation(), wait_time));
+					nextTimedStop.setAlgorithm(algorithm);
+					nextTimedStop.setDg(this);
+					nextTimedStop.setH(currentNode.getH());
+					nextTimedStop.setChanges(currentNode.getChanges());
+					nextTimedStop.setWaitTotal(currentNode.getWaitTotal() + wait_time);
+					nextTimedStop.setWalkingTotal(currentNode.getWalkingTotal());
+					nextTimedStop.setFrom(currentNode);
+
+					double weight = 0;
+					weight += getPlanPreference().w_waiting() * wait_time;
+
+					neighbours.putIfAbsent(nextTimedStop, weight);
+				}
+				continue;
+				*/
 			}
 		}
 
@@ -443,15 +510,16 @@ public class DataGathering{
 						// that is currently being iterated
 						connecting_stop = true;
 					}
-					if(stop.getParentStop().equals(s.getParentStop())){
-						// The stop being iterated has our stop as a
-						// parent stop
-						connecting_stop = true;
-					}
 				} else {
 					if(stop.getParentStop() != null){
 						if(stop.getParentStop().equals(s)){
 							// The iterated stop has our stop as a parent
+							connecting_stop = true;
+						}
+
+						if(stop.getParentStop().equals(s.getParentStop())) {
+							// The stop being iterated has our stop as a
+							// parent stop
 							connecting_stop = true;
 						}
 					}
