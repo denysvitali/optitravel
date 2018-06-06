@@ -2,6 +2,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Location;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.models.plan.PlanSegment;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
@@ -20,7 +21,7 @@ public class MapController implements MapComponentInitializedListener {
     private Marker origin;
     private Marker destination;
 
-    public enum NodeType {ORIGIN, DESTINATION, TRANSIT}
+    public enum NodeType {ORIGIN, DESTINATION}
 
     public MapController(GoogleMapView mapView, MainController mainController) {
         this.mapView = mapView;
@@ -70,36 +71,18 @@ public class MapController implements MapComponentInitializedListener {
         }
     }
 
-    public void clearDirections() {
-        if(directionsService != null && directionsService.renderer != null) directionsService.renderer.clearDirections();
-        map.clearMarkers();
-    }
-
     public void fitToBounds(Coordinate origin, Coordinate dest) {
         LatLong sw = new LatLong(Math.max(origin.getLat(), dest.getLat()), Math.min(origin.getLng(), dest.getLng()));
         LatLong ne = new LatLong(Math.min(origin.getLat(), dest.getLat()), Math.max(origin.getLng(), dest.getLng()));
         map.fitBounds(new LatLongBounds(sw, ne));
     }
 
-    public void addDirections(Coordinate from, Coordinate to, List<Coordinate> stops) {
-        if (directionsService == null) directionsService = new DirectionsService();
-        if(directionsService.renderer != null) directionsService.renderer.clearDirections();
-
-        DirectionsWaypoint[] waypoints = new DirectionsWaypoint[stops.size()];
-        for(int i = 0; i < stops.size(); i++) {
-            waypoints[i] = new DirectionsWaypoint(stops.get(i).toString());
-        }
-        fitToBounds(from, to);
-        DirectionsRequest request = new DirectionsRequest(from.toString(), to.toString(), TravelModes.TRANSIT, waypoints);
-        directionsService.getRoute(request, (results, status) -> System.out.println("Directions received"),
-                new DirectionsRenderer(true, map, mapView.getDirec()));
-    }
     public void addDirections(Coordinate from, Coordinate to, TravelModes travelMode) {
         if (directionsService == null) directionsService = new DirectionsService();
 //        if(directionsService.renderer != null) directionsService.renderer.clearDirections();
 
         DirectionsRequest request = new DirectionsRequest(from.toString(), to.toString(), travelMode);
-        directionsService.getRoute(request, (results, status) -> System.out.println("Directions received"),
+        directionsService.getRoute(request, null,
                 new DirectionsRenderer(true, map, mapView.getDirec()));
     }
 

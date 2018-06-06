@@ -1,5 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
+import ch.supsi.dti.i2b.shrug.optitravel.Main;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
@@ -13,6 +14,9 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTimePicker;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.lynden.gmapsfx.GoogleMapView;
+import com.lynden.gmapsfx.service.directions.DirectionStatus;
+import com.lynden.gmapsfx.service.directions.DirectionsResult;
+import com.lynden.gmapsfx.service.directions.DirectionsServiceCallback;
 import com.lynden.gmapsfx.service.directions.TravelModes;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -29,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -161,7 +166,6 @@ public class MainController {
 //        p.setPlanPreference(pp);
 //        new Thread(() -> onPlannerComputeFinish(p.getPlans())).start();
         onPlannerComputeFinish(null);
-//        mapController.addDirections(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
     }
 
     private void onPlannerComputeFinish(List<Plan> plans) {
@@ -182,20 +186,23 @@ public class MainController {
         }
 
         Plan p = new Plan(timedLocationList);
-//        List<Coordinate> stops = new ArrayList<>();
+        lvPlanSegments.getItems().addAll(p.getPlanSegments());
+        //        List<Coordinate> stops = new ArrayList<>();
+
         for (PlanSegment ps : p.getPlanSegments()) {
-            if(ps.getTrip() instanceof WaitingTrip ||ps.getTrip() instanceof WalkingTrip ||ps.getTrip() instanceof ConnectionTrip)
+            if (ps.getTrip() instanceof WaitingTrip || ps.getTrip() instanceof WalkingTrip || ps.getTrip() instanceof ConnectionTrip)
                 Platform.runLater(() -> mapController.addDirections(ps.getStart().getCoordinate(), ps.getEnd().getCoordinate(), TravelModes.WALKING));
             else
                 Platform.runLater(() -> mapController.addDirections(ps.getStart().getCoordinate(), ps.getEnd().getCoordinate(), TravelModes.TRANSIT));
 //            stops.add(ps.getStart().getCoordinate());
 //            stops.add(ps.getEnd().getCoordinate());
         }
-        lvPlanSegments.getItems().addAll(p.getPlanSegments());
-        mapController.fitToBounds(p.getStartLocation().getCoordinate(), p.getEndLocation().getCoordinate());
 //        List<Coordinate> uniqStops = stops.stream().distinct().collect(Collectors.toList());
-
 //        Platform.runLater(() -> mapController.addDirections(p.getStartLocation().getCoordinate(), p.getEndLocation().getCoordinate(), uniqStops));
+
+        mapController.fitToBounds(p.getStartLocation().getCoordinate(), p.getEndLocation().getCoordinate());
     }
 }
+
+
 
