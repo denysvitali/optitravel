@@ -348,7 +348,14 @@ public class DataGathering{
 								currentNode.getElement().getTrip().equals(t)) {
 							same_trip = true;
 						} else {
-							if (currentNode.getChanges() + 1 > pp.max_total_changes()) {
+							if(currentNode.getElement().getTrip() != null &&
+									(currentNode.getElement().getTrip() instanceof WaitingTrip ||
+									currentNode.getElement().getTrip() instanceof WalkingTrip)) {
+								if (currentNode.getChanges() + 1 > pp.max_total_changes()) {
+									// Changes count exceeded
+									continue;
+								}
+							} else {
 								continue;
 							}
 						}
