@@ -139,8 +139,8 @@ public class DataGathering{
 
 		if(USE_GTFS) {
 			TripSearch ts = new TripSearch();
-			ts.departure_after = start_time.toString();
-			ts.arrival_before = end_time.toString();
+			ts.departure_after = start_time;
+			ts.arrival_before = end_time;
 
 			PaginatedList<ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Trip>
 					gtfs_paginated_trips = null;

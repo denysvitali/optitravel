@@ -219,7 +219,7 @@ class GTFSrsTest {
 			ts.route = "r-acfc6d-7";
 			ts.sort_by = TripSort.ArrivalTime;
 			ts.sort_order = AscDesc.ASC;
-			ts.departure_after = "15:00:00";
+			ts.departure_after = new Time("15:00:00");
 
 			PaginatedList<Trip> p_trips = gtfSrsWrapper.getTripsByBBox(bbox, ts);
 			assertNotEquals(null, p_trips);

@@ -12,6 +12,9 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
+import com.jsoniter.output.EncodingMode;
+import com.jsoniter.output.JsonStream;
+import com.jsoniter.spi.DecodingMode;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 
@@ -28,6 +31,8 @@ public class GTFSrsWrapper {
 
     public GTFSrsWrapper(){
         this.client = new HttpClient();
+        /*JsonIterator.setMode(DecodingMode.STATIC_MODE);
+		JsonStream.setMode(EncodingMode.STATIC_MODE);*/
     }
     
     public boolean isOnline() throws GTFSrsError {
@@ -340,14 +345,14 @@ public class GTFSrsWrapper {
 		if(tripSearch.departure_after != null){
 			builder.addQueryParameter(
 					"departure_after",
-					tripSearch.departure_after
+					tripSearch.departure_after.toString()
 			);
 		}
 
 		if(tripSearch.arrival_before != null){
 			builder.addQueryParameter(
 					"arrival_before",
-					tripSearch.arrival_before
+					tripSearch.arrival_before.toString()
 			);
 		}
 
