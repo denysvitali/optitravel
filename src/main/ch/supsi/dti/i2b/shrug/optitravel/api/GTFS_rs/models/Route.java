@@ -2,6 +2,8 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.models.Operator;
 
+import java.util.Objects;
+
 public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
     public String uid;
     public String agency_id;
@@ -49,11 +51,25 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
         return new Agency(getAgencyUID());
     }
 
-    @Override
+	@Override
     public String toString() {
         if(getShortName() != null){
             return String.format("%s (%s)", getShortName(), getUID());
         }
         return String.format("%s", getUID());
     }
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Route route = (Route) o;
+		return type == route.type &&
+				Objects.equals(uid, route.uid);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(uid);
+	}
 }

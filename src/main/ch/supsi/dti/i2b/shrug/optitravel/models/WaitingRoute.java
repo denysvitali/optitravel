@@ -12,6 +12,11 @@ public class WaitingRoute extends Route {
 	}
 
 	@Override
+	public String getUID() {
+		return "WaitingRoute";
+	}
+
+	@Override
 	public String toString() {
 		return getName();
 	}

@@ -35,7 +35,7 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_waiting_time() {
-		return 20.0;
+		return 35.0;
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double w_change() {
-		return 1.4 * PREF_WEIGHT;
+		return 0.8 * PREF_WEIGHT;
 	}
 
 	@Override
