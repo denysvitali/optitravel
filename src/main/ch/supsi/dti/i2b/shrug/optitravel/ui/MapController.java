@@ -81,16 +81,6 @@ public class MapController implements MapComponentInitializedListener {
         map.fitBounds(new LatLongBounds(sw, ne));
     }
 
-    public void addDirections(Coordinate from, Coordinate to) {
-        if (directionsService == null) directionsService = new DirectionsService();
-//        if(directionsService.renderer != null) directionsService.renderer.clearDirections();
-
-        fitToBounds(from, to);
-        DirectionsRequest request = new DirectionsRequest(from.toString(), to.toString(), TravelModes.TRANSIT);
-        directionsService.getRoute(request, (results, status) -> System.out.println("Directions received"),
-                new DirectionsRenderer(true, map, mapView.getDirec()));
-    }
-
     public void addDirections(Coordinate from, Coordinate to, List<Coordinate> stops) {
         if (directionsService == null) directionsService = new DirectionsService();
         if(directionsService.renderer != null) directionsService.renderer.clearDirections();
@@ -100,7 +90,15 @@ public class MapController implements MapComponentInitializedListener {
             waypoints[i] = new DirectionsWaypoint(stops.get(i).toString());
         }
         fitToBounds(from, to);
-        DirectionsRequest request = new DirectionsRequest(from.toString(), to.toString(), TravelModes.DRIVING, waypoints);
+        DirectionsRequest request = new DirectionsRequest(from.toString(), to.toString(), TravelModes.TRANSIT, waypoints);
+        directionsService.getRoute(request, (results, status) -> System.out.println("Directions received"),
+                new DirectionsRenderer(true, map, mapView.getDirec()));
+    }
+    public void addDirections(Coordinate from, Coordinate to, TravelModes travelMode) {
+        if (directionsService == null) directionsService = new DirectionsService();
+//        if(directionsService.renderer != null) directionsService.renderer.clearDirections();
+
+        DirectionsRequest request = new DirectionsRequest(from.toString(), to.toString(), travelMode);
         directionsService.getRoute(request, (results, status) -> System.out.println("Directions received"),
                 new DirectionsRenderer(true, map, mapView.getDirec()));
     }
