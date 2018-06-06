@@ -68,3 +68,6 @@ build/
 .vscode/
 .project
 bin/
+
+# OptiTravel specific files
+path.classdata

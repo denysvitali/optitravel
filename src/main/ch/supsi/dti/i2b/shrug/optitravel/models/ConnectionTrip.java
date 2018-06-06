@@ -26,4 +26,13 @@ public class ConnectionTrip extends Trip {
 		st_list = new ArrayList<>();
 		st_list.addAll(stopTrip);
 	}
+
+	@Override
+	public String getHeadSign() {
+		StopTrip st_end = st_list.get(1);
+		if(st_end == null || st_end.getStop() == null){
+			return "Connection";
+		}
+		return "Connection to " + st_end.getStop().getName();
+	}
 }

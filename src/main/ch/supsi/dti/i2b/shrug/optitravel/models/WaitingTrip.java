@@ -35,4 +35,9 @@ public class WaitingTrip extends Trip {
 	public void setStopTrip(List<StopTrip> stopTrip) {
 
 	}
+
+	@Override
+	public String getHeadSign() {
+		return null;
+	}
 }
