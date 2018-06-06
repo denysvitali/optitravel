@@ -244,9 +244,12 @@ public class DataGathering{
 			}
 		}
 
+/*
+		String nameroute = trips.get(0).getRoute().getName();
+		String opname = trips.get(0).getRoute().getOperator().getName();
 
-
-
+		nameroute = trips.get(1).getRoute().getName();
+		opname = trips.get(1).getRoute().getOperator().getName();*/
 		//trips.addAll(getwTL().getTripsByBBox(boundingBox));
 		// TODO: Add TL
 //		} catch(GTFSrsError /*| TransitLandAPIError*/ err){

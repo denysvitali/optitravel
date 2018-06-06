@@ -41,7 +41,7 @@ public class TransitLandAPIWrapper {
                 .build();
         Response response;
 
-        Route route = new Route(onestop_id);
+        RouteResult route = new RouteResult();
 
         response = client.get(url,(long) 50E3);
 
@@ -51,13 +51,13 @@ public class TransitLandAPIWrapper {
                 String str = response.body().string();
                 byte ptext[] = str.getBytes("ISO-8859-1");
                 str = new String(ptext, "UTF-8");
-                route = JsonIterator.deserialize(str, Route.class);
+                route = JsonIterator.deserialize(str, RouteResult.class);
 
 
                 response.close();
             } catch (IOException ex) {
                 response.close();
-                return route;
+                return route.getRoutes().get(0);
             }
         } else {
             if (response != null)
@@ -65,7 +65,7 @@ public class TransitLandAPIWrapper {
             throw new TransitLandAPIError("Unable to get any response for this request");
         }
 
-        return route;
+        return route.getRoutes().get(0);
     }
 
 
