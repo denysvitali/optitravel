@@ -8,15 +8,24 @@ import java.io.*;
 import java.util.List;
 
 public class PlanTest {
-	@Test
-	public void testPlanImport() throws IOException, ClassNotFoundException {
+	private void testPlanByClassData(String s) throws IOException, ClassNotFoundException {
 		File f = new File(getClass().getClassLoader()
-				.getResource("classdata/path-1.classdata").getFile());
+				.getResource(s).getFile());
 		FileInputStream fis = new FileInputStream(f);
 		ObjectInputStream ois = new ObjectInputStream(fis);
 
 		List<TimedLocation> timedLocationList = (List<TimedLocation>) ois.readObject();
 		Plan p = new Plan(timedLocationList);
 		System.out.println(timedLocationList);
+	}
+
+	@Test
+	public void testPlanImport1() throws IOException, ClassNotFoundException {
+		testPlanByClassData("classdata/path-1.classdata");
+	}
+
+	@Test
+	public void testPlanImport2() throws IOException, ClassNotFoundException {
+		testPlanByClassData("classdata/path-2.classdata");
 	}
 }
