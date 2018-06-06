@@ -1,16 +1,16 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
-import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
+import ch.supsi.dti.i2b.shrug.optitravel.models.plan.PlanSegment;
 import com.jfoenix.controls.JFXListCell;
 import javafx.scene.Node;
 
-public class TripCellItem extends JFXListCell<Trip> {
+public class PlanSegmentCellItem extends JFXListCell<PlanSegment> {
 
-    private final TripCellController controller = new TripCellController();
+    private final PlanSegmentCellController controller = new PlanSegmentCellController();
     private final Node view = controller.getView();
 
     @Override
-    protected void updateItem(Trip item, boolean empty) {
+    protected void updateItem(PlanSegment item, boolean empty) {
 //        super.updateItem(item, empty);
         if(empty) setGraphic(null);
         else {

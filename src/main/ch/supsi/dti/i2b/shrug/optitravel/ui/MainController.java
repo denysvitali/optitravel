@@ -3,6 +3,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.ui;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.models.plan.PlanSegment;
 import ch.supsi.dti.i2b.shrug.optitravel.params.DenvitPlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.PlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.Planner;
@@ -42,7 +43,7 @@ public class MainController {
     @FXML
     private GoogleMapView mapView;
     @FXML
-    private JFXListView<Trip> lvRouteStops;
+    private JFXListView<PlanSegment> lvPlanSegments;
     @FXML
     private AnchorPane mainContainer;
     @FXML
@@ -122,13 +123,13 @@ public class MainController {
         cbTripPeriod.getSelectionModel().selectFirst();
 
         // Prepare listview
-        lvRouteStops.setPrefWidth(280);
-        mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
-        filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvRouteStops.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
-        lvRouteStops.setCellFactory(param -> new TripCellItem());
+        lvPlanSegments.setPrefWidth(280);
+        mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvPlanSegments.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
+        filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvPlanSegments.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
+        lvPlanSegments.setCellFactory(param -> new PlanSegmentCellItem());
 
         fabSend.toFront();
-        lvRouteStops.toBack();
+        lvPlanSegments.toBack();
 
         fabSend.setOnAction((event) -> validateAndRequest());
     }
@@ -160,10 +161,9 @@ public class MainController {
     private void onPlannerComputeFinish(List<Plan> plans) {
         Plan p = plans.get(0);
         List<Coordinate> stops = new ArrayList<>();
-        for(Trip t : p.getTrips()) {
-            if(t instanceof WaitingTrip) continue;
-            stops.add(t.getStopTrip().get(0).getStop().getCoordinate());
-            lvRouteStops.getItems().add(t);
+        for(PlanSegment ps : p.getPlanSegments()) {
+            if(!(ps.getTrip() instanceof WaitingTrip) && !(ps.getTrip() instanceof ConnectionTrip)) stops.add(ps.getStart().getCoordinate());
+            lvPlanSegments.getItems().add(ps);
         }
         Platform.runLater(() -> mapController.addDirections(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates(), stops));
     }
