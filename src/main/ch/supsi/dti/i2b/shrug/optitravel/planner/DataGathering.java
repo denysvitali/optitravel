@@ -7,7 +7,11 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTimes;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.TripTimeStop;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.PubliBikeWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.LineString;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.RouteStopPattern;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.ScheduleStopPair;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
@@ -18,6 +22,8 @@ import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Algorithm;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class DataGathering{
 	private static final double AVG_MOVING_SPEED_KMH = 50;
@@ -88,9 +94,9 @@ public class DataGathering{
 			return stops;
 		}
 		try{
-			stops.addAll(getwGTFS().getStopsByBBox(boundingBox));
-			//stops.addAll(getwTL().getStopsByBBox(boundingBox));
-		} catch(GTFSrsError  err){
+		//	stops.addAll(getwGTFS().getStopsByBBox(boundingBox));
+			stops.addAll(getwTL().getStopsByBBox(boundingBox));
+		} catch(/*GTFSrsError | */TransitLandAPIError err){
 			err.printStackTrace();
 		}
 
@@ -101,7 +107,7 @@ public class DataGathering{
 		if (trips.size() != 0) {
 			return trips;
 		}
-
+/*
 		Time end_time = getEstimatedEndTime();
 
 
@@ -124,8 +130,8 @@ public class DataGathering{
 
 		/////////////////////////////
 
-
-		/*final List<RouteStopPattern> routeStopPatternsInBBox = new ArrayList<>();
+*/
+		final List<RouteStopPattern> routeStopPatternsInBBox = new ArrayList<>();
 		final List<ScheduleStopPair> scheduleStopPairsInBBox = new ArrayList<>();
 
 		AtomicInteger count = new AtomicInteger();
@@ -214,7 +220,7 @@ public class DataGathering{
 		}
 
 
-*/
+
 
 		//trips.addAll(getwTL().getTripsByBBox(boundingBox));
 		// TODO: Add TL

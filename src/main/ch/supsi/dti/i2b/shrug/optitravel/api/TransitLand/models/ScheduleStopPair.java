@@ -78,6 +78,9 @@ public class ScheduleStopPair extends ch.supsi.dti.i2b.shrug.optitravel.models.S
         return new Time(origin_arrival_time);
     }
 
+    public String getOrigin_departure_time() {
+        return origin_departure_time;
+    }
     public Double getOrigin_dist_traveled() {
         return (origin_dist_traveled == null ? 0.0 :
 				origin_dist_traveled.as(double.class));
@@ -188,8 +191,8 @@ public class ScheduleStopPair extends ch.supsi.dti.i2b.shrug.optitravel.models.S
 	}
 
 	@Override
-	public int getStopSequence() throws ExecutionControl.NotImplementedException {
+	public int getStopSequence() {
     	// TODO: @Pura Implement
-		throw new ExecutionControl.NotImplementedException("Not yet implemented!");
+		return 0;
 	}
 }
