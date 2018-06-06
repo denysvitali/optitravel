@@ -4,10 +4,11 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.Location;
 import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.DataGathering;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class Node<T extends TimedLocation, L extends Location> {
+public class Node<T extends TimedLocation, L extends Location> implements Serializable {
     private T element;
     private HashMap<Node<T,L>, Double> neighbours;
     private double g;

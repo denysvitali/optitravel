@@ -2,9 +2,10 @@ package ch.supsi.dti.i2b.shrug.optitravel.models;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.routing.AStar.Node;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public abstract class TimedLocation extends Location {
+public abstract class TimedLocation extends Location implements Serializable {
 
 	private Location location;
 	private Time time;
