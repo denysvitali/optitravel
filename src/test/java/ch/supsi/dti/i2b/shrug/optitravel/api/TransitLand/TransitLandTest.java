@@ -197,30 +197,30 @@ class TransitLandTest{
 
     }
 
-    @Test
-	void testParsingSSP(){
-		FileInputStream parser_result = null;
-		try {
-			parser_result = new FileInputStream(new File(
-					"src/test/" +
-					"resources/mock/api/transitland/results/" +
-					"ssp_parser_result.json"));
-		} catch (FileNotFoundException e) {
-			fail(e);
-		}
-		try {
-			String json = new String(
-					parser_result.readAllBytes(),
-					StandardCharsets.UTF_8);
-			ScheduleStopPairResult ssp = ScheduleStopPairResultParser.parse(json);
-			assertNotEquals(null, ssp);
-			assertNotEquals(null, ssp.getMeta());
-			assertNotEquals(null, ssp.getScheduleStopPairs());
-			assertNotEquals(0, ssp.getScheduleStopPairs().size());
-		} catch (IOException e) {
-			fail(e);
-		}
-	}
+//    @Test
+//	void testParsingSSP(){
+//		FileInputStream parser_result = null;
+//		try {
+//			parser_result = new FileInputStream(new File(
+//					"src/test/" +
+//					"resources/mock/api/transitland/results/" +
+//					"ssp_parser_result.json"));
+//		} catch (FileNotFoundException e) {
+//			fail(e);
+//		}
+//		try {
+//			String json = new String(
+//					parser_result.readAllBytes(),
+//					StandardCharsets.UTF_8);
+//			ScheduleStopPairResult ssp = ScheduleStopPairResultParser.parse(json);
+//			assertNotEquals(null, ssp);
+//			assertNotEquals(null, ssp.getMeta());
+//			assertNotEquals(null, ssp.getScheduleStopPairs());
+//			assertNotEquals(0, ssp.getScheduleStopPairs().size());
+//		} catch (IOException e) {
+//			fail(e);
+//		}
+//	}
 
     @Test
     void checkGetScheduleStopPairRSP(){

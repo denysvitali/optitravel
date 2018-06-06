@@ -4,7 +4,6 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.DropOff;
 import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Stop;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
-import jdk.jshell.spi.ExecutionControl;
 
 public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip {
 

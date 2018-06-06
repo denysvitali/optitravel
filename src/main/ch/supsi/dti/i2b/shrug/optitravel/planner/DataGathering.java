@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class DataGathering{
 	private static final double AVG_MOVING_SPEED_KMH = 50;
 	private static final double AVG_MOVING_SPEED = AVG_MOVING_SPEED_KMH / (60 * 1000); // in m/minute
-	private static final boolean USE_GTFS = false;
+	private static final boolean USE_GTFS = true;
 	private TransitLandAPIWrapper wTL = new TransitLandAPIWrapper();
 	private GTFSrsWrapper wGTFS = new GTFSrsWrapper();
 	private PubliBikeWrapper wPB = new PubliBikeWrapper();
@@ -246,12 +246,9 @@ public class DataGathering{
 			}
 		}
 
-/*
-		String nameroute = trips.get(0).getRoute().getName();
-		String opname = trips.get(0).getRoute().getOperator().getName();
 
-		nameroute = trips.get(1).getRoute().getName();
-		opname = trips.get(1).getRoute().getOperator().getName();*/
+
+
 		//trips.addAll(getwTL().getTripsByBBox(boundingBox));
 		// TODO: Add TL
 //		} catch(GTFSrsError /*| TransitLandAPIError*/ err){
