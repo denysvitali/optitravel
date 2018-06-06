@@ -4,6 +4,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 
@@ -46,6 +47,15 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     @Override
     public String toString() {
         return getRoute_stop_pattern_id() + " Trip_id: " + getTrip_id();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Trip trip = (Trip) o;
+        return Objects.equals(this.route_stop_pattern_id, trip.route_stop_pattern_id) &&
+                Objects.equals(this.trip_id, trip.trip_id);
     }
 
     public void setRoute(Route route) {

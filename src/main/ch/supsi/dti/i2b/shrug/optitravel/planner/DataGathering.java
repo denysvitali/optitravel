@@ -107,10 +107,10 @@ public class DataGathering{
 		if (trips.size() != 0) {
 			return trips;
 		}
-/*
+
 		Time end_time = getEstimatedEndTime();
 
-
+/*
 		TripSearch ts = new TripSearch();
 		ts.departure_after = start_time.toString();
 		ts.arrival_before = end_time.toString();
@@ -148,7 +148,7 @@ public class DataGathering{
 
 		});
 
-		getwTL().AgetScheduleStopPairsByBBox(boundingBox, (ssps)->{
+		getwTL().AgetScheduleStopPairsByBBox(boundingBox, from_date, start_time, end_time, (ssps)->{
 
 			System.out.println(ssps.size());
 			scheduleStopPairsInBBox.addAll(ssps);
@@ -340,9 +340,6 @@ public class DataGathering{
 				if(!same_trip){
 					weight += pp.w_change();
 					weight += pp.w_moving() * Time.diffMinutes(trip_nx_st.getTime(), trip_el_st.getTime());
-				}
-				else{
-					System.out.println("");
 				}
 
 				neighbours.putIfAbsent(nextConnectedStop, weight);
