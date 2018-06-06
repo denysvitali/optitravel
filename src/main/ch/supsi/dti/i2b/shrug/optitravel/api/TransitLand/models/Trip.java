@@ -49,6 +49,12 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     }
 
     @Override
+    public String getHeadSign() {
+        // TODO: @Pura, implement
+        return null;
+    }
+
+    @Override
     public String toString() {
         return getRoute_stop_pattern_id() + " Trip_id: " + getTrip_id();
     }

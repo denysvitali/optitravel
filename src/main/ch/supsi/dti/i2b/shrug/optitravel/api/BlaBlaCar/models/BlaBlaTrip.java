@@ -40,4 +40,9 @@ public class BlaBlaTrip extends Trip {
     @Override
     public void setStopTrip(List<StopTrip> stopTrip) {
     }
+
+    @Override
+    public String getHeadSign() {
+        return null;
+    }
 }

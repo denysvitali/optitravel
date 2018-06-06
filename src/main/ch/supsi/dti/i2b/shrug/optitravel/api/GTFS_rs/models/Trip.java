@@ -41,6 +41,7 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     	stopTrip.forEach(e->stop_sequence.add((StopTrip) e));
 	}
 
+	@Override
 	public String getHeadSign() {
         return headsign;
     }
