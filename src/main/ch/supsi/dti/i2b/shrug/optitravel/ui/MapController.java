@@ -92,14 +92,14 @@ public class MapController implements MapComponentInitializedListener {
 
     public void addDirections(Coordinate from, Coordinate to, List<Coordinate> stops) {
         if (directionsService == null) directionsService = new DirectionsService();
-
         if(directionsService.renderer != null) directionsService.renderer.clearDirections();
 
         DirectionsWaypoint[] waypoints = new DirectionsWaypoint[stops.size()];
         for(int i = 0; i < stops.size(); i++) {
             waypoints[i] = new DirectionsWaypoint(stops.get(i).toString());
         }
-        DirectionsRequest request = new DirectionsRequest(from.toString(), to.toString(), TravelModes.WALKING, waypoints);
+        fitToBounds(from, to);
+        DirectionsRequest request = new DirectionsRequest(from.toString(), to.toString(), TravelModes.DRIVING, waypoints);
         directionsService.getRoute(request, (results, status) -> System.out.println("Directions received"),
                 new DirectionsRenderer(true, map, mapView.getDirec()));
     }

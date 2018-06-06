@@ -42,16 +42,22 @@ public class PlanSegmentCellController {
         distance.setVisible(false);
         details.setVisible(false);
         if(planSegment.getTrip() instanceof WaitingTrip) {
+            from.setText("Wait for next connection");
+            to.setText(planSegment.getStart().toString());
+            eta.setText(planSegment.getStart().getTime().toString());
             icon.setIcon(MaterialIcon.TIMER);
-        } else if (planSegment.getTrip() instanceof WalkingTrip) {
+        } else if (planSegment.getTrip() instanceof WalkingTrip || planSegment.getTrip() instanceof ConnectionTrip) {
+            from.setText("Walk to next connection");
+            to.setText(planSegment.getStart().toString());
+            eta.setText(planSegment.getStart().getTime().toString());
             icon.setIcon(MaterialIcon.DIRECTIONS_WALK);
-
-        } else if (planSegment.getTrip() instanceof ConnectionTrip) {
-            icon.setIcon(MaterialIcon.DIRECTIONS_WALK);
-
         } else {
             icon.setIcon(MaterialIcon.DIRECTIONS_BUS);
-
+            from.setText(planSegment.getStart().toString());
+            to.setText(planSegment.getEnd().toString());
+            eta.setText(planSegment.getStart().getTime().toString());
+            details.setText(planSegment.getTrip().getHeadSign());
+            details.setVisible(true);
         }
 //        if(planSegment instanceof PlanSegment) {
 //            from.textProperty().setValue("Walk to next stop.");

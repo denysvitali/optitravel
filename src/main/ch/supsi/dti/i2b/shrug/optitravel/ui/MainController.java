@@ -20,6 +20,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DateCell;
 import javafx.scene.layout.AnchorPane;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -135,37 +139,53 @@ public class MainController {
     }
 
     private void validateAndRequest() {
-        if (!tfStartPoint.validate() || !tfEndPoint.validate()) {
-            return;
-        }
-        mapController.fitToBounds(tfStartPoint.getPlace().getCoordinates(),tfEndPoint.getPlace().getCoordinates());
-        // validate time
-        if (cbTripPeriod.getValue() != TripTimeFrame.LEAVE_NOW) {
-            if (LocalDateTime.of(dpDate.getValue(), tpTime.getValue()).compareTo(LocalDateTime.now()) < 0) {
-                return;
-            }
-        }
-        Planner p = new Planner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
-        p.setStartTime(
-                cbTripPeriod.getValue() == TripTimeFrame.LEAVE_NOW ?
-                        LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) :
-                        LocalDateTime.of(dpDate.getValue(), tpTime.getValue())
-        );
-        PlanPreference pp = new DenvitPlanPreference(Distance.distance(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates()));
-        p.setPlanPreference(pp);
-        new Thread(() -> onPlannerComputeFinish(p.getPlans())).start();
-
+//        if (!tfStartPoint.validate() || !tfEndPoint.validate()) {
+//            return;
+//        }
+//        mapController.fitToBounds(tfStartPoint.getPlace().getCoordinates(),tfEndPoint.getPlace().getCoordinates());
+//        // validate time
+//        if (cbTripPeriod.getValue() != TripTimeFrame.LEAVE_NOW) {
+//            if (LocalDateTime.of(dpDate.getValue(), tpTime.getValue()).compareTo(LocalDateTime.now()) < 0) {
+//                return;
+//            }
+//        }
+//        Planner p = new Planner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
+//        p.setStartTime(
+//                cbTripPeriod.getValue() == TripTimeFrame.LEAVE_NOW ?
+//                        LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) :
+//                        LocalDateTime.of(dpDate.getValue(), tpTime.getValue())
+//        );
+//        PlanPreference pp = new DenvitPlanPreference(Distance.distance(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates()));
+//        p.setPlanPreference(pp);
+//        new Thread(() -> onPlannerComputeFinish(p.getPlans())).start();
+onPlannerComputeFinish(null);
 //        mapController.addDirections(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
     }
 
     private void onPlannerComputeFinish(List<Plan> plans) {
-        Plan p = plans.get(0);
+//        Plan p = plans.get(0);
+        lvPlanSegments.getItems().clear();
+
+        List<TimedLocation> timedLocationList = null;
+        File f = new File(getClass().getClassLoader()
+                .getResource("classdata/path-2.classdata").getFile());
+        try {
+            FileInputStream fis = new FileInputStream(f);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            timedLocationList = (List<TimedLocation>) ois.readObject();
+            System.out.println(timedLocationList);
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Plan p = new Plan(timedLocationList);
         List<Coordinate> stops = new ArrayList<>();
         for(PlanSegment ps : p.getPlanSegments()) {
             if(!(ps.getTrip() instanceof WaitingTrip) && !(ps.getTrip() instanceof ConnectionTrip)) stops.add(ps.getStart().getCoordinate());
             lvPlanSegments.getItems().add(ps);
         }
-        Platform.runLater(() -> mapController.addDirections(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates(), stops));
+        Platform.runLater(() -> mapController.addDirections(p.getStartLocation().getCoordinate(), p.getEndLocation().getCoordinate(), stops));
     }
 }
 
