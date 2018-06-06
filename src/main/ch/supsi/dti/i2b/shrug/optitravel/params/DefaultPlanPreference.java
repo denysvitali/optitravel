@@ -55,11 +55,16 @@ public class DefaultPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_total_waiting_time() {
-		return 20.0;
+		return 3 * max_waiting_time();
 	}
 
 	@Override
 	public int max_total_changes() {
 		return 3;
+	}
+
+	@Override
+	public double max_total_walkable_distance() {
+		return 2000;
 	}
 }

@@ -7,6 +7,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class HttpClient {
@@ -24,6 +25,26 @@ public class HttpClient {
                 .build();
         return r;
     }
+/*
+    private Request getRequestWithHeader(HttpUrl url, Map<String, String> headers){
+
+        Request.Builder rb = new Request.Builder().url(url);
+        for(String key : headers.keySet()){
+            rb = rb.header(key, headers.get(key));
+        }
+        Request r = rb.get().build();
+        return r;
+    }
+
+    public Response getWithHeader(HttpUrl url, Map<String, String> headers){
+        try {
+            Response r = client.newCall(getRequestWithHeader(url, headers)).execute();
+            return r;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }*/
 
     public Response get(HttpUrl url, long timeout){
         OkHttpClient timeoutClient = new OkHttpClient.Builder()

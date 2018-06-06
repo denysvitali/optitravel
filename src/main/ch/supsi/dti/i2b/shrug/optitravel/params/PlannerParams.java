@@ -9,7 +9,7 @@ public class PlannerParams {
 	// Radius in which the stop is considered close to our source point
 	public static final double SOURCE_RADIUS = 50.0;
 	// Radius in which the stop is considered final (close to our destination)
-	public static final double DESTINATION_RADIUS = 100;
+	public static final double DESTINATION_RADIUS = 600;
 
 	// Maximum Waiting Time (in minutes)
 	public static final double MAX_WAITING_TIME = 50.0;

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class TransitLandAPIWrapper {
     private static String HOST = "api.transit.land";
     private static int PER_PAGE = 200;
-    private static int MAX_REQUESTS = 1000/PER_PAGE;
+    private static int MAX_REQUESTS = 100000000/PER_PAGE;
     private HttpClient client;
 
     public TransitLandAPIWrapper(){
@@ -106,6 +106,8 @@ public class TransitLandAPIWrapper {
             if (response != null && response.isSuccessful() && response.body() != null) {
                 try {
                     String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
                     rspResult = JsonIterator.deserialize(str, RouteStopPatternsResult.class);
                     response.close();
                     listRsp.addAll(rspResult.getRouteStopPatterns());
@@ -237,6 +239,8 @@ public class TransitLandAPIWrapper {
             if (response != null && response.isSuccessful() && response.body() != null) {
                 try {
                     String str = response.body().string();
+                    byte ptext[] = str.getBytes("ISO-8859-1");
+                    str = new String(ptext, "UTF-8");
                     sspResult = JsonIterator.deserialize(str, ScheduleStopPairResult.class);
                     response.close();
                     listSch.addAll(sspResult.getScheduleStopPairs());
@@ -316,6 +320,8 @@ public class TransitLandAPIWrapper {
             try {
                 // TODO: @denvit Check
                 String str = response.body().string();
+                byte ptext[] = str.getBytes("ISO-8859-1");
+                str = new String(ptext, "UTF-8");
                 operator = JsonIterator.deserialize(str, OperatorsResult.class)
                         .getOperators()
                         .get(0);
@@ -357,22 +363,28 @@ public class TransitLandAPIWrapper {
         throw new TransitLandAPIError("Unable to get any response for this request");
     }
 
-    public List<RouteStopPattern> getRouteStopPatternsByBBox(GPSCoordinates coord1, GPSCoordinates coord2) throws TransitLandAPIError {
+    public List<RouteStopPattern> getRouteStopPatternsByBBox(BoundingBox bbox) throws TransitLandAPIError {
 
         HttpUrl url = new HttpUrl.Builder()
                 .host(HOST)
                 .scheme("https")
                 .addPathSegments("api/v1/route_stop_patterns")
-                .addQueryParameter("bbox", coord1.getLongitude()+","+coord1.getLatitude()+","+coord2.getLongitude()+","+coord2.getLatitude())
+                .addQueryParameter("bbox",
+                        String.format("%f,%f,%f,%f",
+                                bbox.getP1().getLng(),
+                                bbox.getP1().getLat(),
+                                bbox.getP2().getLng(),
+                                bbox.getP2().getLat()
+                        ))
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
         return parseRouteStopPatternResult(url);
     }
 
-    public void AgetRouteStopPatternsByBBox(GPSCoordinates coord1, GPSCoordinates coord2, Callback<List<RouteStopPattern>> cb){
+    public void AgetRouteStopPatternsByBBox(BoundingBox bbox, Callback<List<RouteStopPattern>> cb){
         Runnable r = ()->{
             try {
-                cb.exec(getRouteStopPatternsByBBox(coord1, coord2));
+                cb.exec(getRouteStopPatternsByBBox(bbox));
             } catch (TransitLandAPIError transitLandAPIError) {
                 transitLandAPIError.printStackTrace();
                 cb.exec(null);
@@ -437,6 +449,8 @@ public class TransitLandAPIWrapper {
         if(response != null) {
             if(response.body() != null) {
                 String str = response.body().string();
+                byte ptext[] = str.getBytes("ISO-8859-1");
+                str = new String(ptext, "UTF-8");
                 stopsResult = JsonIterator.deserialize(str, StopsResult.class);
                 listStop.addAll(stopsResult.getStops());
             }
@@ -490,6 +504,9 @@ public class TransitLandAPIWrapper {
                                 bbox.getP2().getLng(),
                                 bbox.getP2().getLat()
                         ))
+                .addQueryParameter("date", "2018-05-24")
+                .addQueryParameter("origin_departure_between", "10:00:00,11:00:00")
+
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();
 
@@ -509,6 +526,52 @@ public class TransitLandAPIWrapper {
         t.start();
     }
 
+    public List<ScheduleStopPair> getScheduleStopPair(String rsp, String originStopId) throws TransitLandAPIError {
+
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/schedule_stop_pairs")
+                .addQueryParameter("date", "2018-05-24")
+                .addQueryParameter("origin_departure_between", "10:00:00,17:00:00")
+                .addQueryParameter("origin_onestop_id", originStopId)
+                .addQueryParameter("route_stop_pattern_onestop_id", rsp)
+
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
+                .build();
+
+        return parseRouteStopPairResult(url);
+    }
+/*
+    public List<ScheduleStopPair> getScheduleStopPairsByBBoxAndRSP(String rsp) throws TransitLandAPIError {
+
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/schedule_stop_pairs")
+                .addQueryParameter("date", "2018-05-24")
+          //      .addQueryParameter("origin_departure_between", "10:00:00,17:00:00")
+                .addQueryParameter("route_stop_pattern_onestop_id", rsp)
+
+                .addQueryParameter("per_page", String.valueOf(PER_PAGE))
+                .build();
+
+        return parseRouteStopPairResult(url);
+    }
+
+    public void AgetScheduleStopPairsByBBoxAndRSP(String rsp, Callback<List<ScheduleStopPair>> cb){
+        Runnable r = ()->{
+            try {
+                cb.exec(getScheduleStopPairsByBBoxAndRSP(rsp));
+            } catch (TransitLandAPIError transitLandAPIError) {
+                transitLandAPIError.printStackTrace();
+                cb.exec(null);
+            }
+        };
+        Thread t = new Thread(r);
+        t.start();
+    }
+*/
     public void destroy() {
         if(client != null){
             client.destroy();

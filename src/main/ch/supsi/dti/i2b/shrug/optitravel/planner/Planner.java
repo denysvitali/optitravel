@@ -1,7 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.planner;
 
 
-import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
@@ -30,12 +29,13 @@ public class Planner<T extends TimedLocation, L extends Location> {
 	private Algorithm<T, L> algorithm;
 
 
-	public Planner(Coordinate from, Coordinate to){
-        this.from = from;
-        this.to = to;
-    }
+	public Planner(Coordinate from, Coordinate to) {
+		this.from = from;
+		this.to = to;
+		dg = new DataGathering();
+	}
 
-    public List<Plan> getPlans(){
+	public List<Plan> getPlans(){
         if(!alreadyComputed){
             computePlans();
         }
@@ -52,7 +52,11 @@ public class Planner<T extends TimedLocation, L extends Location> {
                             + ")"
             );
 		}
-		DataGathering dg = new DataGathering();
+
+		if(dg == null){
+			return;
+		}
+
         dg.setPlanPreference(pp);
 		dg.setFromDate(new Date(start_time.toLocalDate()));
 		dg.setStartTime(new Time(start_time.toLocalTime()));
@@ -133,5 +137,9 @@ public class Planner<T extends TimedLocation, L extends Location> {
 
 	public void setPlanPreference(PlanPreference pp) {
 		this.pp = pp;
+	}
+
+	protected void setDG(DataGathering dg) {
+		this.dg = dg;
 	}
 }

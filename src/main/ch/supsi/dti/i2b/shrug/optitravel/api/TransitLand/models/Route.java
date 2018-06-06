@@ -46,6 +46,11 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
         return operator;
     }
 
+    @Override
+    public String getUID() {
+        return getId();
+    }
+
     public String getId() {
         return route_onestop_id;
     }

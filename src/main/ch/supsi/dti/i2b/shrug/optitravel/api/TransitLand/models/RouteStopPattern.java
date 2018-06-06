@@ -46,9 +46,12 @@ public class RouteStopPattern {
         return new Route(route_onestop_id);
     }
 
-    public ArrayList<Stop> getStopPattern() {
-        return stop_pattern.stream().map(Stop::fromId).collect(Collectors.toCollection(ArrayList::new));
+    public ArrayList<String> getStopPattern(){
+        return stop_pattern;
     }
+/*    public ArrayList<Stop> getStopPattern() {
+        return stop_pattern.stream().map(Stop::fromId).collect(Collectors.toCollection(ArrayList::new));
+    }*/
 
     public ArrayList<Double> getStopDistances() {
         return stop_distances;
