@@ -2,48 +2,67 @@ package ch.supsi.dti.i2b.shrug.optitravel.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models.GPSCoordinates;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.models.plan.PlanSegment;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Plan {
-    private List<Trip> trips;
-    private Time start_time;
-    private Time end_time;
+    private TimedLocation start_location;
+    private TimedLocation end_location;
 
-    private Coordinate start_location;
-    private Coordinate end_location;
+    private List<PlanSegment> planSegments = new ArrayList<>();
 
-    public Plan(List<Trip> trips,
-				Time start_time,
-				Time end_time,
-				Coordinate start_location,
-				Coordinate end_location){
-    	this.trips = trips;
-    	this.start_time = start_time;
-    	this.end_time = end_time;
-    	this.start_location = start_location;
-    	this.end_location = end_location;
+    public Plan(){}
+
+	public void setPlanSegments(List<PlanSegment> planSegments) {
+		this.planSegments = planSegments;
 	}
 
-	public List<Trip> getTrips() {
-		return trips;
+	public List<PlanSegment> getPlanSegments() {
+		return planSegments;
 	}
 
-	public Coordinate getEndLocation() {
+	public Plan(List<TimedLocation> timedLocationList) {
+    	Trip t = null;
+    	TimedLocation st_start = null;
+    	TimedLocation st_end = null;
+
+		PlanSegment ps = null;
+
+    	for(TimedLocation tl : timedLocationList){
+			if(st_start == null){
+				st_start = tl;
+				continue;
+			}
+
+			if(ps == null){
+				ps = new PlanSegment(tl.getTrip(), tl);
+				continue;
+			}
+
+			ps.addElement(tl);
+			if(!ps.getTrip().equals(tl.getTrip())){
+				ps.setEnd(tl);
+				planSegments.add(ps);
+				ps = new PlanSegment(tl.getTrip(), tl);
+			}
+
+			ps.setEnd(tl);
+			st_end = tl;
+		}
+		start_location = st_start;
+		end_location = st_end;
+	}
+
+	public Location getEndLocation() {
 		return end_location;
 	}
 
-	public Coordinate getStartLocation() {
+	public Location getStartLocation() {
 		return start_location;
 	}
 
-	public Time getStartTime() {
-		return start_time;
-	}
-
-	public Time getEndTime() {
-		return end_time;
-	}
 }

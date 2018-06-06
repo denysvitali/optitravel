@@ -1,9 +1,10 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-public class Time {
+public class Time implements Serializable {
 	private LocalTime localTime;
 
 	public Time(){

@@ -7,6 +7,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.mock.MockedDataGathering;
 import ch.supsi.dti.i2b.shrug.optitravel.mock.MockedPlanner;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Plan;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Trip;
+import ch.supsi.dti.i2b.shrug.optitravel.models.plan.PlanSegment;
 import ch.supsi.dti.i2b.shrug.optitravel.params.*;
 import org.junit.jupiter.api.Test;
 
@@ -209,11 +210,11 @@ public class PlannerTest {
 		Plan plan = plans.get(0);
 
 		assertNotEquals(null, plan);
-		assertNotEquals(null, plan.getTrips());
+		assertNotEquals(null, plan.getPlanSegments());
 
-		plan.getTrips()
+		plan.getPlanSegments()
 				.stream()
-				.map(Trip::getRoute)
+				.map(PlanSegment::getRoute)
 				.forEach(System.out::println);
 	}
 
@@ -237,11 +238,11 @@ public class PlannerTest {
 		Plan plan = plans.get(0);
 
 		assertNotEquals(null, plan);
-		assertNotEquals(null, plan.getTrips());
+		assertNotEquals(null, plan.getPlanSegments());
 
-		plan.getTrips()
+		plan.getPlanSegments()
 				.stream()
-				.map(Trip::getRoute)
+				.map(PlanSegment::getRoute)
 				.forEach(System.out::println);
 	}
 

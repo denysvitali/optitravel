@@ -2,9 +2,10 @@ package ch.supsi.dti.i2b.shrug.optitravel.geography;
 
 import com.lynden.gmapsfx.javascript.object.LatLong;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Coordinate {
+public class Coordinate implements Serializable {
     private double lat;
     private double lng;
 
