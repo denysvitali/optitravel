@@ -1,5 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.geography;
 
+import com.lynden.gmapsfx.javascript.object.LatLong;
+
 import java.util.Objects;
 
 public class Coordinate {
@@ -19,6 +21,10 @@ public class Coordinate {
 
     public double getLng() {
         return lng;
+    }
+
+    public LatLong toLatLong() {
+        return new LatLong(lat, lng);
     }
 
     @Override

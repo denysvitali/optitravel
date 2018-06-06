@@ -65,7 +65,7 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_total_waiting_time() {
-		return max_waiting_time()*2;
+		return max_waiting_time();
 	}
 
 	@Override

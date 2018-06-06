@@ -86,8 +86,8 @@ public class BoundingBox {
 				c2f_y = c2_y + meters;
 			} else {
 				/*
-					c2
-						c1
+					c1
+						c2
 				 */
 				c1f_x = c1_x + meters;
 				c1f_y = c1_y - meters;

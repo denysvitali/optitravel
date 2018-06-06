@@ -6,4 +6,5 @@ public class DirectionsService {
     private static final String SEGMENTS = "maps/api/directions/json";
     private static final String KEY = "AIzaSyAvtzzsAPAlOrK8JbGfXfHMt18MbqCqrj4";
 
+
 }

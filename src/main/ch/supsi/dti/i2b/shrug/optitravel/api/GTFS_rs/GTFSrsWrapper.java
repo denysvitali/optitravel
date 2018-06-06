@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GTFSrsWrapper {
-    public static final String HOST = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? "localhost": "gtfs.ded1.denv.it");
+    public static final String HOST = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? "192.168.43.34": "gtfs.ded1.denv.it");
     public static final int PORT = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? 8000 : 443);
     public static final String SCHEME = (BuildConfig.isDev() && !BuildConfig.USE_GTFS_REMOTE ? "http" : "https");
     private HttpClient client;
@@ -185,7 +185,7 @@ public class GTFSrsWrapper {
                 .scheme(SCHEME)
                 .addPathSegments("api/trips/in/" + boundingBox)
                 .build();
-        Response response = client.get(url, 20 * 1000);
+        Response response = client.get(url, 120 * 1000);
 		return getPaginatedTrips(response);
 	}
 
@@ -444,7 +444,7 @@ public class GTFSrsWrapper {
 				.scheme(SCHEME)
 				.addPathSegments("api/stops/in/" + boundingBox)
 				.build();
-		Response response = client.get(url);
+		Response response = client.get(url, 20*1000);
 		return parseStopResponse(response);
     }
 

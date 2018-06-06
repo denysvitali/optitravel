@@ -505,7 +505,7 @@ public class TransitLandAPIWrapper {
                                 bbox.getP2().getLat()
                         ))
                 .addQueryParameter("date", "2018-05-24")
-                .addQueryParameter("origin_departure_between", "10:00:00,11:00:00")
+                .addQueryParameter("origin_departure_between", "11:00:00,12:00:00")
 
                 .addQueryParameter("per_page", String.valueOf(PER_PAGE))
                 .build();

@@ -1,8 +1,10 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.params.DefaultPlanPreference;
+import ch.supsi.dti.i2b.shrug.optitravel.params.DenvitPlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.DataGathering;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.PlanPreference;
 import ch.supsi.dti.i2b.shrug.optitravel.planner.Planner;
@@ -13,6 +15,7 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTimePicker;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.lynden.gmapsfx.GoogleMapView;
+import com.lynden.gmapsfx.service.directions.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -24,6 +27,8 @@ import javafx.scene.layout.AnchorPane;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,30 +141,41 @@ public class MainController {
     }
 
     private void validateAndRequest() {
-//        if (!tfStartPoint.validate() || !tfEndPoint.validate()) {
-//            return;
-//        }
-//        // validate time
-//        if (cbTripPeriod.getValue() != TripTimeFrame.LEAVE_NOW) {
-//            if (LocalDateTime.of(dpDate.getValue(), tpTime.getValue()).compareTo(LocalDateTime.now()) < 0) {
-//                return;
-//            }
-//        }
+        if (!tfStartPoint.validate() || !tfEndPoint.validate()) {
+            return;
+        }
+        mapController.fitToBounds(tfStartPoint.getPlace().getCoordinates(),tfEndPoint.getPlace().getCoordinates());
+        // validate time
+        if (cbTripPeriod.getValue() != TripTimeFrame.LEAVE_NOW) {
+            if (LocalDateTime.of(dpDate.getValue(), tpTime.getValue()).compareTo(LocalDateTime.now()) < 0) {
+                return;
+            }
+        }
 //        Planner p = new Planner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
 //        p.setStartTime(
 //                cbTripPeriod.getValue() == TripTimeFrame.LEAVE_NOW ?
-//                        LocalDateTime.now() :
+//                        LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) :
 //                        LocalDateTime.of(dpDate.getValue(), tpTime.getValue())
 //        );
-//        PlanPreference pp = new DefaultPlanPreference();
+//        PlanPreference pp = new DenvitPlanPreference(Distance.distance(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates()));
 //        p.setPlanPreference(pp);
-//        new Thread(() -> onPlannerComputeFinish(p.getPlans()));
-        MockPlanner mp = new MockPlanner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
-        onPlannerComputeFinish(mp.getPlans());
+//        new Thread(() -> onPlannerComputeFinish(p.getPlans())).start();
+//        DirectionsRequest request = new DirectionsRequest(tfStartPoint.getPlace().getCoordinates().toLatLong(),
+//                tfEndPoint.getPlace().getCoordinates().toLatLong(), TravelModes.TRANSIT);
+//        DirectionsRenderer renderer = new DirectionsRenderer(true, mapController.getMap(), );
+//        renderer.setMap(mapController.getMap());
+//        DirectionsService service = new DirectionsService();
+//        DirectionsServiceCallback callback = new DirectionsServiceCallback() {
+//            @Override
+//            public void directionsReceived(DirectionsResult results, DirectionStatus status) {
+//                System.out.println("Diopo rco");
+//            }
+//        };
+//        service.getRoute(request, callback, renderer);
+
     }
 
     private void onPlannerComputeFinish(List<Plan> plans) {
-        Plan plan = plans.get(0);
     }
 }
 

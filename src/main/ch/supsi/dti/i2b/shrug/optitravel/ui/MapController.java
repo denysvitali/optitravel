@@ -1,9 +1,13 @@
 package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Location;
+import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
+import com.lynden.gmapsfx.service.directions.DirectionsRenderer;
+import com.lynden.gmapsfx.service.directions.DirectionsRequest;
+import com.lynden.gmapsfx.service.directions.DirectionsService;
 import com.lynden.gmapsfx.service.geocoding.GeocodingService;
 import javafx.application.Platform;
 
@@ -70,7 +74,11 @@ public class MapController implements MapComponentInitializedListener {
         }
     }
 
-    public void clearMarkers() {
-
+    public void fitToBounds(Coordinate origin, Coordinate dest) {
+        LatLong sw = new LatLong(Math.max(origin.getLat(), dest.getLat()), Math.min(origin.getLng(), dest.getLng()));
+        LatLong ne = new LatLong(Math.min(origin.getLat(), dest.getLat()), Math.max(origin.getLng(), dest.getLng()));
+        map.fitBounds(new LatLongBounds(sw, ne));
     }
+
+    public GoogleMap getMap() { return map; }
 }
