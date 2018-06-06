@@ -90,10 +90,10 @@ public class BoundingBox {
 						c1
 				 */
 				c1f_x = c1_x + meters;
-				c1f_y = c1_y + meters;
+				c1f_y = c1_y - meters;
 
 				c2f_x = c2_x - meters;
-				c2f_y = c2_y - meters;
+				c2f_y = c2_y + meters;
 			}
 		} else {
 			if(c1_y < c2_y){
@@ -102,20 +102,20 @@ public class BoundingBox {
 						c1
 				 */
 				c1f_x = c1_x + meters;
-				c1f_y = c1_y + meters;
+				c1f_y = c1_y - meters;
 
 				c2f_x = c2_x - meters;
-				c2f_y = c2_y - meters;
+				c2f_y = c2_y + meters;
 			} else {
 				/*
 						c1
 					c2
 				 */
-				c1f_x = c1_x - meters;
-				c1f_y = c1_y - meters;
+				c1f_x = c1_x + meters;
+				c1f_y = c1_y + meters;
 
-				c2f_x = c2_x + meters;
-				c2f_y = c2_y + meters;
+				c2f_x = c2_x - meters;
+				c2f_y = c2_y - meters;
 			}
 		}
 
