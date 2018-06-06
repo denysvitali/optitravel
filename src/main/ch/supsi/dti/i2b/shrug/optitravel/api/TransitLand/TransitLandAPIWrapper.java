@@ -30,6 +30,45 @@ public class TransitLandAPIWrapper {
         return getStopsByRoute(new Route(route_onestop_id));
     }
 
+    public Route getRoute(String onestop_id) throws TransitLandAPIError {
+        // /api/v1/stops
+        HttpUrl url = new HttpUrl.Builder()
+                .host(HOST)
+                .scheme("https")
+                .addPathSegments("api/v1/routes")
+                .addQueryParameter("onestop_id", onestop_id)
+
+                .build();
+        Response response;
+
+        Route route = new Route(onestop_id);
+
+        response = client.get(url,(long) 50E3);
+
+        if (response != null && response.isSuccessful() && response.body() != null) {
+            try {
+
+                String str = response.body().string();
+                byte ptext[] = str.getBytes("ISO-8859-1");
+                str = new String(ptext, "UTF-8");
+                route = JsonIterator.deserialize(str, Route.class);
+
+
+                response.close();
+            } catch (IOException ex) {
+                response.close();
+                return route;
+            }
+        } else {
+            if (response != null)
+                response.close();
+            throw new TransitLandAPIError("Unable to get any response for this request");
+        }
+
+        return route;
+    }
+
+
     public List<Stop> getStopsByRoute(Route route) throws TransitLandAPIError {
         // https://transit.land/api/v1/stops?served_by=r-u0nmf-449
         HttpUrl url = new HttpUrl.Builder()

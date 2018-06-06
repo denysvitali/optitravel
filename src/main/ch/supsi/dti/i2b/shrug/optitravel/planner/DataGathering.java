@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class DataGathering{
 	private static final double AVG_MOVING_SPEED_KMH = 50;
 	private static final double AVG_MOVING_SPEED = AVG_MOVING_SPEED_KMH / (60 * 1000); // in m/minute
-	private static final boolean USE_GTFS = true;
+	private static final boolean USE_GTFS = false;
 	private TransitLandAPIWrapper wTL = new TransitLandAPIWrapper();
 	private GTFSrsWrapper wGTFS = new GTFSrsWrapper();
 	private PubliBikeWrapper wPB = new PubliBikeWrapper();
@@ -202,9 +202,6 @@ public class DataGathering{
 
 				for (String trip_id : rsp.getTrips()) {
 
-					if (rsp.getId().equals("r-gcut-largstoglasgowcentralsr-acc06b-978211") && trip_id.equals("216025")) {
-						System.out.println("a");
-					}
 					List<ScheduleStopPair> schedulesInRspTrip = new ArrayList<>();
 					for (ScheduleStopPair sch : scheduleStopPairsInBBox) {
 
@@ -535,7 +532,7 @@ public class DataGathering{
 		});
 		trips = getTrips(boundingBox);
 
-		stop_times = getStopTimes(boundingBox);
+//		stop_times = getStopTimes(boundingBox);
 
 		stop_times.forEach(e->{
 			trip_time_stop_by_stop.put(

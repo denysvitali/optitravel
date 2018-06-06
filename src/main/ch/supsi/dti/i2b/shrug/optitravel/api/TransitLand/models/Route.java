@@ -1,5 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.models;
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIError;
+import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.TransitLandAPIWrapper;
 import ch.supsi.dti.i2b.shrug.optitravel.api.TransitLand.enums.FeatureStatus;
 import com.jsoniter.annotation.JsonCreator;
 import com.jsoniter.annotation.JsonObject;
@@ -39,6 +41,16 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
     }
 
     public String getName() {
+
+        if(name == null){
+            TransitLandAPIWrapper tl = new TransitLandAPIWrapper();
+            try {
+                Route route = tl.getRoute(route_onestop_id);
+            } catch (TransitLandAPIError transitLandAPIError) {
+                transitLandAPIError.printStackTrace();
+            }
+        }
+
         return name;
     }
 
