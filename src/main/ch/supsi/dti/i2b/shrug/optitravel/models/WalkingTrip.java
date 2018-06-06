@@ -54,6 +54,11 @@ public class WalkingTrip extends Trip {
 	}
 
 	@Override
+	public String toString() {
+		return String.format("Walking %s (@%s) - %s (@%s)", from.getStop(), from.getTime(), to.getStop(), to.getTime());
+	}
+
+	@Override
 	public int hashCode() {
 		return Objects.hash(from.getCoordinate(), to.getCoordinate(), WalkingRoute.class);
 	}

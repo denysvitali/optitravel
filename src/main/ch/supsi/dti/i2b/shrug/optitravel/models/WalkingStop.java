@@ -28,6 +28,11 @@ public class WalkingStop extends Stop {
 		return "ws-" + coordinate.toString().replace(".", "-");
 	}
 
+	@Override
+	public String toString() {
+		return getUid();
+	}
+
 	public List<StopTime> findNeighbors(Time time) throws ExecutionControl.NotImplementedException {
 		throw new ExecutionControl.NotImplementedException("Not implemented yet.");
 	}
