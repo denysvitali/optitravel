@@ -458,7 +458,12 @@ public class DataGathering{
 				}
 			}
 
-			if(Distance.distance(stop.getCoordinate(), currentNode.getElement().getCoordinate()) > pp.walkable_radius_meters()){
+			double stop_distance = Distance.distance(stop.getCoordinate(), currentNode.getElement().getCoordinate());
+			if(stop_distance < 100 && stop.getName().equals(((Stop) currentNode.getElement().getLocation()).getName())){
+				connecting_stop = true;
+			}
+
+			if(stop_distance > pp.walkable_radius_meters()){
 				// Unreachable Stop
 				continue;
 			}
@@ -472,6 +477,16 @@ public class DataGathering{
 				stoptime.setTrip(new ConnectionTrip((StopTime) currentNode.getElement(), stoptime));
 			} else {
 				stoptime.setTrip(new WalkingTrip((StopTime) currentNode.getElement(), stoptime));
+			}
+
+			if(currentNode.getElement().getTrip() instanceof ConnectionTrip) {
+				// I can't connect / walk more than once consecutively (either by Walking or Connecting)!
+				continue;
+			}
+
+			if(currentNode.getElement().getTrip() instanceof WalkingTrip){
+				// I can't walk more than once consecutively!
+				continue;
 			}
 
 
