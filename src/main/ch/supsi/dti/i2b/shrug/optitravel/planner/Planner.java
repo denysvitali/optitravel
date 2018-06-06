@@ -125,28 +125,18 @@ public class Planner<T extends TimedLocation, L extends Location> {
 			oos.writeObject(tl);
 			oos.close();
 			System.out.println("File saved!");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		List<Trip> plan_trips = path.stream()
+		/*List<Trip> plan_trips = path.stream()
 						.map((e)->e.getElement().getTrip())
 						.filter(Objects::nonNull)
 						.map(dg::fetchTrip)
 						.distinct()
-						.collect(Collectors.toList());
+						.collect(Collectors.toList());*/
 
-		/*Plan p = new Plan(plan_trips,
-				path.get(0).getElement().getTime(),
-				path.get(path.size()-1).getElement().getTime(),
-				path.get(0).getElement().getCoordinate(),
-				path.get(path.size()-1).getElement().getCoordinate()
-				);*/
-
-		Plan p = null;
-
+		Plan p = new Plan(tl);
 		plans.add(p);
     }
 

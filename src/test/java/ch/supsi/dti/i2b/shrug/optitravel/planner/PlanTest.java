@@ -38,4 +38,9 @@ public class PlanTest {
 	public void testPlanImport4() throws IOException, ClassNotFoundException {
 		testPlanByClassData("classdata/path-4.classdata");
 	}
+
+	@Test
+	public void testPlanImport5() throws IOException, ClassNotFoundException {
+		testPlanByClassData("classdata/path-5.classdata");
+	}
 }
