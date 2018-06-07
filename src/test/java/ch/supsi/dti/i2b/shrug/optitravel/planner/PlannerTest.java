@@ -75,6 +75,21 @@ public class PlannerTest {
 	}
 
 	@Test
+	public void planChiasso_SUPSI(){
+		testPlan(CHIASSO_COORDINATE,
+				SUPSI_COORDINATE,
+				LocalDateTime.of(2018,
+						5,
+						17,
+						10,
+						20,
+						0
+				),
+				new DenvitPlanPreference(Distance.distance(PREGASSONA_COORDINATE,
+						LUGANO_CENTRO_COORDINATE)));
+	}
+
+	@Test
 	public void planPregassona_Bozzoreda(){
 		testPlan(PREGASSONA_COORDINATE,
 				BOZZOREDA_COORDINATE,

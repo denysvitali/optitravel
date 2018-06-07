@@ -131,6 +131,11 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
 		return null;
 	}
 
+	@Override
+	public void setColor(String color) {
+    	this.color = color;
+	}
+
 	public String getId() {
         return onestop_id;
     }

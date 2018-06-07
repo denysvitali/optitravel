@@ -6,6 +6,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.RouteType;
 import java.util.Objects;
 
 public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
+	private static final long serialVersionUID = 6099999255747497502L;
     public String uid;
     public String agency_id;
     public String short_name;
@@ -36,6 +37,11 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
 
 	public String getTextColor() {
 		return text_color;
+	}
+
+	@Override
+	public void setColor(String color) {
+		this.color = color;
 	}
 
 	public String getAgencyUID() {

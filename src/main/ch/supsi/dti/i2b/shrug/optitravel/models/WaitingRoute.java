@@ -32,6 +32,11 @@ public class WaitingRoute extends Route {
 	}
 
 	@Override
+	public void setColor(String color) {
+
+	}
+
+	@Override
 	public String toString() {
 		return getName();
 	}

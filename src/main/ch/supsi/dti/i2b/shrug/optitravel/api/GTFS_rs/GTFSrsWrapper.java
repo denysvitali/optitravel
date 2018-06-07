@@ -553,7 +553,7 @@ public class GTFSrsWrapper {
 				.addPathSegment("in")
 				.addPathSegment(boundingBox.toString())
 				.build();
-		Response response = client.get(url);
+		Response response = client.get(url, 20 * 1000);
 		return getPaginatedStopTimes(response);
 	}
 }

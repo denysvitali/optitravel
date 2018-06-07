@@ -25,12 +25,17 @@ public class WalkingRoute extends Route {
 
 	@Override
 	public String getColor() {
-		return null;
+		return "#2196F3";
 	}
 
 	@Override
 	public String getTextColor() {
 		return null;
+	}
+
+	@Override
+	public void setColor(String color) {
+
 	}
 
 	@Override

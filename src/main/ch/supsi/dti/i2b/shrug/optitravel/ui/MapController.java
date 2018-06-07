@@ -4,6 +4,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Location;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.RouteType;
 import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
+import ch.supsi.dti.i2b.shrug.optitravel.models.WalkingTrip;
 import ch.supsi.dti.i2b.shrug.optitravel.models.plan.PlanSegment;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
@@ -32,7 +33,6 @@ public class MapController implements MapComponentInitializedListener {
     	MVCArray mva = new MVCArray(ps.getElements().stream().map(e-> new LatLong(e.getCoordinate().getLat(),
 				e.getCoordinate().getLng())).toArray());
 		PolylineOptions line_opts = new PolylineOptions();
-
 
 		String color= ps.getTrip().getRoute().getColor();
 		RouteType rc = ps.getTrip().getRoute().getType();

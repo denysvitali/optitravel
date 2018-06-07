@@ -14,6 +14,7 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTimePicker;
 import com.jfoenix.validation.RequiredFieldValidator;
 import com.lynden.gmapsfx.GoogleMapView;
+import com.lynden.gmapsfx.javascript.object.LatLong;
 import com.lynden.gmapsfx.service.directions.DirectionStatus;
 import com.lynden.gmapsfx.service.directions.DirectionsResult;
 import com.lynden.gmapsfx.service.directions.DirectionsServiceCallback;
@@ -190,7 +191,7 @@ public class MainController {
 		if(mockedPlanner) {
 			List<TimedLocation> timedLocationList = null;
 			File f = new File(getClass().getClassLoader()
-					.getResource("classdata/path-7.classdata").getFile());
+					.getResource("classdata/path-1.classdata").getFile());
 			try {
 				FileInputStream fis = new FileInputStream(f);
 				ObjectInputStream ois = new ObjectInputStream(fis);
@@ -211,6 +212,25 @@ public class MainController {
 
         if(p != null) {
         	List<PlanSegment> planSegments = p.getPlanSegments();
+        	planSegments.forEach(e->{
+				String[] bus_colors = new String[]{"#FF5722","#4CAF50", "#3F51B5", "#EC407A"};
+				String[] train_colors = new String[]{"#CDDC39","#c62828", "#33691E", "#3E2723"};
+
+				Route r = e.getRoute();
+				if(r != null) {
+					RouteType rt = e.getRoute().getType();
+					if(rt != null) {
+						rt = rt.getRouteCategory();
+						if (r.getColor() == null) {
+							if (rt == RouteType.RAIL || rt == RouteType.RAILWAY_SERVICE) {
+								e.getRoute().setColor(train_colors[(int) (Math.random() * train_colors.length)]);
+							} else if (rt == RouteType.BUS || rt == RouteType.BUS_SERVICE) {
+								e.getRoute().setColor(train_colors[(int) (Math.random() * bus_colors.length)]);
+							}
+						}
+					}
+				}
+			});
         	Platform.runLater(()->{
         		lvPlanSegments.getItems().clear();
 				lvPlanSegments.getItems().addAll(planSegments);
@@ -219,15 +239,21 @@ public class MainController {
 			Coordinate start_coordinate = p.getStartLocation().getCoordinate();
 			Coordinate end_coordinate = p.getEndLocation().getCoordinate();
 
+			mapController.addMarker(new LatLong(start_coordinate.getLat(),
+					start_coordinate.getLng()), MapController.NodeType.ORIGIN);
+
+			mapController.addMarker(new LatLong(end_coordinate.getLat(),
+					end_coordinate.getLng()), MapController.NodeType.DESTINATION);
+
 			for (PlanSegment ps : p.getPlanSegments()) {
-				if (ps.getTrip() instanceof WaitingTrip || ps.getTrip() instanceof WalkingTrip || ps.getTrip() instanceof ConnectionTrip) {
+				Platform.runLater(() -> mapController.addComputedDirections(ps));
+				/*if (ps.getTrip() instanceof WaitingTrip || ps.getTrip() instanceof WalkingTrip || ps.getTrip() instanceof ConnectionTrip) {
 					Platform.runLater(() -> mapController.addDirections(ps.getStart().getCoordinate(), ps.getEnd().getCoordinate(), TravelModes.WALKING));
 				} else {
-					Platform.runLater(() -> mapController.addComputedDirections(ps));
 					//Platform.runLater(() -> mapController.addDirections(ps.getStart().getCoordinate(), ps.getEnd().getCoordinate(), TravelModes.DRIVING));
-				}
+				}*/
 			}
-			//Platform.runLater(() -> mapController.fitToBounds(start_coordinate, end_coordinate));
+			Platform.runLater(() -> mapController.fitToBounds(start_coordinate, end_coordinate));
 		}
     }
 }

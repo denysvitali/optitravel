@@ -30,4 +30,9 @@ public class ConnectionRoute extends Route {
 	public String getTextColor() {
 		return null;
 	}
+
+	@Override
+	public void setColor(String color) {
+
+	}
 }

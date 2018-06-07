@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Paint;
 
 import java.io.IOException;
 
@@ -97,6 +98,9 @@ public class PlanSegmentCellController {
         } else {
             icon.setIcon(getIcon(planSegment.getTrip().getRoute().getType()));
             from.setText(planSegment.getStart().toString());
+            if(planSegment.getRoute().getColor() != null){
+				from.setTextFill(Paint.valueOf(planSegment.getRoute().getColor()));
+			}
             setFromText(start_stop, start_location);
 			setToText(end_stop, end_location);
             from_time.setText(from_time_string);
