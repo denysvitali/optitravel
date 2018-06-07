@@ -86,7 +86,7 @@
                     <Insets bottom="8.0" top="8.0"/>
                 </VBox.margin>
             </AutoCompleteTextField>
-            <JFXComboBox fx:id="cbTripPeriod" styleClass="trip-filters" prefHeight="26.0" prefWidth="264">
+            <JFXComboBox fx:id="cbTripPeriod" styleClass="trip-filters" prefHeight="26.0" prefWidth="350">
                 <VBox.margin>
                     <Insets bottom="8.0" top="8.0"/>
                 </VBox.margin>
@@ -94,16 +94,16 @@
             <HBox>
                 <JFXDatePicker fx:id="dpDate" visible="false" managed="false" promptText="Date" editable="false"
                                defaultColor="#002984" prefHeight="26"
-                               prefWidth="132">
+                               prefWidth="175">
                     <HBox.margin>
-                        <Insets bottom="8.0" top="8.0"/>
+                        <Insets bottom="8.0" top="8.0" right="10.0"/>
                     </HBox.margin>
                 </JFXDatePicker>
                 <JFXTimePicker fx:id="tpTime" visible="false" managed="false" promptText="Time" editable="false"
                                defaultColor="#002984" prefHeight="26"
-                               prefWidth="132">
+                               prefWidth="175">
                     <HBox.margin>
-                        <Insets bottom="8.0" top="8.0"/>
+                        <Insets bottom="8.0" top="8.0" left="10.0"/>
                     </HBox.margin>
                 </JFXTimePicker>
             </HBox>

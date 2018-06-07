@@ -191,7 +191,7 @@ public class MainController {
 		if(mockedPlanner) {
 			List<TimedLocation> timedLocationList = null;
 			File f = new File(getClass().getClassLoader()
-					.getResource("classdata/path-1.classdata").getFile());
+					.getResource("classdata/path-4.classdata").getFile());
 			try {
 				FileInputStream fis = new FileInputStream(f);
 				ObjectInputStream ois = new ObjectInputStream(fis);
