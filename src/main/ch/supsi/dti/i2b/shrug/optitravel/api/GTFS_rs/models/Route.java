@@ -11,6 +11,8 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
     public String short_name;
     public String long_name;
     public String description;
+    public String color;
+    public String text_color;
     public int type;
 
     public Route(){}
@@ -29,7 +31,11 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
 
 	@Override
 	public String getColor() {
-		return null;
+		return color;
+	}
+
+	public String getTextColor() {
+		return text_color;
 	}
 
 	public String getAgencyUID() {

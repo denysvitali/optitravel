@@ -25,4 +25,9 @@ public class ConnectionRoute extends Route {
 	public String getColor() {
 		return null;
 	}
+
+	@Override
+	public String getTextColor() {
+		return null;
+	}
 }

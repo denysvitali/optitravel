@@ -117,15 +117,16 @@ class GTFSrsTest {
     @Test
     public void testRoute(){
         try{
-            String uid = "r-acfc6d-7";
+            String uid = "r-03c93b-1";
             Route r = gtfSrsWrapper.getRoute(uid);
             assertNotEquals(null, r);
             assertEquals(uid, r.getUID());
-            assertEquals("a-de9f39-trasportipubbliciluganesi", r.getAgencyUID());
-            assertEquals("7", r.getShortName());
+            assertEquals("a-049862-transportforlondon", r.getAgencyUID());
+            assertEquals("1", r.getShortName());
             assertEquals("", r.getLongName());
-            assertEquals("Bus", r.getDescription());
-            assertEquals(RouteType.getRoute(700), r.getType());
+            assertEquals(null, r.getDescription());
+            assertEquals(null, r.getColor());
+            assertEquals(RouteType.getRoute(3), r.getType());
         } catch(GTFSrsError err){
             fail(err);
         }

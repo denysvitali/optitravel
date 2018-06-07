@@ -29,6 +29,11 @@ public class WalkingRoute extends Route {
 	}
 
 	@Override
+	public String getTextColor() {
+		return null;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof WalkingRoute){
 			return true;

@@ -8,4 +8,5 @@ public abstract class Route implements Serializable {
     public abstract String getUID();
     public abstract RouteType getType();
     public abstract String getColor();
+    public abstract String getTextColor();
 }
