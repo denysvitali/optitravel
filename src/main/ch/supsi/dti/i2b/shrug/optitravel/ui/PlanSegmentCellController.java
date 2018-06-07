@@ -101,8 +101,20 @@ public class PlanSegmentCellController {
 			setToText(end_stop, end_location);
             from_time.setText(from_time_string);
             to_time.setText(to_time_string);
-            details.setText(planSegment.getTrip().getHeadSign());
-            details.setVisible(true);
+
+            String hs = planSegment.getTrip().getHeadSign();
+            if(hs == null || hs.equals("")){
+				String route_shortname = planSegment.getTrip()
+						.getRoute().getName();
+				if(route_shortname != null && !route_shortname.equals("")){
+					details.setText(route_shortname);
+					details.setVisible(true);
+				}
+			} else {
+				details.setText(hs);
+				details.setVisible(true);
+			}
+
         }
     }
 
@@ -112,11 +124,15 @@ public class PlanSegmentCellController {
 		}
     	rt = rt.getRouteCategory();
     	switch(rt){
+			case BUS:
 			case BUS_SERVICE:
 			case COACH_SERVICE:
 				return MaterialIcon.DIRECTIONS_BUS;
-			case SUBURBAN_RAILWAY_SERVICE:
-				return MaterialIcon.DIRECTIONS_RAILWAY;
+			case UNDERGROUND_SERVICE:
+			case METRO_SERVICE:
+			case SUBWAY:
+				return MaterialIcon.DIRECTIONS_SUBWAY;
+			case RAIL:
 			case RAILWAY_SERVICE:
 				return MaterialIcon.DIRECTIONS_RAILWAY;
 		}

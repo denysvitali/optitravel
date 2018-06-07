@@ -4,6 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum RouteType {
+    TRAM(0),
+    SUBWAY(1),
+	RAIL(2),
+	BUS(3),
+	FERRY(4),
+	CABLE_CAR(5),
+	GONDOLA(6),
+	FUNIULAR(7),
     RAILWAY_SERVICE(100),
     HIGH_SPEED_RAIL_SERVICE(101),
     LONG_DISTANCE_TRAINS(102),
@@ -124,7 +132,7 @@ public enum RouteType {
     HIRE_MOTORBIKE(1603),
     HIRE_CYCLE(1604),
     MISCELLANEOUS_SERVICE(1700),
-    CABLE_CAR(1701),
+    CABLE_CAR_2(1701),
     HORSE_DRAWN_CARRIAGE(1702);
     
     private int index;

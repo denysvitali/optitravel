@@ -190,7 +190,7 @@ public class MainController {
 		if(mockedPlanner) {
 			List<TimedLocation> timedLocationList = null;
 			File f = new File(getClass().getClassLoader()
-					.getResource("classdata/path-2.classdata").getFile());
+					.getResource("classdata/path-7.classdata").getFile());
 			try {
 				FileInputStream fis = new FileInputStream(f);
 				ObjectInputStream ois = new ObjectInputStream(fis);
