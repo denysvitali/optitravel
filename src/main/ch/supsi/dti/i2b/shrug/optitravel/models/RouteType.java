@@ -1,4 +1,4 @@
-package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
+package ch.supsi.dti.i2b.shrug.optitravel.models;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -151,6 +151,10 @@ public enum RouteType {
         } else {
             return rt;
         }
+    }
+
+    public RouteType getRouteCategory(){
+        return RouteType.getRouteCategory(this.index);
     }
     
     public static RouteType getRouteCategory(int index){

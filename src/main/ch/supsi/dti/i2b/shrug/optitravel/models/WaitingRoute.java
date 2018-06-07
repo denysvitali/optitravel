@@ -17,6 +17,16 @@ public class WaitingRoute extends Route {
 	}
 
 	@Override
+	public RouteType getType() {
+		return null;
+	}
+
+	@Override
+	public String getColor() {
+		return null;
+	}
+
+	@Override
 	public String toString() {
 		return getName();
 	}

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public abstract class Trip implements Serializable {
+	private static final long serialVersionUID = -6163128468610780143L;
 	public abstract List<StopTrip> getStopTrip();
 	public abstract Route getRoute();
 
@@ -25,4 +26,6 @@ public abstract class Trip implements Serializable {
 	public abstract void setStopTrip(List<StopTrip> stopTrip);
 
 	public abstract String getHeadSign();
+
+	public abstract void setRoute(Route route);
 }

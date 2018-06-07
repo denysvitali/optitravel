@@ -62,6 +62,8 @@ public class MainController {
 
     private MapController mapController;
 
+    private boolean mockedPlanner = true;
+
     public MainController() {
 
     }
@@ -134,9 +136,18 @@ public class MainController {
         cbTripPeriod.getSelectionModel().selectFirst();
 
         // Prepare listview
-        lvPlanSegments.setPrefWidth(280);
-        mainContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvPlanSegments.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
-        filtersContainer.heightProperty().addListener((observable, oldValue, newValue) -> lvPlanSegments.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2));
+        lvPlanSegments.setPrefWidth(350);
+        mainContainer
+			.heightProperty()
+			.addListener((observable, oldValue, newValue) ->
+				lvPlanSegments.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2)
+			);
+        filtersContainer
+			.heightProperty()
+			.addListener((observable, oldValue, newValue) ->
+				lvPlanSegments.setPrefHeight(mainContainer.getHeight() - filtersContainer.getHeight() + 8 - fabSend.getPrefHeight() / 2)
+			);
+
         lvPlanSegments.setCellFactory(param -> new PlanSegmentCellItem());
 
         fabSend.toFront();
@@ -146,61 +157,78 @@ public class MainController {
     }
 
     private void validateAndRequest() {
-//        if (!tfStartPoint.validate() || !tfEndPoint.validate()) {
-//            return;
-//        }
-//        mapController.fitToBounds(tfStartPoint.getPlace().getCoordinates(),tfEndPoint.getPlace().getCoordinates());
-//        // validate time
-//        if (cbTripPeriod.getValue() != TripTimeFrame.LEAVE_NOW) {
-//            if (LocalDateTime.of(dpDate.getValue(), tpTime.getValue()).compareTo(LocalDateTime.now()) < 0) {
-//                return;
-//            }
-//        }
-//        Planner p = new Planner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
-//        p.setStartTime(
-//                cbTripPeriod.getValue() == TripTimeFrame.LEAVE_NOW ?
-//                        LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) :
-//                        LocalDateTime.of(dpDate.getValue(), tpTime.getValue())
-//        );
-//        PlanPreference pp = new DenvitPlanPreference(Distance.distance(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates()));
-//        p.setPlanPreference(pp);
-//        new Thread(() -> onPlannerComputeFinish(p.getPlans())).start();
-        onPlannerComputeFinish(null);
+    	if(!mockedPlanner) {
+			if (!tfStartPoint.validate() || !tfEndPoint.validate()) {
+				return;
+			}
+			mapController.fitToBounds(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
+			// validate time
+			if (cbTripPeriod.getValue() != TripTimeFrame.LEAVE_NOW) {
+				if (LocalDateTime.of(dpDate.getValue(), tpTime.getValue()).compareTo(LocalDateTime.now()) < 0) {
+					return;
+				}
+			}
+			Planner p = new Planner(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates());
+			p.setStartTime(
+					cbTripPeriod.getValue() == TripTimeFrame.LEAVE_NOW ?
+							LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS) :
+							LocalDateTime.of(dpDate.getValue(), tpTime.getValue())
+			);
+			PlanPreference pp = new DenvitPlanPreference(Distance.distance(tfStartPoint.getPlace().getCoordinates(), tfEndPoint.getPlace().getCoordinates()));
+			p.setPlanPreference(pp);
+			new Thread(() -> onPlannerComputeFinish(p.getPlans())).start();
+		} else {
+			onPlannerComputeFinish(null);
+		}
     }
 
     private void onPlannerComputeFinish(List<Plan> plans) {
-//        Plan p = plans.get(0);
-        lvPlanSegments.getItems().clear();
+		lvPlanSegments.getItems().clear();
+		lvPlanSegments.refresh();
 
-        List<TimedLocation> timedLocationList = null;
-        File f = new File(getClass().getClassLoader()
-                .getResource("classdata/path-4.classdata").getFile());
-        try {
-            FileInputStream fis = new FileInputStream(f);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            timedLocationList = (List<TimedLocation>) ois.readObject();
-            System.out.println(timedLocationList);
+		Plan p = null;
+		if(mockedPlanner) {
+			List<TimedLocation> timedLocationList = null;
+			File f = new File(getClass().getClassLoader()
+					.getResource("classdata/path-2.classdata").getFile());
+			try {
+				FileInputStream fis = new FileInputStream(f);
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				timedLocationList = (List<TimedLocation>) ois.readObject();
+				System.out.println(timedLocationList);
 
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+			} catch (IOException | ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			if(timedLocationList != null) {
+				p = new Plan(timedLocationList);
+			}
+		} else {
+    		if(plans.size() != 0) {
+				p = plans.get(0);
+			}
+		}
 
-        Plan p = new Plan(timedLocationList);
-        lvPlanSegments.getItems().addAll(p.getPlanSegments());
-        //        List<Coordinate> stops = new ArrayList<>();
+        if(p != null) {
+        	List<PlanSegment> planSegments = p.getPlanSegments();
+        	Platform.runLater(()->{
+        		lvPlanSegments.getItems().clear();
+				lvPlanSegments.getItems().addAll(planSegments);
+			});
 
-        for (PlanSegment ps : p.getPlanSegments()) {
-            if (ps.getTrip() instanceof WaitingTrip || ps.getTrip() instanceof WalkingTrip || ps.getTrip() instanceof ConnectionTrip)
-                Platform.runLater(() -> mapController.addDirections(ps.getStart().getCoordinate(), ps.getEnd().getCoordinate(), TravelModes.WALKING));
-            else
-                Platform.runLater(() -> mapController.addDirections(ps.getStart().getCoordinate(), ps.getEnd().getCoordinate(), TravelModes.TRANSIT));
-//            stops.add(ps.getStart().getCoordinate());
-//            stops.add(ps.getEnd().getCoordinate());
-        }
-//        List<Coordinate> uniqStops = stops.stream().distinct().collect(Collectors.toList());
-//        Platform.runLater(() -> mapController.addDirections(p.getStartLocation().getCoordinate(), p.getEndLocation().getCoordinate(), uniqStops));
+			Coordinate start_coordinate = p.getStartLocation().getCoordinate();
+			Coordinate end_coordinate = p.getEndLocation().getCoordinate();
 
-        mapController.fitToBounds(p.getStartLocation().getCoordinate(), p.getEndLocation().getCoordinate());
+			for (PlanSegment ps : p.getPlanSegments()) {
+				if (ps.getTrip() instanceof WaitingTrip || ps.getTrip() instanceof WalkingTrip || ps.getTrip() instanceof ConnectionTrip) {
+					Platform.runLater(() -> mapController.addDirections(ps.getStart().getCoordinate(), ps.getEnd().getCoordinate(), TravelModes.WALKING));
+				} else {
+					Platform.runLater(() -> mapController.addComputedDirections(ps));
+					//Platform.runLater(() -> mapController.addDirections(ps.getStart().getCoordinate(), ps.getEnd().getCoordinate(), TravelModes.DRIVING));
+				}
+			}
+			//Platform.runLater(() -> mapController.fitToBounds(start_coordinate, end_coordinate));
+		}
     }
 }
 

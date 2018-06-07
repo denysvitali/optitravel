@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.planner;
 
 
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.GTFSrsError;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Distance;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
@@ -12,6 +13,7 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -113,11 +115,36 @@ public class Planner<T extends TimedLocation, L extends Location> {
 
 		System.out.println(path);
 		assert(path!=null);
+
 		alreadyComputed = true;
+
+		if(path == null){
+			return;
+		}
 
 		List<TimedLocation> tl = path.stream()
 				.map(Node::getElement)
 				.collect(Collectors.toList());
+
+		HashMap<String, Route> routeByUID = new HashMap<>();
+
+		for(TimedLocation tlel : tl){
+			if(tlel.getTrip() != null) {
+				Route r = tlel.getTrip().getRoute();
+				if (r instanceof ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Route) {
+					if (routeByUID.get(r.getUID()) == null) {
+						try {
+							routeByUID.put(r.getUID(),
+									dg.getwGTFS().getRoute(r.getUID()));
+						} catch (GTFSrsError gtfSrsError) {
+							gtfSrsError.printStackTrace();
+						}
+
+						tlel.getTrip().setRoute(routeByUID.get(r.getUID()));
+					}
+				}
+			}
+		}
 
 		try {
 			FileOutputStream fos = new FileOutputStream("path.classdata");

@@ -45,4 +45,9 @@ public class BlaBlaTrip extends Trip {
     public String getHeadSign() {
         return null;
     }
+
+    @Override
+    public void setRoute(Route route) {
+
+    }
 }

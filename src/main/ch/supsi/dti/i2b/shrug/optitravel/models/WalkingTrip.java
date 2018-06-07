@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class WalkingTrip extends Trip {
-
+	private static final long serialVersionUID = -4656911873315804026L;
 	private StopTime from;
 	private StopTime to;
 
@@ -49,6 +49,11 @@ public class WalkingTrip extends Trip {
 	@Override
 	public String getHeadSign() {
 		return null;
+	}
+
+	@Override
+	public void setRoute(Route route) {
+
 	}
 
 	@Override

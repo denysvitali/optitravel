@@ -267,9 +267,8 @@ public class DataGathering{
 		max_travel_minutes += getPlanPreference().max_total_waiting_time();
 		max_travel_minutes += Math.round(Distance.distance(source, destination) * (AVG_MOVING_SPEED) + 10);
 		max_travel_minutes += Math.round(pp.max_total_walkable_distance() / (pp.walk_speed_mps() * 60));
-		Time end_time = Time.addMinutes(start_time, max_travel_minutes);
 
-		estimatedEndTime = end_time;
+		estimatedEndTime = Time.addMinutes(start_time, max_travel_minutes);
 		return estimatedEndTime;
 	}
 

@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="64" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="72" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1">
     <MaterialIconView fx:id="icon" fill="#0000008a" glyphName="DIRECTIONS_BIKE" size="24" AnchorPane.leftAnchor="4"
                       AnchorPane.topAnchor="20"/>
     <Label fx:id="from" text="From" textFill="#000000de" AnchorPane.leftAnchor="36" AnchorPane.topAnchor="8">
@@ -12,7 +12,7 @@
             <Font name="Roboto Bold" size="12.0"/>
         </font>
     </Label>
-    <Label fx:id="to" text="To" textFill="#000000de" AnchorPane.leftAnchor="36" AnchorPane.topAnchor="20.0">
+    <Label fx:id="to" text="To" textFill="#000000de" AnchorPane.leftAnchor="36" AnchorPane.topAnchor="24.0">
         <font>
             <Font name="Roboto Bold" size="12.0"/>
         </font>
@@ -23,7 +23,12 @@
             <Font name="Roboto Bold" size="12.0"/>
         </font>
     </Label>
-    <Label fx:id="eta" text="ETA" textFill="#000000de" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="8">
+    <Label fx:id="from_time" text="ETA" textFill="#000000de" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="8">
+        <font>
+            <Font name="Roboto Bold" size="12.0"/>
+        </font>
+    </Label>
+    <Label fx:id="to_time" text="ETA" textFill="#000000de" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="28">
         <font>
             <Font name="Roboto Bold" size="12.0"/>
         </font>

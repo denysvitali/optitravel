@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionTrip extends Trip {
+	private static final long serialVersionUID = -8968774798874265789L;
 	private List<StopTrip> st_list = new ArrayList<>();
 	public ConnectionTrip(StopTime first, StopTime second) {
 		super();
@@ -34,5 +35,10 @@ public class ConnectionTrip extends Trip {
 			return "Connection";
 		}
 		return "Connection to " + st_end.getStop().getName();
+	}
+
+	@Override
+	public void setRoute(Route route) {
+
 	}
 }

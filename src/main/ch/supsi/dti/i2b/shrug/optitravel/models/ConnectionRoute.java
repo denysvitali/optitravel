@@ -15,4 +15,14 @@ public class ConnectionRoute extends Route {
 	public String getUID() {
 		return null;
 	}
+
+	@Override
+	public RouteType getType() {
+		return null;
+	}
+
+	@Override
+	public String getColor() {
+		return null;
+	}
 }

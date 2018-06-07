@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.models.Operator;
+import ch.supsi.dti.i2b.shrug.optitravel.models.RouteType;
 
 import java.util.Objects;
 
@@ -21,7 +22,17 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
         return uid;
     }
 
-    public String getAgencyUID() {
+	@Override
+	public RouteType getType() {
+		return RouteType.getRoute(type);
+	}
+
+	@Override
+	public String getColor() {
+		return null;
+	}
+
+	public String getAgencyUID() {
         return agency_id;
     }
 
@@ -35,10 +46,6 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
 
     public String getDescription() {
         return description;
-    }
-
-    public RouteType getRouteType() {
-        return RouteType.getRoute(type);
     }
 
     @Override

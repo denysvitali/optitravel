@@ -16,7 +16,9 @@ public class PlanSegmentCellController {
     @FXML
     private Label from;
     @FXML
-    private Label eta;
+    private Label from_time;
+    @FXML
+	private Label to_time;
     @FXML
     private Label to;
     @FXML
@@ -38,38 +40,89 @@ public class PlanSegmentCellController {
         }
     }
 
+	private void setFromText(Stop s, Location l){
+		if(s!=null) {
+			from.setText(s.getName());
+		} else {
+			from.setText(l.toString());
+		}
+	}
+
+    private void setToText(Stop s, Location l){
+		if(s!=null) {
+			to.setText(s.getName());
+		} else {
+			to.setText(l.toString());
+		}
+	}
+
     public void setTrip(PlanSegment planSegment) {
         distance.setVisible(false);
         details.setVisible(false);
+
+        Location start_location = planSegment.getStart().getLocation();
+        Stop start_stop = null;
+
+		Location end_location = planSegment.getEnd().getLocation();
+		Stop end_stop = null;
+
+
+		if(start_location instanceof Stop){
+            start_stop = (Stop) start_location;
+        }
+
+		if(end_location instanceof Stop){
+			end_stop = (Stop) end_location;
+		}
+
+		String from_time_string = planSegment.getStart().getTime().prettyFormat();
+		String to_time_string = planSegment.getEnd().getTime().prettyFormat();
+
         if(planSegment.getTrip() instanceof WaitingTrip) {
-            from.setText("Wait for next connection");
-            to.setText(planSegment.getStart().toString());
-            eta.setText(planSegment.getStart().getTime().toString());
+        	WaitingTrip t = (WaitingTrip) planSegment.getTrip();
+            from.setText(String.format(
+            		"Wait %d minutes for your connection",
+					(int) t.getWaitTime())
+			);
+			setToText(end_stop, end_location);
+			from_time.setText(from_time_string);
+			to_time.setText(to_time_string);
             icon.setIcon(MaterialIcon.TIMER);
         } else if (planSegment.getTrip() instanceof WalkingTrip || planSegment.getTrip() instanceof ConnectionTrip) {
-            from.setText("Walk to next connection");
-            to.setText(planSegment.getStart().toString());
-            eta.setText(planSegment.getStart().getTime().toString());
+            from.setText("Walk to the next stop");
+			setToText(end_stop, end_stop);
+            from_time.setText(from_time_string);
+			to_time.setText(to_time_string);
             icon.setIcon(MaterialIcon.DIRECTIONS_WALK);
         } else {
-            icon.setIcon(MaterialIcon.DIRECTIONS_BUS);
+            icon.setIcon(getIcon(planSegment.getTrip().getRoute().getType()));
             from.setText(planSegment.getStart().toString());
-            to.setText(planSegment.getEnd().toString());
-            eta.setText(planSegment.getStart().getTime().toString());
+            setFromText(start_stop, start_location);
+			setToText(end_stop, end_location);
+            from_time.setText(from_time_string);
+            to_time.setText(to_time_string);
             details.setText(planSegment.getTrip().getHeadSign());
             details.setVisible(true);
         }
-//        if(planSegment instanceof PlanSegment) {
-//            from.textProperty().setValue("Walk to next stop.");
-//            to.setVisible(false);
-//            icon.setIcon(MaterialIcon.DIRECTIONS_WALK);
-//        } else {
-//            icon.setIcon(MaterialIcon.DIRECTIONS_BUS);
-//            from.textProperty().setValue(trip.getStopTrip().get(0).getStop().getName());
-//            to.textProperty().setValue(trip.getRoute().getName());
-//        }
-//        eta.textProperty().setValue(trip.getStopTrip().get(0).getDeparture().toString());
     }
+
+    private MaterialIcon getIcon(RouteType rt){
+    	if(rt == null){
+    		return MaterialIcon.DIRECTIONS_TRANSIT;
+		}
+    	rt = rt.getRouteCategory();
+    	switch(rt){
+			case BUS_SERVICE:
+			case COACH_SERVICE:
+				return MaterialIcon.DIRECTIONS_BUS;
+			case SUBURBAN_RAILWAY_SERVICE:
+				return MaterialIcon.DIRECTIONS_RAILWAY;
+			case RAILWAY_SERVICE:
+				return MaterialIcon.DIRECTIONS_RAILWAY;
+		}
+
+		return MaterialIcon.DIRECTIONS_TRANSIT;
+	}
 
     public Node getView() {
         return view;

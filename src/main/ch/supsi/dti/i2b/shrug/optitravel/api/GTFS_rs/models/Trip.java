@@ -1,6 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
+import com.jsoniter.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,6 +10,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
+	private static final long serialVersionUID = 238604785615237409L;
     public String uid;
     public String route_id;
     public String service_id;
@@ -16,6 +18,9 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     public String short_name;
     public int direction_id;
     public List<StopTrip> stop_sequence;
+
+    @JsonIgnore
+    private Route route;
 
     public Trip(){
 
@@ -32,7 +37,10 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
     	return new ArrayList<>(stop_sequence);
     }
     public Route getRoute() {
-        return new Route(route_id);
+        if(route != null){
+        	return route;
+		}
+    	return new Route(route_id);
     }
 
 	@Override
@@ -45,6 +53,11 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 	public String getHeadSign() {
         return headsign;
     }
+
+	@Override
+	public void setRoute(ch.supsi.dti.i2b.shrug.optitravel.models.Route route) {
+		this.route = (Route) route;
+	}
 
 	public List<StopTrip> getStopSequence() {
 		return stop_sequence;

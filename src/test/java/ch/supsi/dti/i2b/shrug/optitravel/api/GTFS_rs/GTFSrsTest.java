@@ -1,7 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Meta;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Result;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Route;
@@ -95,7 +94,7 @@ class GTFSrsTest {
         }
 
         routes.forEach((r) -> {
-            assertNotEquals(r.getRouteType(), null);
+            assertNotEquals(r.getType(), null);
         });
     }
 
@@ -126,7 +125,7 @@ class GTFSrsTest {
             assertEquals("7", r.getShortName());
             assertEquals("", r.getLongName());
             assertEquals("Bus", r.getDescription());
-            assertEquals(RouteType.getRoute(700), r.getRouteType());
+            assertEquals(RouteType.getRoute(700), r.getType());
         } catch(GTFSrsError err){
             fail(err);
         }

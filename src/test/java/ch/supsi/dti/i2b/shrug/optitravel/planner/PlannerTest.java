@@ -27,7 +27,9 @@ public class PlannerTest {
 						17,
 						16,
 						30,
-						0));
+						0),
+				new DenvitPlanPreference(Distance.distance(SUPSI_COORDINATE,
+						LAMONE_FFS_COORDINATE)));
 	}
 
 	@Test
@@ -190,7 +192,7 @@ public class PlannerTest {
 						26,
 						0
 				),
-				new LongTripPreference(Distance.distance(LUGANO_COORDINATE, BELLINZONA_COORDINATE)));
+				new DenvitPlanPreference(Distance.distance(LUGANO_COORDINATE, BELLINZONA_COORDINATE)));
 	}
 
 	private void testPlan(Coordinate from, Coordinate to, LocalDateTime ldt, PlanPreference pp){

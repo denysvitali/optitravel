@@ -18,7 +18,7 @@
     </stylesheets>
     <AnchorPane fx:id="filtersContainer">
         <VBox style="-fx-background-color: #3f51b5;" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"
-              prefWidth="280">
+              prefWidth="350">
             <padding>
                 <Insets bottom="24.0" left="8.0" right="8.0" top="8.0"/>
             </padding>
@@ -116,8 +116,8 @@
             </graphic>
         </JFXButton>
     </AnchorPane>
-    <GoogleMapView fx:id="mapView" id="mapView" layoutX="280.0" AnchorPane.bottomAnchor="0.0"
-                   AnchorPane.leftAnchor="280.0"
+    <GoogleMapView fx:id="mapView" id="mapView" layoutX="350.0" AnchorPane.bottomAnchor="0.0"
+                   AnchorPane.leftAnchor="350.0"
                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
     <JFXListView styleClass="mylistview" fx:id="lvPlanSegments" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0"/>
 </AnchorPane>

@@ -2,14 +2,19 @@ package ch.supsi.dti.i2b.shrug.optitravel.ui;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GoogleMaps.model.Location;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
+import ch.supsi.dti.i2b.shrug.optitravel.models.RouteType;
+import ch.supsi.dti.i2b.shrug.optitravel.models.TimedLocation;
 import ch.supsi.dti.i2b.shrug.optitravel.models.plan.PlanSegment;
 import com.lynden.gmapsfx.GoogleMapView;
 import com.lynden.gmapsfx.MapComponentInitializedListener;
 import com.lynden.gmapsfx.javascript.object.*;
 import com.lynden.gmapsfx.service.directions.*;
+import com.lynden.gmapsfx.shapes.Polyline;
+import com.lynden.gmapsfx.shapes.PolylineOptions;
 import javafx.application.Platform;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MapController implements MapComponentInitializedListener {
 
@@ -21,7 +26,47 @@ public class MapController implements MapComponentInitializedListener {
     private Marker origin;
     private Marker destination;
 
-    public enum NodeType {ORIGIN, DESTINATION}
+    public void addComputedDirections(PlanSegment ps) {
+    	TimedLocation prevLocation = null;
+
+    	MVCArray mva = new MVCArray(ps.getElements().stream().map(e-> new LatLong(e.getCoordinate().getLat(),
+				e.getCoordinate().getLng())).toArray());
+		PolylineOptions line_opts = new PolylineOptions();
+
+
+		String color= ps.getTrip().getRoute().getColor();
+		RouteType rc = ps.getTrip().getRoute().getType();
+		if(rc != null) {
+			rc = rc.getRouteCategory();
+		} else {
+			rc = RouteType.BUS_SERVICE;
+		}
+		if(color == null){
+			switch(rc){
+				case RAILWAY_SERVICE:
+					color = "#f44336";
+					break;
+				case UNDERGROUND_SERVICE:
+					color = "#673AB7";
+					break;
+				default:
+					color = "#607D8B";
+			}
+		}
+
+		line_opts.strokeColor(color);
+		line_opts.strokeWeight(5);
+    	Polyline pl = new Polyline(line_opts);
+    	pl.setPath(mva);
+
+        map.addMapShape(pl);
+    }
+
+	public void clearDirections() {
+
+	}
+
+	public enum NodeType {ORIGIN, DESTINATION}
 
     public MapController(GoogleMapView mapView, MainController mainController) {
         this.mapView = mapView;

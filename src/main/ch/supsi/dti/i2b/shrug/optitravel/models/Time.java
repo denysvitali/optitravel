@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 
 public class Time implements Serializable {
 	private LocalTime localTime;
+	private static final long serialVersionUID = 8561706581563487591L;
 
 	public Time(){
 
@@ -93,4 +94,7 @@ public class Time implements Serializable {
 	}
 
 
+	public String prettyFormat() {
+		return localTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+	}
 }

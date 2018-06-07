@@ -6,4 +6,6 @@ public abstract class Route implements Serializable {
     public abstract String getName();
     public abstract Operator getOperator();
     public abstract String getUID();
+    public abstract RouteType getType();
+    public abstract String getColor();
 }

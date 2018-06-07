@@ -4,16 +4,13 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Error;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.models.Pagination;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.models.RouteType;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.output.EncodingMode;
 import com.jsoniter.output.JsonStream;
-import com.jsoniter.spi.Decoder;
 import com.jsoniter.spi.DecodingMode;
-import com.jsoniter.spi.JsoniterSpi;
 import com.jsoniter.spi.TypeLiteral;
 import com.jsoniter.static_codegen.StaticCodegenConfig;
-
-import java.io.IOException;
 
 public class StaticCodeGen implements StaticCodegenConfig {
 
