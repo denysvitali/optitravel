@@ -71,3 +71,7 @@ bin/
 
 # OptiTravel specific files
 path.classdata
+
+# VSCode generated files
+.settings
+.classpath
