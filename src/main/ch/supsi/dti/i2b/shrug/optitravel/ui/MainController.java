@@ -63,7 +63,7 @@ public class MainController {
 
     private MapController mapController;
 
-    private boolean mockedPlanner = true;
+    private boolean mockedPlanner = false;
 
     public MainController() {
 
@@ -191,7 +191,7 @@ public class MainController {
 		if(mockedPlanner) {
 			List<TimedLocation> timedLocationList = null;
 			File f = new File(getClass().getClassLoader()
-					.getResource("classdata/path-4.classdata").getFile());
+					.getResource("classdata/path-5.classdata").getFile());
 			try {
 				FileInputStream fis = new FileInputStream(f);
 				ObjectInputStream ois = new ObjectInputStream(fis);
