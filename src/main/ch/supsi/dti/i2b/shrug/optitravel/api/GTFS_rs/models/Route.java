@@ -2,6 +2,7 @@ package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.models.Operator;
 import ch.supsi.dti.i2b.shrug.optitravel.models.RouteType;
+import com.jsoniter.annotation.JsonProperty;
 
 import java.util.Objects;
 
@@ -12,6 +13,7 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
     public String short_name;
     public String long_name;
     public String description;
+    @JsonProperty("color")
     public String color;
     public String text_color;
     public int type;

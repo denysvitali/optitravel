@@ -191,7 +191,7 @@ public class MainController {
 		if(mockedPlanner) {
 			List<TimedLocation> timedLocationList = null;
 			File f = new File(getClass().getClassLoader()
-					.getResource("classdata/path-5.classdata").getFile());
+					.getResource("classdata/path-9.classdata").getFile());
 			try {
 				FileInputStream fis = new FileInputStream(f);
 				ObjectInputStream ois = new ObjectInputStream(fis);
@@ -225,7 +225,7 @@ public class MainController {
 							if (rt == RouteType.RAIL || rt == RouteType.RAILWAY_SERVICE) {
 								e.getRoute().setColor(train_colors[(int) (Math.random() * train_colors.length)]);
 							} else if (rt == RouteType.BUS || rt == RouteType.BUS_SERVICE) {
-								e.getRoute().setColor(train_colors[(int) (Math.random() * bus_colors.length)]);
+								e.getRoute().setColor(bus_colors[(int) (Math.random() * bus_colors.length)]);
 							}
 						}
 					}
@@ -239,11 +239,13 @@ public class MainController {
 			Coordinate start_coordinate = p.getStartLocation().getCoordinate();
 			Coordinate end_coordinate = p.getEndLocation().getCoordinate();
 
-			mapController.addMarker(new LatLong(start_coordinate.getLat(),
-					start_coordinate.getLng()), MapController.NodeType.ORIGIN);
+			Platform.runLater(()->{
+				mapController.addMarker(new LatLong(start_coordinate.getLat(),
+						start_coordinate.getLng()), MapController.NodeType.ORIGIN);
 
-			mapController.addMarker(new LatLong(end_coordinate.getLat(),
-					end_coordinate.getLng()), MapController.NodeType.DESTINATION);
+				mapController.addMarker(new LatLong(end_coordinate.getLat(),
+						end_coordinate.getLng()), MapController.NodeType.DESTINATION);
+			});
 
 			for (PlanSegment ps : p.getPlanSegments()) {
 				Platform.runLater(() -> mapController.addComputedDirections(ps));

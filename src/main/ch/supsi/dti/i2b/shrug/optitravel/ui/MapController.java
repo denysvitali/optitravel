@@ -30,11 +30,17 @@ public class MapController implements MapComponentInitializedListener {
     public void addComputedDirections(PlanSegment ps) {
     	TimedLocation prevLocation = null;
 
-    	MVCArray mva = new MVCArray(ps.getElements().stream().map(e-> new LatLong(e.getCoordinate().getLat(),
+    	int endIndex = ps.getElements().indexOf(ps.getEnd());
+    	int startIndex = ps.getElements().indexOf(ps.getStart());
+
+    	MVCArray mva = new MVCArray(ps.getElements().stream()
+				.filter((e->ps.getElements().indexOf(e) >= startIndex))
+				.filter((e-> ps.getElements().indexOf(e) <= endIndex))
+				.map(e-> new LatLong(e.getCoordinate().getLat(),
 				e.getCoordinate().getLng())).toArray());
 		PolylineOptions line_opts = new PolylineOptions();
 
-		String color= ps.getTrip().getRoute().getColor();
+		String color = ps.getTrip().getRoute().getColor();
 		RouteType rc = ps.getTrip().getRoute().getType();
 		if(rc != null) {
 			rc = rc.getRouteCategory();
