@@ -9,7 +9,7 @@ node {
     }
 
     stage('Build') {
-        sh 'java --version'
+        sh 'java -version'
         sh './gradlew clean build'
         archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
     }
