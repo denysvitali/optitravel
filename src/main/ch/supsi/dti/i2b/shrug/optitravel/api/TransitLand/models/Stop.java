@@ -7,7 +7,6 @@ import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import com.jsoniter.annotation.JsonCreator;
 import com.jsoniter.annotation.JsonObject;
 import com.jsoniter.annotation.JsonProperty;
-import jdk.jshell.spi.ExecutionControl;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -66,8 +65,8 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
         return null;
     }
 
-    public List<StopTime> findNeighbors(Time time) throws ExecutionControl.NotImplementedException {
-        throw new ExecutionControl.NotImplementedException("Not implemented yet.");
+    public List<StopTime> findNeighbors(Time time) {
+        return null;
     }
 
     public ArrayList<Operator> getOperators() {

@@ -6,6 +6,7 @@ buildscript {
     dependencies {
         classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.3'
+        classpath group: 'de.dynamicfiles.projects.gradle.plugins', name: 'javafx-gradle-plugin', version: '8.8.2'
     }
 }
 
@@ -13,6 +14,7 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'javafx-gradle-plugin'
 
 mainClassName = "ch.supsi.dti.i2b.shrug.optitravel.Main";
 
@@ -73,6 +75,14 @@ jar {
     manifest {
         attributes 'Main-Class': mainClassName
     }
+}
+
+
+jfx {
+    // minimal requirement for jfxJar-task
+    mainClass = mainClassName
+    // minimal requirement for jfxNative-task
+    vendor = '¯\\_(ツ)_/¯'
 }
 
 run{

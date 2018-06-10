@@ -1,7 +1,6 @@
 package ch.supsi.dti.i2b.shrug.optitravel.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
-import jdk.jshell.spi.ExecutionControl;
 
 import java.util.List;
 

@@ -36,7 +36,7 @@ These are the requirements set by our teacher, therefore most of our choices wer
 Since Java FX is a requirement, we were denied the request of making a web-based application - therefore many of our choices (like the client side routing) were made because of the requirements colliding w/ eachother.
 
 ## System Requirements
-- Java 9+ (Java 10 preferably)
+- Java 8+
 - JavaFX
 - Gradle
 
