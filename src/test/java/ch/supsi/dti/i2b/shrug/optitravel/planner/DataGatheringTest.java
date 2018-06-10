@@ -30,6 +30,11 @@ public class DataGatheringTest {
 			);
 		});
 
+		dg.setSource(LUGANO_COORDINATE);
+		dg.setDestination(BELLINZONA_COORDINATE);
+		dg.setFromDate(new Date("2018-06-01"));
+		dg.setStartTime(new Time("12:00:00"));
+
 		List <Trip> trips = dg.getTrips(LUGANO_BBOX);
 	}
 

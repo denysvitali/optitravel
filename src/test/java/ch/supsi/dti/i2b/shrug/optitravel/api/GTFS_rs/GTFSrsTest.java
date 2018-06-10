@@ -26,7 +26,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 class GTFSrsTest {
-    private GTFSrsWrapper gtfSrsWrapper;
+	private GTFSrsWrapper gtfSrsWrapper;
+
+	private static final String STOP_BIOGGIO_PIANONI = "s-7fa1f6-bioggiopianoni";
+	private static final String STOP_MANNO_CENTRODICALCOLO = "s-7648b0-mannocentrodicalcolo";
+	private static final String TRIP_BIOGGIO_MOLINAZZO = "t-4e4725-10ta20449j1811r";
+	private static final String STOP_MANNO_LAMONDA = "s-e4263b-mannolamonda";
 
     public GTFSrsTest(){
         gtfSrsWrapper = new GTFSrsWrapper();
@@ -43,7 +48,7 @@ class GTFSrsTest {
 
     @Test
     void StopsByTripId(){
-        String trip_id = "t-0194f9-168ta207bj1811r";
+        String trip_id = TRIP_BIOGGIO_MOLINAZZO;
 
         assertNotEquals(null, gtfSrsWrapper);
         List<Stop> stops;
@@ -101,7 +106,7 @@ class GTFSrsTest {
     @Test
     public void testAgency(){
         try{
-            String uid = "a-de9f39-trasportipubbliciluganesi";
+            String uid = "a-0f7eb6-trasportipubbliciluganesi";
             Agency a = gtfSrsWrapper.getAgency(uid);
             assertEquals(uid, a.getUid());
             assertEquals("Trasporti Pubblici Luganesi", a.getName());
@@ -135,7 +140,7 @@ class GTFSrsTest {
     @Test
     public void testTrip(){
         try{
-            String uid = "t-0194f9-168ta207bj1811r";
+            String uid = "t-0e6b6b-c6de6662bafc91aa3d9d3c655f70d1cc";
             Trip t = gtfSrsWrapper.getTrip(uid);
             assertNotEquals(null, t);
             assertEquals(uid, t.getUID());
@@ -148,16 +153,16 @@ class GTFSrsTest {
             assertNotEquals(null, stopTrip.get(0).getStop());
 
             // May change based on the feed version!
-            assertEquals("s-fcf74e-pregassonapiazzadigiro", ((StopTrip) stopTrip.get(0)).getStop().getUid());
-            assertEquals("Pregassona, Piazza di Giro", stopTrip.get(0).getStop().getName());
+            assertEquals("s-61dbca-newoxfordstreet", ((StopTrip) stopTrip.get(0)).getStop().getUid());
+            assertEquals("New Oxford Street", stopTrip.get(0).getStop().getName());
 
-            assertEquals(new Coordinate(46.01946, 8.974125), stopTrip.get(0).getStop().getCoordinate());
-            assertEquals(new Time("15:40"), stopTrip.get(0).getArrival());
-            assertEquals(new Time("15:40"), stopTrip.get(0).getDeparture());
+            assertEquals(new Coordinate(51.516727, 	-0.128466), stopTrip.get(0).getStop().getCoordinate());
+            assertEquals(new Time("05:45"), stopTrip.get(0).getArrival());
+            assertEquals(new Time("05:45"), stopTrip.get(0).getDeparture());
 
 
-            assertEquals(new Time("15:40"), stopTrip.get(1).getArrival());
-            assertEquals(new Time("15:40"), stopTrip.get(1).getDeparture());
+            assertEquals(new Time("05:47"), stopTrip.get(1).getArrival());
+            assertEquals(new Time("05:47"), stopTrip.get(1).getDeparture());
         } catch(GTFSrsError err){
             fail(err);
         }
@@ -166,7 +171,7 @@ class GTFSrsTest {
     @Test
     public void testRoutesByStop(){
         try{
-            String uid = "s-fcf74e-pregassonapiazzadigiro";
+            String uid = "s-61dbca-newoxfordstreet";
             List<Route> routes = gtfSrsWrapper.getRouteByStop(uid);
             assertNotEquals(null, routes);
             assertNotEquals(0, routes.size());
@@ -214,9 +219,9 @@ class GTFSrsTest {
 		try {
 			BoundingBox bbox = LUGANO_BBOX;
 			TripSearch ts = new TripSearch();
-			ts.per_page = 200;
+			ts.per_page = 1000;
 			ts.offset = 1;
-			ts.route = "r-acfc6d-7";
+			ts.route = "r-a498ea-7";
 			ts.sort_by = TripSort.ArrivalTime;
 			ts.sort_order = AscDesc.ASC;
 			ts.departure_after = new Time("15:00:00");
@@ -238,12 +243,12 @@ class GTFSrsTest {
 
 			Trip t = trips.get(0);
 			assertNotEquals(null, t);
-			assertEquals("t-061cb9-318ta207bj1812h", t.getUID());
+			assertEquals("t-d1bda2-28ta207bj1811h", t.getUID());
 			assertNotEquals(null, t.getRoute());
 			assertEquals("Pregassona, Piazza di Giro", t.getHeadSign());
-			assertEquals("se-c08245-ta-b0015", t.getServiceId());
+			assertEquals("se-79b594-ta-b0bn0", t.getServiceId());
 			assertEquals(0, t.getDirectionId());
-			assertEquals(t.getRoute().getUID(), "r-acfc6d-7");
+			assertEquals(t.getRoute().getUID(), ts.route);
 
 			List<ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip> stop_trip = t.getStopTrip();
 			assertNotEquals(null, stop_trip);
@@ -253,7 +258,7 @@ class GTFSrsTest {
 
 			Stop s = st.getStop();
 			assertNotEquals(null, s);
-			assertEquals("s-fb2366-luganocentro", s.getUid());
+			assertEquals("s-6ad033-luganocentro", s.getUid());
 			assertEquals("Lugano, Centro", s.getName());
 			assertEquals(
 					new Coordinate(46.00598, 8.952449),
@@ -321,7 +326,7 @@ class GTFSrsTest {
 	@Test
 	public void testStopTimesByStop(){
 		try {
-			String stop_uid = "s-c1829f-bioggiopianoni";
+			String stop_uid = STOP_BIOGGIO_PIANONI;
 			Time after = new Time("13:00:00");
 
 			StopTimes st =
@@ -412,7 +417,7 @@ class GTFSrsTest {
 	@Test
 	public void testStopTimesBetween(){
 		Stop s = Mockito.mock(Stop.class);
-		when(s.getUid()).thenReturn("s-c1829f-bioggiopianoni");
+		when(s.getUid()).thenReturn(STOP_BIOGGIO_PIANONI);
 
 		Time t1 = new Time("13:00:00");
 		Time t2 = new Time("13:40:00");
@@ -433,7 +438,7 @@ class GTFSrsTest {
 	@Test
 	public void testStopTimesBetween2(){
 		Stop s = Mockito.mock(Stop.class);
-		when(s.getUid()).thenReturn("s-aefcaa-mannocentrodicalcolo");
+		when(s.getUid()).thenReturn(STOP_MANNO_CENTRODICALCOLO);
 
 		Time t1 = new Time("16:30:00");
 		Time t2 = new Time("17:26:00");
@@ -448,9 +453,9 @@ class GTFSrsTest {
 
 			assertEquals(4, stopTimes.getTime().size());
 			TripTimeStop tts = stopTimes.getTime().get(0);
-			assertEquals("s-e9f3cd-mannolamonda", tts.getNextStop());
-			assertEquals(new Time("16:37:00"), tts.getTime());
-			assertEquals("t-03353d-59ta20449j1815r", tts.getTrip());
+			assertEquals(STOP_BIOGGIO_PIANONI, tts.getNextStop());
+			assertEquals(new Time("17:14:00"), tts.getTime());
+			assertEquals("t-256d0c-6ta20449j1811r", tts.getTrip());
 
 		} catch(GTFSrsError err){
 			fail(err);

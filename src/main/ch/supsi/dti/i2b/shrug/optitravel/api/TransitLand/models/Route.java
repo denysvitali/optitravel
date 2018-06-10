@@ -22,6 +22,7 @@ public class Route extends ch.supsi.dti.i2b.shrug.optitravel.models.Route {
 //    private ArrayList<GPSCoordinates> path;
 //    private String long_name;
     private String vehicle_type;
+    @JsonProperty("color")
     private String color;
 
     private boolean additionalInfosFetched = false;

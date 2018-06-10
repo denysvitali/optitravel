@@ -44,7 +44,9 @@ public class GTFSrsWrapper {
                 .build();
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
-                return response.isSuccessful();
+                boolean online = response.isSuccessful();
+                response.close();
+                return online;
         } else {
             throw new GTFSrsError("Unable to get any response for this request");
         }
@@ -66,6 +68,7 @@ public class GTFSrsWrapper {
 		if(response != null && response.isSuccessful() && response.body() != null){
 			try {
 				ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
+				response.close();
 				return a.getResult()
 						.asList()
 						.stream()
@@ -91,6 +94,7 @@ public class GTFSrsWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
+				response.close();
                 return a.getResult().asList().stream().map(e-> e.as(Route.class)).collect(Collectors.toList());
             } catch(IOException ex){
                 return null;
@@ -112,6 +116,7 @@ public class GTFSrsWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
+				response.close();
                 return a.getResult().as(Agency.class);
             } catch(IOException ex){
                 return null;
@@ -132,6 +137,7 @@ public class GTFSrsWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 Result a = JsonIterator.deserialize(response.body().string()).as(Result.class);
+                response.close();
                 return a.result.as(Route.class);
             } catch(IOException ex){
                 return null;
@@ -152,6 +158,7 @@ public class GTFSrsWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
+				response.close();
                 List<Route> routes = new ArrayList<>();
                 a.getResult().asList().forEach(e->routes.add(e.as(Route.class)));
                 return routes;
@@ -174,6 +181,7 @@ public class GTFSrsWrapper {
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
+				response.close();
                 return a.getResult().as(Trip.class);
             } catch(IOException ex){
                 return null;
@@ -253,7 +261,7 @@ public class GTFSrsWrapper {
 				.addPathSegment(String.valueOf(radius));
 
 		HttpUrl url = builder.build();
-		Response response = client.get(url);
+		Response response = client.get(url, 20 * 1000);
 		return getPaginatedStopTimes(response);
 	}
 
@@ -311,6 +319,7 @@ public class GTFSrsWrapper {
 				ResultArray a = JsonIterator.deserialize(
 						response.body().string(),
 						ResultArray.class);
+				response.close();
 				return new PaginatedList<>(
 						a.getResult()
 								.asList()
@@ -433,7 +442,9 @@ public class GTFSrsWrapper {
 	private PaginatedList<Trip> getPaginatedTrips(Response response) throws GTFSrsError {
 		if(response != null && response.isSuccessful() && response.body() != null){
 			try {
-				return parsePaginatedTrips(response.body().string());
+				PaginatedList<Trip> paginatedTrips = parsePaginatedTrips(response.body().string());
+				response.close();
+				return paginatedTrips;
 			} catch(IOException ex){
 				return null;
 			}
@@ -519,6 +530,7 @@ public class GTFSrsWrapper {
 				ResultArray a = JsonIterator.deserialize(
 						response.body().string(),
 						ResultArray.class);
+				response.close();
 				return new PaginatedList<>(
 						a.getResult()
 								.asList()

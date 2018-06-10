@@ -9,12 +9,15 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HttpClient {
     private OkHttpClient client;
 
     public HttpClient(){
         client = new OkHttpClient();
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
     }
 
     private Request getRequest(HttpUrl url){
