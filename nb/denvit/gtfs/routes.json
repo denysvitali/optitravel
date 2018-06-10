@@ -1,0 +1,510 @@
+[
+  {
+    "id": "100",
+    "description": "Railway Service"
+  },
+  {
+    "id": "101",
+    "description": "High Speed Rail Service"
+  },
+  {
+    "id": "102",
+    "description": "Long Distance Trains"
+  },
+  {
+    "id": "103",
+    "description": "Inter Regional Rail Service"
+  },
+  {
+    "id": "104",
+    "description": "Car Transport Rail Service"
+  },
+  {
+    "id": "105",
+    "description": "Sleeper Rail Service"
+  },
+  {
+    "id": "106",
+    "description": "Regional Rail Service"
+  },
+  {
+    "id": "107",
+    "description": "Tourist Railway Service"
+  },
+  {
+    "id": "108",
+    "description": "Rail Shuttle (Within Complex)"
+  },
+  {
+    "id": "109",
+    "description": "Suburban Railway"
+  },
+  {
+    "id": "110",
+    "description": "Replacement Rail Service"
+  },
+  {
+    "id": "111",
+    "description": "Special Rail Service"
+  },
+  {
+    "id": "112",
+    "description": "Lorry Transport Rail Service"
+  },
+  {
+    "id": "113",
+    "description": "All Rail Services"
+  },
+  {
+    "id": "114",
+    "description": "Cross-Country Rail Service"
+  },
+  {
+    "id": "115",
+    "description": "Vehicle Transport Rail Service"
+  },
+  {
+    "id": "116",
+    "description": "Rack and Pinion Railway"
+  },
+  {
+    "id": "117",
+    "description": "Additional Rail Service"
+  },
+  {
+    "id": "200",
+    "description": "Coach Service"
+  },
+  {
+    "id": "201",
+    "description": "International Coach Service"
+  },
+  {
+    "id": "202",
+    "description": "National Coach Service"
+  },
+  {
+    "id": "203",
+    "description": "Shuttle Coach Service"
+  },
+  {
+    "id": "204",
+    "description": "Regional Coach Service"
+  },
+  {
+    "id": "205",
+    "description": "Special Coach Service"
+  },
+  {
+    "id": "206",
+    "description": "Sightseeing Coach Service"
+  },
+  {
+    "id": "207",
+    "description": "Tourist Coach Service"
+  },
+  {
+    "id": "208",
+    "description": "Commuter Coach Service"
+  },
+  {
+    "id": "209",
+    "description": "All Coach Services"
+  },
+  {
+    "id": "300",
+    "description": "Suburban Railway Service"
+  },
+  {
+    "id": "400",
+    "description": "Urban Railway Service"
+  },
+  {
+    "id": "401",
+    "description": "Metro Service"
+  },
+  {
+    "id": "402",
+    "description": "Underground Service"
+  },
+  {
+    "id": "403",
+    "description": "Urban Railway Service"
+  },
+  {
+    "id": "404",
+    "description": "All Urban Railway Services"
+  },
+  {
+    "id": "405",
+    "description": "Monorail"
+  },
+  {
+    "id": "500",
+    "description": "Metro Service"
+  },
+  {
+    "id": "600",
+    "description": "Underground Service"
+  },
+  {
+    "id": "700",
+    "description": "Bus Service"
+  },
+  {
+    "id": "701",
+    "description": "Regional Bus Service"
+  },
+  {
+    "id": "702",
+    "description": "Express Bus Service"
+  },
+  {
+    "id": "703",
+    "description": "Stopping Bus Service"
+  },
+  {
+    "id": "704",
+    "description": "Local Bus Service"
+  },
+  {
+    "id": "705",
+    "description": "Night Bus Service"
+  },
+  {
+    "id": "706",
+    "description": "Post Bus Service"
+  },
+  {
+    "id": "707",
+    "description": "Special Needs Bus"
+  },
+  {
+    "id": "708",
+    "description": "Mobility Bus Service"
+  },
+  {
+    "id": "709",
+    "description": "Mobility Bus for Registered Disabled"
+  },
+  {
+    "id": "710",
+    "description": "Sightseeing Bus"
+  },
+  {
+    "id": "711",
+    "description": "Shuttle Bus"
+  },
+  {
+    "id": "712",
+    "description": "School Bus"
+  },
+  {
+    "id": "713",
+    "description": "School and Public Service Bus"
+  },
+  {
+    "id": "714",
+    "description": "Rail Replacement Bus Service"
+  },
+  {
+    "id": "715",
+    "description": "Demand and Response Bus Service"
+  },
+  {
+    "id": "716",
+    "description": "All Bus Services"
+  },
+  {
+    "id": "800",
+    "description": "Trolleybus Service"
+  },
+  {
+    "id": "900",
+    "description": "Tram Service"
+  },
+  {
+    "id": "901",
+    "description": "City Tram Service"
+  },
+  {
+    "id": "902",
+    "description": "Local Tram Service"
+  },
+  {
+    "id": "903",
+    "description": "Regional Tram Service"
+  },
+  {
+    "id": "904",
+    "description": "Sightseeing Tram Service"
+  },
+  {
+    "id": "905",
+    "description": "Shuttle Tram Service"
+  },
+  {
+    "id": "906",
+    "description": "All Tram Services"
+  },
+  {
+    "id": "1000",
+    "description": "Water Transport Service"
+  },
+  {
+    "id": "1001",
+    "description": "International Car Ferry Service"
+  },
+  {
+    "id": "1002",
+    "description": "National Car Ferry Service"
+  },
+  {
+    "id": "1003",
+    "description": "Regional Car Ferry Service"
+  },
+  {
+    "id": "1004",
+    "description": "Local Car Ferry Service"
+  },
+  {
+    "id": "1005",
+    "description": "International Passenger Ferry Service"
+  },
+  {
+    "id": "1006",
+    "description": "National Passenger Ferry Service"
+  },
+  {
+    "id": "1007",
+    "description": "Regional Passenger Ferry Service"
+  },
+  {
+    "id": "1008",
+    "description": "Local Passenger Ferry Service"
+  },
+  {
+    "id": "1009",
+    "description": "Post Boat Service"
+  },
+  {
+    "id": "1010",
+    "description": "Train Ferry Service"
+  },
+  {
+    "id": "1011",
+    "description": "Road-Link Ferry Service"
+  },
+  {
+    "id": "1012",
+    "description": "Airport-Link Ferry Service"
+  },
+  {
+    "id": "1013",
+    "description": "Car High-Speed Ferry Service"
+  },
+  {
+    "id": "1014",
+    "description": "Passenger High-Speed Ferry Service"
+  },
+  {
+    "id": "1015",
+    "description": "Sightseeing Boat Service"
+  },
+  {
+    "id": "1016",
+    "description": "School Boat"
+  },
+  {
+    "id": "1017",
+    "description": "Cable-Drawn Boat Service"
+  },
+  {
+    "id": "1018",
+    "description": "River Bus Service"
+  },
+  {
+    "id": "1019",
+    "description": "Scheduled Ferry Service"
+  },
+  {
+    "id": "1020",
+    "description": "Shuttle Ferry Service"
+  },
+  {
+    "id": "1021",
+    "description": "All Water Transport Services"
+  },
+  {
+    "id": "1100",
+    "description": "Air Service"
+  },
+  {
+    "id": "1101",
+    "description": "International Air Service"
+  },
+  {
+    "id": "1102",
+    "description": "Domestic Air Service"
+  },
+  {
+    "id": "1103",
+    "description": "Intercontinental Air Service"
+  },
+  {
+    "id": "1104",
+    "description": "Domestic Scheduled Air Service"
+  },
+  {
+    "id": "1105",
+    "description": "Shuttle Air Service"
+  },
+  {
+    "id": "1106",
+    "description": "Intercontinental Charter Air Service"
+  },
+  {
+    "id": "1107",
+    "description": "International Charter Air Service"
+  },
+  {
+    "id": "1108",
+    "description": "Round-Trip Charter Air Service"
+  },
+  {
+    "id": "1109",
+    "description": "Sightseeing Air Service"
+  },
+  {
+    "id": "1110",
+    "description": "Helicopter Air Service"
+  },
+  {
+    "id": "1111",
+    "description": "Domestic Charter Air Service"
+  },
+  {
+    "id": "1112",
+    "description": "Schengen-Area Air Service"
+  },
+  {
+    "id": "1113",
+    "description": "Airship Service"
+  },
+  {
+    "id": "1114",
+    "description": "All Air Services"
+  },
+  {
+    "id": "1200",
+    "description": "Ferry Service"
+  },
+  {
+    "id": "1300",
+    "description": "Telecabin Service"
+  },
+  {
+    "id": "1301",
+    "description": "Telecabin Service"
+  },
+  {
+    "id": "1302",
+    "description": "Cable Car Service"
+  },
+  {
+    "id": "1303",
+    "description": "Elevator Service"
+  },
+  {
+    "id": "1304",
+    "description": "Chair Lift Service"
+  },
+  {
+    "id": "1305",
+    "description": "Drag Lift Service"
+  },
+  {
+    "id": "1306",
+    "description": "Small Telecabin Service"
+  },
+  {
+    "id": "1307",
+    "description": "All Telecabin Services"
+  },
+  {
+    "id": "1400",
+    "description": "Funicular Service"
+  },
+  {
+    "id": "1401",
+    "description": "Funicular Service"
+  },
+  {
+    "id": "1402",
+    "description": "All Funicular Service"
+  },
+  {
+    "id": "1500",
+    "description": "Taxi Service"
+  },
+  {
+    "id": "1501",
+    "description": "Communal Taxi Service"
+  },
+  {
+    "id": "1502",
+    "description": "Water Taxi Service"
+  },
+  {
+    "id": "1503",
+    "description": "Rail Taxi Service"
+  },
+  {
+    "id": "1504",
+    "description": "Bike Taxi Service"
+  },
+  {
+    "id": "1505",
+    "description": "Licensed Taxi Service"
+  },
+  {
+    "id": "1506",
+    "description": "Private Hire Service Vehicle"
+  },
+  {
+    "id": "1507",
+    "description": "All Taxi Services"
+  },
+  {
+    "id": "1600",
+    "description": "Self Drive"
+  },
+  {
+    "id": "1601",
+    "description": "Hire Car"
+  },
+  {
+    "id": "1602",
+    "description": "Hire Van"
+  },
+  {
+    "id": "1603",
+    "description": "Hire Motorbike"
+  },
+  {
+    "id": "1604",
+    "description": "Hire Cycle"
+  },
+  {
+    "id": "1700",
+    "description": "Miscellaneous Service"
+  },
+  {
+    "id": "1701",
+    "description": "Cable Car"
+  },
+  {
+    "id": "1702",
+    "description": "Horse-drawn Carriage"
+  }
+]

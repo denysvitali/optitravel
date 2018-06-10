@@ -45,7 +45,6 @@ fabric.properties
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.ear
 *.zip
@@ -64,3 +63,15 @@ build/
 # IDEA
 *.iml
 *.ipr
+
+# VSCode
+.vscode/
+.project
+bin/
+
+# OptiTravel specific files
+path.classdata
+
+# VSCode generated files
+.settings
+.classpath

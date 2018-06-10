@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+.combo-box.trip-filters .list-cell {
+    -fx-padding: 2px 2px;
+}
+
+.combo-box.trip-filters .list-cell,
+.text-field.trip-filters,
+.combo-box.trip-filters,
+.combo-box.trip-filters > .text-field,
+.jfx-date-picker > .text-field,
+.jfx-time-picker > .text-field {
+    -fx-prompt-text-fill: rgba(255,255,255,0.4);
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Roboto";
+    -fx-font-size: 13px;
+}
+
+.combo-box.trip-filters .list-view .list-cell {
+    -fx-text-fill: #222;
+}
+
+.combo-box.trip-filters .list-view .list-cell:selected {
+    -fx-background-color: none;
+}
+
+.combo-box.trip-filters .list-view .list-cell:hover {
+    -fx-background-color: #757de8;
+}
+
+/* JFoenix controls styling */
+.jfx-text-field.trip-filters,
+.jfx-combo-box.trip-filters,
+.jfx-date-picker > .jfx-text-field,
+.jfx-time-picker > .jfx-text-field {
+    -jfx-focus-color: #ffffff;
+    -jfx-unfocus-color: #ffffff;
+}
+
+.toggle-button.trip-filters {
+    -fx-background-color: rgba(0,0,0,0);
+    -fx-background-radius: 21px 21px 21px 21px;
+}
+
+.toggle-button:selected.trip-filters {
+    -fx-background-color: #002984;
+}
+
+.jfx-button.fab {
+    -fx-background-radius: 23px 23px 23px 23px;
+    -fx-background-color: #002984;
+    -fx-padding: 9px 8px 9px 10px;
+}
+
+.date-picker > .arrow-button > .arrow,
+.jfx-time-picker > .arrow-button > .arrow {
+    -fx-padding: 0;
+}
+
+.jfx-decorator {
+    -fx-decorator-color: blue;
+}
+
+.jfx-decorator .jfx-decorator-buttons-container {
+    -fx-background-color: -fx-decorator-color;
+}
+
+.jfx-decorator .resize-border {
+    -fx-border-color: -fx-decorator-color;
+    -fx-border-width: 0 4 4 4;
+}
+
+.mylistview .scroll-bar:horizontal .track,
+.mylistview .scroll-bar:vertical .track{
+    -fx-background-color:transparent;
+    -fx-border-color:transparent;
+    -fx-background-radius: 0em;
+    -fx-border-radius:2em;
+}
+
+.mylistview .scroll-bar:horizontal .increment-button ,
+.mylistview .scroll-bar:horizontal .decrement-button {
+    -fx-background-color:transparent;
+    -fx-background-radius: 0em;
+    -fx-padding:0 0 10 0;
+}
+
+.mylistview .scroll-bar:vertical .increment-button ,
+.mylistview .scroll-bar:vertical .decrement-button {
+    -fx-background-color:transparent;
+    -fx-background-radius: 0em;
+    -fx-padding:0 10 0 0;
+}
+.mylistview  .scroll-bar .increment-arrow,
+.mylistview  .scroll-bar .decrement-arrow{
+    -fx-shape:" ";
+    -fx-padding:0;
+}
+
+.mylistview .scroll-bar:horizontal .thumb,
+.mylistview .scroll-bar:vertical .thumb {
+    -fx-background-color:derive(black,90%);
+    -fx-background-insets: 2, 0, 0;
+    -fx-background-radius: 2em;
+}
