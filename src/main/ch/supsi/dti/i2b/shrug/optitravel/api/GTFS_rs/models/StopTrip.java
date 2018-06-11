@@ -1,4 +1,4 @@
-package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api;
+package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
 import ch.supsi.dti.i2b.shrug.optitravel.models.DropOff;
 import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
@@ -60,5 +60,29 @@ public class StopTrip extends ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip 
 	public int hashCode() {
 		return Objects.hash(stop, arrival_time, departure_time, stop_sequence,
 				drop_off, pickup);
+	}
+
+	public void setStop(Stop stop) {
+		this.stop = stop;
+	}
+
+	public void setArrival_time(String arrival_time) {
+		this.arrival_time = arrival_time;
+	}
+
+	public void setDeparture_time(String departure_time) {
+		this.departure_time = departure_time;
+	}
+
+	public void setStop_sequence(int stop_sequence) {
+		this.stop_sequence = stop_sequence;
+	}
+
+	public void setDrop_off(DropOff drop_off) {
+		this.drop_off = drop_off;
+	}
+
+	public void setPickup(PickUp pickup) {
+		this.pickup = pickup;
 	}
 }

@@ -88,4 +88,32 @@ public class Stop extends ch.supsi.dti.i2b.shrug.optitravel.models.Stop {
 	public int hashCode() {
 		return Objects.hash(uid, name, lat, lng, location_type, parent_station);
 	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	public void setLng(double lng) {
+		this.lng = lng;
+	}
+
+	public void setLocation_type(int location_type) {
+		this.location_type = location_type;
+	}
+
+	public void setParent_station(String parent_station) {
+		this.parent_station = parent_station;
+	}
+
+	public void setGtfSrsWrapper(GTFSrsWrapper gtfSrsWrapper) {
+		this.gtfSrsWrapper = gtfSrsWrapper;
+	}
 }

@@ -1,14 +1,17 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
 
+import ca.fuzzlesoft.JsonParse;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Error;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Meta;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Result;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.ResultArray;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.models.Pagination;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.search.TripSearch;
 import ch.supsi.dti.i2b.shrug.optitravel.config.BuildConfig;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.BoundingBox;
 import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Date;
-import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Time;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
@@ -21,6 +24,7 @@ import okhttp3.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class GTFSrsWrapper {
@@ -31,6 +35,8 @@ public class GTFSrsWrapper {
 
     public GTFSrsWrapper(){
         this.client = new HttpClient();
+		restoreJsonIteratorMode();
+
         /*JsonIterator.setMode(DecodingMode.STATIC_MODE);
 		JsonStream.setMode(EncodingMode.STATIC_MODE);*/
     }
@@ -67,13 +73,18 @@ public class GTFSrsWrapper {
 	private List<Stop> parseStopResponse(Response response) throws GTFSrsError {
 		if(response != null && response.isSuccessful() && response.body() != null){
 			try {
+				JsonIterator.setMode(DecodingMode.REFLECTION_MODE);
+				JsonStream.setMode(EncodingMode.REFLECTION_MODE);
 				ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
 				response.close();
-				return a.getResult()
+				List<Stop> stopList = a.getResult()
 						.asList()
 						.stream()
 						.map(e-> e.as(Stop.class))
 						.collect(Collectors.toList());
+
+				restoreJsonIteratorMode();
+				return stopList;
 			} catch(IOException ex){
 				return null;
 			}
@@ -81,6 +92,11 @@ public class GTFSrsWrapper {
 			throw new GTFSrsError("Unable to get any response for this request");
 		}
     }
+
+	private static void restoreJsonIteratorMode() {
+		JsonIterator.setMode(DecodingMode.DYNAMIC_MODE_AND_MATCH_FIELD_WITH_HASH);
+		JsonStream.setMode(EncodingMode.DYNAMIC_MODE);
+	}
 
 	public List<Route> getRoutes() throws GTFSrsError {
         // /api/routes
@@ -115,9 +131,13 @@ public class GTFSrsWrapper {
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
+				JsonIterator.setMode(DecodingMode.REFLECTION_MODE);
+				JsonStream.setMode(EncodingMode.STATIC_MODE);
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
 				response.close();
-                return a.getResult().as(Agency.class);
+                Agency ag = a.getResult().as(Agency.class);
+				restoreJsonIteratorMode();
+				return ag;
             } catch(IOException ex){
                 return null;
             }
@@ -180,9 +200,13 @@ public class GTFSrsWrapper {
         Response response = client.get(url);
         if(response != null && response.isSuccessful() && response.body() != null){
             try {
+            	JsonIterator.setMode(DecodingMode.REFLECTION_MODE);
+            	JsonStream.setMode(EncodingMode.REFLECTION_MODE);
                 ResultArray a = JsonIterator.deserialize(response.body().string(), ResultArray.class);
 				response.close();
-                return a.getResult().as(Trip.class);
+                Trip t = a.getResult().as(Trip.class);
+                restoreJsonIteratorMode();
+                return t;
             } catch(IOException ex){
                 return null;
             }
@@ -303,8 +327,12 @@ public class GTFSrsWrapper {
 				Result a = JsonIterator.deserialize(
 						response.body().string(),
 						Result.class);
-				return a.getResult()
+				JsonIterator.setMode(DecodingMode.REFLECTION_MODE);
+				JsonStream.setMode(EncodingMode.DYNAMIC_MODE);
+				StopTimes st = a.getResult()
 								.as(StopTimes.class);
+				restoreJsonIteratorMode();
+				return st;
 			} catch(IOException ex){
 				return null;
 			}
@@ -320,7 +348,9 @@ public class GTFSrsWrapper {
 						response.body().string(),
 						ResultArray.class);
 				response.close();
-				return new PaginatedList<>(
+				JsonIterator.setMode(DecodingMode.REFLECTION_MODE);
+				JsonStream.setMode(EncodingMode.STATIC_MODE);
+				PaginatedList<StopTimes> pl = new PaginatedList<>(
 						a.getResult()
 								.asList()
 								.stream()
@@ -328,6 +358,8 @@ public class GTFSrsWrapper {
 								.collect(Collectors.toList()),
 						a.getMeta()
 				);
+				restoreJsonIteratorMode();
+				return pl;
 			} catch(IOException ex){
 				return null;
 			}
@@ -426,17 +458,65 @@ public class GTFSrsWrapper {
 	}
 
 	public static PaginatedList<Trip> parsePaginatedTrips(String json){
-		ResultArray a = JsonIterator.deserialize(
-				json,
-				ResultArray.class);
-		return new PaginatedList<>(
-				a.getResult()
-						.asList()
-						.stream()
-						.map((e) -> e.as(Trip.class))
-						.collect(Collectors.toList()),
-				a.getMeta()
-		);
+
+    	Map<String, Object> resultArray = JsonParse.map(json);
+    	List<Map<String, Object>> trips = (List<Map<String, Object>>) resultArray.get("result");
+    	Map<String, Object> meta = (Map<String, Object>) resultArray.get("meta");
+		Meta metaobj = new Meta();
+
+		Map<String, Object> pag = (Map<String, Object>) meta.get("pagination");
+		Map<String, Object> err = (Map<String, Object>) meta.get("error");
+
+		if(pag != null){
+			Pagination p = new Pagination();
+			p.limit = ((Long) pag.get("limit")).intValue();
+			p.offset = ((Long) pag.get("offset")).intValue();
+			metaobj.pagination = p;
+		}
+
+		if(err != null){
+			Error error = new Error();
+			error.message = (String) err.get("message");
+			error.code = ((Long) err.get("code")).intValue();
+			metaobj.error = error;
+		}
+
+		metaobj.success = (boolean) meta.get("success");
+
+    	List<Trip> trips_objs = trips.stream().map(e->{
+    		Trip t = new Trip();
+    		t.uid = (String) e.get("uid");
+    		t.route_id = (String) e.get("route_id");
+    		t.service_id = (String) e.get("service_id");
+    		t.headsign = (String) e.get("headsign");
+    		t.short_name = (String) e.get("short_name");
+    		t.direction_id = ((int) (long) e.get("direction_id"));
+    		t.stop_sequence = ((List<Map<String, Object>>) e.get("stop_sequence")).stream().map(ss->{
+    			StopTrip st = new StopTrip();
+    			Map<String, Object> stopMap = (Map<String, Object>) ss.get("stop");
+    			Stop s = new Stop();
+    			s.setUid((String) stopMap.get("uid"));
+    			s.setName((String) stopMap.get("name"));
+    			s.setLat((Double) stopMap.get("lat"));
+    			s.setLng((Double) stopMap.get("lng"));
+    			s.setLocation_type(((Long) stopMap.get("location_type")).intValue());
+    			s.setParent_station((String) stopMap.get("parent_station"));
+
+    			st.setStop(s);
+    			st.setArrival_time((String) ss.get("arrival_time"));
+    			st.setDeparture_time((String) ss.get("departure_time"));
+    			st.setStop_sequence(((Long) ss.get("stop_sequence")).intValue());
+    			st.setDrop_off(ch.supsi.dti.i2b.shrug.optitravel.models.DropOff.valueOf((String) ss.get("drop_off")));
+    			st.setPickup(ch.supsi.dti.i2b.shrug.optitravel.models.PickUp.valueOf((String) ss.get("pickup")));
+    			return st;
+			}).collect(Collectors.toList());
+    		return t;
+		}).collect(Collectors.toList());
+
+		PaginatedList<Trip> pl = new PaginatedList<>();
+		pl.setResult(trips_objs);
+		pl.setMeta(metaobj);
+		return pl;
 	}
 
 	private PaginatedList<Trip> getPaginatedTrips(Response response) throws GTFSrsError {
@@ -505,7 +585,7 @@ public class GTFSrsWrapper {
 				.addPathSegment(String.valueOf(coordinate.getLng()));
 
 		HttpUrl url = builder.build();
-		Response response = client.get(url);
+		Response response = client.get(url, 20 * 1000);
 		return getPaginatedStopDistances(response);
 	}
 
@@ -531,7 +611,9 @@ public class GTFSrsWrapper {
 						response.body().string(),
 						ResultArray.class);
 				response.close();
-				return new PaginatedList<>(
+				JsonIterator.setMode(DecodingMode.REFLECTION_MODE);
+				JsonStream.setMode(EncodingMode.STATIC_MODE);
+				PaginatedList<StopDistance> pl = new PaginatedList<>(
 						a.getResult()
 								.asList()
 								.stream()
@@ -539,6 +621,8 @@ public class GTFSrsWrapper {
 								.collect(Collectors.toList()),
 						a.getMeta()
 				);
+				restoreJsonIteratorMode();
+				return pl;
 			} catch(IOException ex){
 				return null;
 			}

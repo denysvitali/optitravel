@@ -14,7 +14,7 @@ apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
-apply plugin: 'javafx-gradle-plugin'
+//apply plugin: 'javafx-gradle-plugin'
 
 mainClassName = "ch.supsi.dti.i2b.shrug.optitravel.Main";
 
@@ -35,9 +35,11 @@ dependencies {
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     compile 'com.lynden:GMapsFX:2.12.0'
+    compile 'ca.fuzzlesoft:json-parse:1.3.4'
     compile 'com.jsoniter:jsoniter:0.9.19'
-//    compile 'com.jfoenix:jfoenix:8.0.3' // Java 8
+    //compile 'com.jfoenix:jfoenix:8.0.3' // Java 8
     compile 'com.jfoenix:jfoenix:9.0.3' // Java 9
+    compile group: 'org.javassist', name: 'javassist', version: '3.22.0-GA'
     compile group: 'de.jensd', name: 'fontawesomefx-materialicons', version: '2.2.0-9.1.2'
 }
 
@@ -78,23 +80,23 @@ jar {
 }
 
 
-jfx {
-    // minimal requirement for jfxJar-task
-    mainClass = mainClassName
-    // minimal requirement for jfxNative-task
-    vendor = '¯\\_(ツ)_/¯'
-}
+//jfx {
+//    // minimal requirement for jfxJar-task
+//    mainClass = mainClassName
+//    // minimal requirement for jfxNative-task
+//    vendor = '¯\\_(ツ)_/¯'
+//}
 
 run{
 
 }
 
-/*task jsoniterStaticCodgen(type:JavaExec) {
+task jsoniterStaticCodgen(type:JavaExec) {
     classpath configurations.getByName(sourceSets.main.compileConfigurationName)
     classpath = sourceSets.main.runtimeClasspath + sourceSets.main.compileClasspath
     workingDir = new File(project.rootDir, '/src/main')
     main = 'com.jsoniter.static_codegen.StaticCodegen'
-    args 'ch.supsi.dti.i2b.shrug.optitravel.staticgen.StaticCodeGen'
+    args 'ch.supsi.dti.i2b.shrug.optitravel.codegen.CGConfig'
     standardOutput = System.out
     errorOutput = System.err
-}*/
+}

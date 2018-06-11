@@ -15,11 +15,23 @@ public class PaginatedList<T> {
 		this.meta = meta;
 	}
 
+	public PaginatedList() {
+
+	}
+
 	public Meta getMeta() {
 		return meta;
 	}
 
 	public List<T> getResult() {
 		return result;
+	}
+
+	public void setResult(List<T> result) {
+		this.result = result;
+	}
+
+	public void setMeta(Meta metaobj) {
+		this.meta = metaobj;
 	}
 }

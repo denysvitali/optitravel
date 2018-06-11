@@ -1,7 +1,7 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs;
 
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Meta;
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
+import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.StopTrip;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Route;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.Stop;
@@ -14,6 +14,10 @@ import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.models.DropOff;
 import ch.supsi.dti.i2b.shrug.optitravel.models.PickUp;
+import com.jsoniter.JsonIterator;
+import com.jsoniter.output.EncodingMode;
+import com.jsoniter.output.JsonStream;
+import com.jsoniter.spi.DecodingMode;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -59,7 +63,7 @@ class GTFSrsTest {
             return;
         }
 
-        assertEquals(15, stops.size());
+        assertEquals(12, stops.size());
         for(Stop s : stops){
             assertNotEquals(null, s);
         }
@@ -71,9 +75,9 @@ class GTFSrsTest {
             assertNotEquals(null, s.getLng());
         }
 
-        assertEquals("s-fcf74e-pregassonapiazzadigiro", stops.get(0).getUid());
-        assertEquals("Pregassona, Piazza di Giro", stops.get(0).getName());
-        assertEquals(new Coordinate(46.01946, 8.974125), stops.get(0).getCoordinate());
+        assertEquals("s-0795c1-lamonecadempinostazione", stops.get(0).getUid());
+        assertEquals("Lamone-Cadempino, Stazione", stops.get(0).getName());
+        assertEquals(new Coordinate(46.040350,8.932156), stops.get(0).getCoordinate());
         assertEquals(0, stops.get(0).getType());
     }
 
@@ -436,6 +440,16 @@ class GTFSrsTest {
 	}
 
 	@Test
+	public void parsingTest1(){
+		JsonIterator.setMode(DecodingMode.REFLECTION_MODE);
+		JsonStream.setMode(EncodingMode.DYNAMIC_MODE);
+		String text = "{\"stop\":\"s-7648b0-mannocentrodicalcolo\",\"time\":[{\"trip\":\"t-256d0c-6ta20449j1811r\",\"time\":\"17:14:00\",\"next_stop\":\"s-7fa1f6-bioggiopianoni\"},{\"trip\":\"t-48e0ce-5ta20449j1811r\",\"time\":\"16:44:00\",\"next_stop\":\"s-7fa1f6-bioggiopianoni\"},{\"trip\":\"t-5c4a41-15ta20449j1812r\",\"time\":\"16:37:00\",\"next_stop\":\"s-e4263b-mannolamonda\"},{\"trip\":\"t-9a680a-16ta20449j1812r\",\"time\":\"17:07:00\",\"next_stop\":\"s-e4263b-mannolamonda\"}]}";
+		StopTimes st = JsonIterator.deserialize(text).as(StopTimes.class);
+		assertNotEquals(null, st.getTime());
+		assertNotEquals(null, st.getStop());
+	}
+
+	@Test
 	public void testStopTimesBetween2(){
 		Stop s = Mockito.mock(Stop.class);
 		when(s.getUid()).thenReturn(STOP_MANNO_CENTRODICALCOLO);
@@ -483,6 +497,7 @@ class GTFSrsTest {
 	}
 
 	private void checkStopTimesContent(StopTimes stopTimes) {
+		assertNotEquals(null, stopTimes.getTime());
 		stopTimes.getTime().stream().forEach(e->{
 			assertNotEquals(null, e);
 			assertNotEquals(null, e.getNextStop());

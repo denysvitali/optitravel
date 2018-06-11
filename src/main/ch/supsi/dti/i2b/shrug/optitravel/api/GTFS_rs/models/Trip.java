@@ -1,13 +1,10 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models;
 
-import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.StopTrip;
 import com.jsoniter.annotation.JsonIgnore;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 	private static final long serialVersionUID = 238604785615237409L;
@@ -45,8 +42,10 @@ public class Trip extends ch.supsi.dti.i2b.shrug.optitravel.models.Trip {
 
 	@Override
 	public void setStopTrip(List<ch.supsi.dti.i2b.shrug.optitravel.models.StopTrip> stopTrip) {
-    	this.stop_sequence = new ArrayList<>();
-    	stopTrip.forEach(e->stop_sequence.add((StopTrip) e));
+    	if(stopTrip != null) {
+			this.stop_sequence = new ArrayList<>();
+			stopTrip.forEach(e -> stop_sequence.add((StopTrip) e));
+		}
 	}
 
 	@Override
