@@ -40,15 +40,21 @@ public class MapController implements MapComponentInitializedListener {
 				e.getCoordinate().getLng())).toArray());
 		PolylineOptions line_opts = new PolylineOptions();
 
-		String color = ps.getTrip().getRoute().getColor();
-		RouteType rc = ps.getTrip().getRoute().getType();
-		if(rc != null) {
+		String color = null;
+		RouteType rc = null;
+
+		if(ps.getTrip().getRoute() != null) {
+			color = ps.getTrip().getRoute().getColor();
+			rc = ps.getTrip().getRoute().getType();
+		}
+
+		if (rc != null) {
 			rc = rc.getRouteCategory();
 		} else {
 			rc = RouteType.BUS_SERVICE;
 		}
-		if(color == null){
-			switch(rc){
+		if (color == null) {
+			switch (rc) {
 				case RAILWAY_SERVICE:
 					color = "#f44336";
 					break;

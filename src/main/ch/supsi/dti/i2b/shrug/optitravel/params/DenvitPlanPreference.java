@@ -35,27 +35,27 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_waiting_time() {
-		return 25.0;
+		return Math.max(25, distance/(60*average_moving_speed));
 	}
 
 	@Override
 	public double w_walk() {
-		return 4 * PREF_WEIGHT;
+		return 40 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_waiting() {
-		return 2 * PREF_WEIGHT;
+		return 1 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_fast_change() {
-		return 6 * PREF_WEIGHT;
+		return 60 * PREF_WEIGHT;
 	}
 
 	@Override
 	public double w_change() {
-		return 5 * PREF_WEIGHT;
+		return 50 * PREF_WEIGHT;
 	}
 
 	@Override
@@ -65,12 +65,12 @@ public class DenvitPlanPreference implements PlanPreference {
 
 	@Override
 	public double max_total_waiting_time() {
-		return max_waiting_time() + 10 * max_total_changes();
+		return max_waiting_time() + 40 * max_total_changes();
 	}
 
 	@Override
 	public int max_total_changes() {
-		return 6;
+		return Math.min(5, (int) Math.ceil(distance / 5000));
 	}
 
 	@Override
