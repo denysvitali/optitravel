@@ -5,6 +5,9 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models.Tariff;
 import ch.supsi.dti.i2b.shrug.optitravel.utilities.HttpClient;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
+import com.jsoniter.output.EncodingMode;
+import com.jsoniter.output.JsonStream;
+import com.jsoniter.spi.DecodingMode;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 
@@ -19,6 +22,8 @@ public class PubliBikeWrapper {
     private HttpClient client;
 
     public PubliBikeWrapper(){
+        JsonIterator.setMode(DecodingMode.STATIC_MODE);
+		JsonStream.setMode(EncodingMode.STATIC_MODE);
         this.client = new HttpClient();
     }
     

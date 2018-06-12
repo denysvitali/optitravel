@@ -16,13 +16,13 @@ stream.writeRaw("{\"hour\":", 8);
 jsoniter_codegen.cfg1524563512.encoder.ch.supsi.dti.i2b.shrug.optitravel.models.Time.encode_((ch.supsi.dti.i2b.shrug.optitravel.models.Time)obj.getTime(), stream);
 stream.write((byte)'}');
 }
-stream.writeRaw(",\"nextStop\":", 12);
-if (obj.getNextStop() == null) { stream.writeNull(); } else {
-stream.writeVal((java.lang.String)obj.getNextStop());
-}
 stream.writeRaw(",\"trip\":", 8);
 if (obj.getTrip() == null) { stream.writeNull(); } else {
 stream.writeVal((java.lang.String)obj.getTrip());
+}
+stream.writeRaw(",\"nextStop\":", 12);
+if (obj.getNextStop() == null) { stream.writeNull(); } else {
+stream.writeVal((java.lang.String)obj.getNextStop());
 }
 }
 }

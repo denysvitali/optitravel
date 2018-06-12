@@ -4,6 +4,7 @@ import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.StopDistance;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.Result;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.api.ResultArray;
 import ch.supsi.dti.i2b.shrug.optitravel.api.GTFS_rs.models.*;
+import ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models.*;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Route;
 import ch.supsi.dti.i2b.shrug.optitravel.models.StopTime;
 import com.jsoniter.JsonIterator;
@@ -47,7 +48,16 @@ public class CGConfig implements StaticCodegenConfig {
 				TypeLiteral.create(ResultArray.class),
 				TypeLiteral.create(StopDistance.class),
 				TypeLiteral.create(PickUp.class),
-				TypeLiteral.create(DropOff.class)
+				TypeLiteral.create(DropOff.class),
+				// PubliBike
+				TypeLiteral.create(VehicleType.class),
+				TypeLiteral.create(Vehicle.class),
+				TypeLiteral.create(Network.class),
+				TypeLiteral.create(Sponsor.class),
+				TypeLiteral.create(Station.class),
+				TypeLiteral.create(StationState.class),
+				TypeLiteral.create(Tariff.class),
+				TypeLiteral.create(TariffModel.class),
 		};
 	}
 }

@@ -6,23 +6,37 @@ import ch.supsi.dti.i2b.shrug.optitravel.geography.Coordinate;
 import ch.supsi.dti.i2b.shrug.optitravel.models.Location;
 import com.jsoniter.annotation.JsonCreator;
 import com.jsoniter.annotation.JsonIgnore;
+import com.jsoniter.annotation.JsonObject;
+import com.jsoniter.annotation.JsonProperty;
 import com.jsoniter.any.Any;
 
 import java.util.ArrayList;
 
+@JsonObject
 public class Station extends Location {
+    @JsonProperty("id")
     private int id;
+    @JsonProperty("latitude")
     private double latitude;
+    @JsonProperty("logitude")
     private double longitude;
+	@JsonProperty("state")
     private StationState state;
 
+	@JsonProperty("name")
     private String name;
+	@JsonProperty("address")
     private String address;
+	@JsonProperty("zip")
     private String zip;
-    private String city;
+	@JsonProperty("city")
+	private String city;
 
-    private ArrayList<Any> vehicles;
+	@JsonProperty("vehicles")
+    private ArrayList<Vehicle> vehicles;
+	@JsonProperty("network")
     private Network network;
+	@JsonProperty("sponsors")
     private ArrayList<Sponsor> sponsors;
 
     @JsonIgnore private PubliBikeWrapper pbw;
@@ -77,7 +91,7 @@ public class Station extends Location {
         }
     }
 
-    public ArrayList<Any> getVehicles() {
+    public ArrayList<Vehicle> getVehicles() {
         if(vehicles != null){
             return vehicles;
         }

@@ -1,5 +1,8 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models;
 
+import com.jsoniter.annotation.JsonObject;
+
+@JsonObject
 public class TariffModel {
     private VehicleType vehicle_type;
     private String fixed_price;

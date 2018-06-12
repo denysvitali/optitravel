@@ -1,7 +1,10 @@
 package ch.supsi.dti.i2b.shrug.optitravel.api.PubliBike.models;
 
+import com.jsoniter.annotation.JsonObject;
+
 import java.util.List;
 
+@JsonObject
 public class Tariff {
     private int id;
     private String name;
