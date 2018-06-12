@@ -150,3 +150,4 @@ These are the project presentations - part of the course grade.
 - Denys Vitali (GTFS Integration, Routing, Planner)
 - Alessandro Ferrari (UI)
 - Filippo Pura (TransitLand + Routing)
+- Zul Arizal (Logo Design)
