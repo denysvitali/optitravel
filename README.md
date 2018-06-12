@@ -1,4 +1,8 @@
-# OptiTravel
+# Opti Travel
+
+<h1 align=center>
+<img src="Logo/horizontal.png" width=50%>
+</h1>
 
 A journey planner which takes into consideration public transport systems,
 bike sharing services and car sharing / car pooling services to find
